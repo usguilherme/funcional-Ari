@@ -93,7 +93,7 @@
                     <i data-lucide="calendar-days"></i> Agenda
                 </a>
                 <a onclick="abrirAba('novo_atendimento')" class="nav-item">
-                    <i data-lucide="sparkles"></i> Caixa / Venda
+                    <i data-lucide="sparkles"></i> Atualização
                 </a>
                 
                 <p class="nav-title">GESTÃO</p>
@@ -415,8 +415,10 @@
 
                 <div class="grid-2 mobile-stack mt-10">
                     <div>
-                        <label class="label-small">Frequência</label>
-                        <input type="text" id="novo-cli-frequencia" class="modern-input" placeholder="Ex: 3x por semana">
+                        <label class="label-small">Plano / Frequência</label>
+                        <select id="novo-cli-frequencia" class="modern-input">
+                            <option value="">Selecione o plano...</option>
+                        </select>
                     </div>
                     <div>
                         <label class="label-small">Tempo / Treino</label>

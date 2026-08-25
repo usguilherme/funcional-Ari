@@ -367,6 +367,7 @@
             store.servicos = snap.val() ? Object.values(snap.val()) : [];
             renderServicosPDV();
             renderListaServicosCad();
+            if (typeof renderSelectPlanosAluno === 'function') renderSelectPlanosAluno(); // 👈 Atualiza a lista de planos no cadastro do aluno
         });
 
         db.ref('clientes').on('value', snap => {
@@ -376,6 +377,10 @@
             atualizarKPIs();
             filtrarRetornosDashboard();
             renderAniversariantesDashboard();
+            if (typeof renderPainelCobrancas === 'function') renderPainelCobrancas();
+            
+            // Atualiza a tabela na aba de Atualização instantaneamente
+            if (typeof renderTabelaAtualizacao === 'function') renderTabelaAtualizacao();
         });
 
         // --- MODIFICADO: Carrega apenas os últimos 500 atendimentos ---
@@ -1223,7 +1228,12 @@
             }
         });
 
-        // 4. Exibe o modal na tela
+        // 4. Atualiza a lista de planos disponíveis no select do modal
+        if (typeof renderSelectPlanosAluno === 'function') {
+            renderSelectPlanosAluno();
+        }
+
+        // 5. Exibe o modal na tela
         const modal = document.getElementById('modal-novo-cliente');
         if (modal) {
             modal.style.display = 'flex';
@@ -1247,6 +1257,49 @@
             const el = document.getElementById(idElemento);
             if (el) el.value = valor || "";
         };
+
+        // Garante que as opções de planos estejam carregadas antes de definir o valor salvo do aluno
+        if (typeof renderSelectPlanosAluno === 'function') {
+            renderSelectPlanosAluno();
+        }
+
+        // Puxa todos os dados do banco e preenche no formulário novo
+        preencherCampo("novo-cli-nome", c.nome);
+        preencherCampo("novo-cli-sexo", c.sexo);
+        preencherCampo("novo-cli-idade", c.idade);
+        preencherCampo("novo-cli-tel", c.telefone);
+        preencherCampo("novo-cli-email", c.email);
+        preencherCampo("novo-cli-objetivo", c.objetivo);
+        preencherCampo("novo-cli-frequencia", c.frequencia);
+        preencherCampo("novo-cli-tempo", c.tempoTreino);
+        preencherCampo("novo-cli-inicio", c.inicio);
+        preencherCampo("novo-cli-vencimento", c.vencimento);
+
+        // Exibe o modal na tela
+        const modal = document.getElementById("modal-novo-cliente");
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function editarCliente(id) {
+        const c = store.clientes.find(x => x.id == id);
+        if (!c) return;
+
+        idClienteEdicao = id;
+        
+        // Atualiza o título do modal
+        const titulo = document.getElementById("titulo-modal-cliente");
+        if(titulo) titulo.innerText = "Editar Aluno";
+
+        // Função auxiliar para preencher os dados de forma segura sem travar o código
+        const preencherCampo = (idElemento, valor) => {
+            const el = document.getElementById(idElemento);
+            if (el) el.value = valor || "";
+        };
+
+        // Garante que as opções de planos estejam carregadas antes de definir o valor salvo do aluno
+        if (typeof renderSelectPlanosAluno === 'function') {
+            renderSelectPlanosAluno();
+        }
 
         // Puxa todos os dados do banco e preenche no formulário novo
         preencherCampo("novo-cli-nome", c.nome);
@@ -1298,7 +1351,14 @@
         const frequencia = document.getElementById("novo-cli-frequencia")?.value.trim() || "";
         const tempoTreino = document.getElementById("novo-cli-tempo")?.value.trim() || "";
         const inicio = document.getElementById("novo-cli-inicio")?.value || new Date().toISOString().split('T')[0];
-        const vencimento = document.getElementById("novo-cli-vencimento")?.value || "10"; // Padrão dia 10 se não preenchido
+        
+        // AUTOMATIZAÇÃO DO VENCIMENTO: Pega o dia exato da data de início escolhida
+        let vencimento = document.getElementById("novo-cli-vencimento")?.value;
+        if (!vencimento && inicio) {
+            vencimento = parseInt(inicio.split('-')[2], 10).toString();
+        }
+        if (!vencimento) vencimento = "10";
+
         const fotoInput = document.getElementById("novo-cli-foto");
         
         if(!nome) return dispararToast("Nome é obrigatório", "error");
@@ -1317,17 +1377,8 @@
             } else {
                 const id = Date.now();
                 db.ref(`clientes/${id}`).set({ 
-                    id, 
-                    nome, 
-                    sexo, 
-                    idade, 
-                    telefone: tel, 
-                    email, 
-                    objetivo, 
-                    frequencia, 
-                    tempoTreino, 
-                    inicio,
-                    vencimento,
+                    id, nome, sexo, idade, telefone: tel, email, 
+                    objetivo, frequencia, tempoTreino, inicio, vencimento,
                     dataCadastro: new Date().toISOString(),
                     pontos: 0,
                     foto: fotoBase64 || null
@@ -2781,3 +2832,213 @@ function renderPainelCobrancas() {
 
     if(window.lucide) lucide.createIcons();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const inputInicio = document.getElementById('novo-cli-inicio');
+    const inputVencimento = document.getElementById('novo-cli-vencimento');
+
+    if (inputInicio && inputVencimento) {
+        inputInicio.addEventListener('change', (e) => {
+            const dataSelecionada = e.target.value; // Formato AAAA-MM-DD
+            if (dataSelecionada) {
+                const dia = parseInt(dataSelecionada.split('-')[2], 10);
+                // Preenche de forma dinâmica enquanto você edita/cadastra
+                inputVencimento.value = dia;
+            }
+        });
+    }
+});
+
+
+// Sincroniza automaticamente o vencimento com a data de início de todos os alunos ao abrir o sistema
+document.addEventListener('sistemaPronto', () => {
+    if (store && store.clientes) {
+        store.clientes.forEach(c => {
+            if (c.inicio && (!c.vencimento || c.vencimento === "10")) {
+                const diaReal = parseInt(c.inicio.split('-')[2], 10);
+                if (!isNaN(diaReal)) {
+                    db.ref(`clientes/${c.id}`).update({
+                        vencimento: diaReal.toString()
+                    });
+                }
+            }
+        });
+    }
+});
+
+
+// Monitora a seleção de aluno no PDV para mostrar o painel de mensalidade rápida
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'pdv-cliente') {
+        const clienteId = e.target.value;
+        const painel = document.getElementById('painel-status-mensalidade');
+        const labelNome = document.getElementById('status-aluno-nome');
+        
+        if (!clienteId) {
+            if (painel) painel.style.display = 'none';
+            return;
+        }
+
+        const aluno = store.clientes.find(c => c.id == clienteId);
+        if (aluno && painel && labelNome) {
+            painel.style.display = 'block';
+            const statusAtual = aluno.statusMensalidade || 'regular';
+            labelNome.innerHTML = `${aluno.nome} — Vencimento: Dia ${aluno.vencimento || '10'} <span class="badge" style="margin-left:8px; background:${statusAtual === 'pago' ? '#10b98120; color:#10b981' : '#f43f5e20; color:#f43f5e'}">${statusAtual.toUpperCase()}</span>`;
+        }
+    }
+});
+
+function mudarStatusMensalidade(novoStatus) {
+    const selCliente = document.getElementById('pdv-cliente');
+    if (!selCliente || !selCliente.value) {
+        dispararToast("Selecione um aluno primeiro!", "error");
+        return;
+    }
+
+    const clienteId = selCliente.value;
+    db.ref(`clientes/${clienteId}`).update({
+        statusMensalidade: novoStatus
+    }).then(() => {
+        dispararToast(novoStatus === 'pago' ? "✅ Mensalidade autorizada/paga com sucesso!" : "⚠️ Mensalidade marcada como atrasada.");
+        // Atualiza o texto visual do painel instantaneamente
+        const aluno = store.clientes.find(c => c.id == clienteId);
+        if (aluno) aluno.statusMensalidade = novoStatus;
+        
+        const labelNome = document.getElementById('status-aluno-nome');
+        if (labelNome) {
+            labelNome.innerHTML = `${aluno.nome} — Vencimento: Dia ${aluno.vencimento || '10'} <span class="badge" style="margin-left:8px; background:${novoStatus === 'pago' ? '#10b98120; color:#10b981' : '#f43f5e20; color:#f43f5e'}">${novoStatus.toUpperCase()}</span>`;
+        }
+    }).catch(err => {
+        dispararToast("Erro ao atualizar status", "error");
+    });
+}
+
+// Dispara o carregamento da tabela de atualização sempre que a aba for aberta
+const _abrirAbaOriginalNoScript = window.abrirAba;
+window.abrirAba = function(idAba) {
+    if (typeof _abrirAbaOriginalNoScript === 'function') _abrirAbaOriginalNoScript(idAba);
+    if (idAba === 'novo_atendimento') {
+        renderTabelaAtualizacao();
+    }
+};
+
+document.addEventListener('sistemaPronto', () => {
+    renderTabelaAtualizacao();
+});
+
+
+// ==========================================
+// CENTRAL DE ATUALIZAÇÃO DE MENSALIDADES
+// ==========================================
+
+// Garante que a tabela carrega ao abrir a aba
+const _abrirAbaOriginal = window.abrirAba;
+window.abrirAba = function(idAba) {
+    if (typeof _abrirAbaOriginal === 'function') _abrirAbaOriginal(idAba);
+    if (idAba === 'novo_atendimento') {
+        renderTabelaAtualizacao();
+    }
+};
+
+document.addEventListener('sistemaPronto', () => {
+    renderTabelaAtualizacao();
+});
+
+function renderTabelaAtualizacao() {
+    const tbody = document.getElementById("tabela-atualizacao-mensalidades");
+    if (!tbody) return; // Se a aba não estiver aberta, evita erro
+
+    if (!store.clientes || store.clientes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; opacity:0.5;">Nenhum aluno cadastrado.</td></tr>`;
+        return;
+    }
+
+    // Ordena os alunos alfabeticamente
+    const clientesOrdenados = [...store.clientes].sort((a, b) => a.nome.localeCompare(b.nome));
+
+    tbody.innerHTML = clientesOrdenados.map(c => {
+        const telefoneClean = c.telefone ? c.telefone.replace(/\D/g, '') : '';
+        const status = c.statusMensalidade || 'atrasado'; // Padrão como atrasado se não definido
+        
+        const badgeCor = status === 'pago' ? '#10b981' : '#f43f5e';
+        const badgeTexto = status === 'pago' ? 'PAGO / REGULAR' : 'NÃO PAGO / ATRASADO';
+
+        return `
+        <tr data-cliente-id="${c.id}">
+            <td><strong>${c.nome}</strong></td>
+            <td>${c.telefone || 'Sem telefone'}</td>
+            <td>Dia ${c.vencimento || '10'}</td>
+            <td>
+                <span class="badge" style="background:${badgeCor}20; color:${badgeCor}; border: 1px solid ${badgeCor}40;">
+                    ${badgeTexto}
+                </span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+                <button type="button" class="btn-small bg-green" onclick="atualizarStatusAluno('${c.id}', 'pago')" title="Marcar como Pago">
+                    ✅ Foi Pago
+                </button>
+                <button type="button" class="btn-small" style="background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3);" onclick="atualizarStatusAluno('${c.id}', 'atrasado')" title="Marcar como Não Pago">
+                    ❌ Não Pago
+                </button>
+            </td>
+        </tr>
+        `;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+}
+
+function atualizarStatusAluno(clienteId, novoStatus) {
+    db.ref(`clientes/${clienteId}`).update({
+        statusMensalidade: novoStatus
+    }).then(() => {
+        dispararToast(novoStatus === 'pago' ? "✅ Mensalidade marcada como PAGA!" : "⚠️ Mensalidade marcada como NÃO PAGA.");
+        
+        // Atualiza localmente no store para refletir na hora
+        const aluno = store.clientes.find(c => c.id == clienteId);
+        if (aluno) aluno.statusMensalidade = novoStatus;
+        
+        renderTabelaAtualizacao();
+    }).catch(err => {
+        dispararToast("Erro ao atualizar status", "error");
+    });
+}
+
+function filtrarTabelaAtualizacao() {
+    const inputBusca = document.getElementById("busca-atualizacao");
+    if (!inputBusca) return;
+    const termo = inputBusca.value.toLowerCase();
+    const linhas = document.querySelectorAll("#tabela-atualizacao-mensalidades tr");
+    
+    linhas.forEach(linha => {
+        const txt = linha.innerText.toLowerCase();
+        linha.style.display = txt.includes(termo) ? "" : "none";
+    });
+}
+
+
+function renderSelectPlanosAluno() {
+    const sel = document.getElementById("novo-cli-frequencia");
+    if (!sel) return;
+
+    const valorAtual = sel.value; // Mantém selecionado se estiver editando
+
+    let html = '<option value="">Selecione o plano...</option>';
+    if (store.servicos && store.servicos.length > 0) {
+        store.servicos.forEach(s => {
+            html += `<option value="${s.nome}">${s.nome} - R$ ${parseFloat(s.preco).toFixed(2)}</option>`;
+        });
+    }
+
+    sel.innerHTML = html;
+    if (valorAtual) sel.value = valorAtual;
+}
+
+
+
+
+
+
+
+
+
