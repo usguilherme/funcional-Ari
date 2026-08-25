@@ -1043,45 +1043,47 @@
         const div = document.getElementById("lista-agenda");
         const inputDate = document.getElementById("agenda-date-input");
         
-        if(!inputDate || !div) return; // Segurança extra
+        if(!inputDate || !div) return;
 
         const dataSelecionada = inputDate.value;
         
+        // Atualiza o texto do dia da semana
         const dataObj = new Date(dataSelecionada + 'T00:00:00');
         const options = { weekday: 'long', day: 'numeric', month: 'long' };
         const diaEl = document.getElementById("agenda-dia-semana");
         if(diaEl) diaEl.innerText = dataObj.toLocaleDateString('pt-BR', options);
 
-        const filtroProfissional = document.getElementById("agenda-filtro-profissional") ? document.getElementById("agenda-filtro-profissional").value : "";
+        // Busca na lista de CLIENTES quem tem a data de "inicio" igual à data selecionada
+        const alunosNovosHoje = store.clientes
+            .filter(c => c.inicio === dataSelecionada)
+            .sort((a,b) => a.nome.localeCompare(b.nome));
 
-        const agendaDoDia = store.atendimentos
-            .filter(a => a.data === dataSelecionada)
-            .filter(a => !filtroProfissional || a.profissionalId == filtroProfissional)
-            .sort((a,b) => b.timestamp - a.timestamp);
-
-        if(agendaDoDia.length === 0) {
-            div.innerHTML = "<p class='text-muted' style='text-align:center; padding:20px;'>Nenhum atendimento neste dia.</p>";
+        if(alunosNovosHoje.length === 0) {
+            div.innerHTML = "<p class='text-muted' style='text-align:center; padding:20px;'>Nenhum aluno novo iniciando neste dia. 🏋️‍♂️</p>";
             return;
         }
 
-        div.innerHTML = agendaDoDia.map(a => `
-            <div class="glass-panel" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--primary); display:flex; justify-content:space-between; align-items:center">
+        div.innerHTML = alunosNovosHoje.map(c => {
+            const telefoneClean = c.telefone ? c.telefone.replace(/\D/g, '') : '';
+            // Cria um link do WhatsApp com uma mensagem de boas-vindas para o primeiro dia!
+            const linkBoasVindas = telefoneClean ? `https://wa.me/55${telefoneClean}?text=${encodeURIComponent(`Olá ${c.nome.split(' ')[0]}! Hoje é sua primeira aula no Funcional do Ari! Estamos te esperando com muita energia. 💪`)}` : '#';
+
+            return `
+            <div class="glass-panel" style="padding:15px; margin-bottom:10px; border-left:4px solid var(--success); display:flex; justify-content:space-between; align-items:center">
                 <div>
-                    <strong style="font-size:18px">${a.hora}</strong>
-                    <h4>${a.nomeCliente}</h4>
-                    <small class="text-muted">${a.servicos.map(s => s.nome).join(", ")}</small>
-                    ${a.nomeProfissional ? `<br><span class="badge" style="background:#8b5cf620; color:#8b5cf6; margin-top:4px; display:inline-block;">💅 ${a.nomeProfissional}</span>` : ''}
+                    <span class="badge" style="background:#10b98120; color:var(--success); margin-bottom:8px; display:inline-block; font-size: 11px;">✨ Primeira Aula / Novo Cadastro</span>
+                    <h4 style="margin: 0; font-size: 18px; color: var(--text-main);">${c.nome}</h4>
+                    <small class="text-muted">Objetivo: ${c.objetivo || '-'} | Frequência: ${c.frequencia || '-'}</small>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px">
-                    <h3 style="color:var(--success); margin-right:10px">R$ ${a.total.toFixed(2)}</h3>
-                    ${a.clienteId ? `<button class="btn-small bg-purple" onclick="abrirHistoricoRapido('${a.clienteId}')" title="Ver Histórico Rápido"><i data-lucide="eye" style="width:14px"></i></button>` : ''}
-                    <button class="btn-small bg-green" onclick="chamarCliente('${a.id}', '${a.nomeCliente}')" title="Chamar na TV"><i data-lucide="megaphone" style="width:14px"></i></button>
-                    <button class="btn-small bg-yellow" onclick="editarAtendimento(${a.id})" title="Editar Venda"><i data-lucide="pencil" style="width:14px"></i></button>
-                    <button class="btn-small bg-purple" onclick="excluirAtendimentoEDisponibilidade(${a.id}, '${a.data}', '${a.profissionalId || ''}', '${a.hora}')" title="Excluir"><i data-lucide="trash-2" style="width:14px"></i></button>
+                    ${telefoneClean ? `<a href="${linkBoasVindas}" target="_blank" class="btn-small bg-green" style="text-decoration:none; display:flex; align-items:center; gap:5px;" title="Enviar Boas-Vindas"><i data-lucide="message-circle" style="width:14px"></i> Boas-Vindas</a>` : ''}
+                    <button class="btn-small bg-purple" onclick="abrirModalAnamnese('${c.id}')" title="Ver Ficha do Aluno" style="display:flex; align-items:center; gap:5px;"><i data-lucide="clipboard-list" style="width:14px"></i> Ficha</button>
                 </div>
             </div>
-        `).join("");
-        lucide.createIcons();
+            `;
+        }).join("");
+        
+        if(window.lucide) lucide.createIcons();
     }
 
     // ==========================================
@@ -1094,39 +1096,49 @@
         // Ordena os clientes por nome de forma alfabética (A-Z)
         const clientesOrdenados = [...store.clientes].sort((a, b) => a.nome.localeCompare(b.nome));
         
-        const hojeMesDia = new Date().toISOString().slice(5, 10); // "MM-DD"
-        
-        tbody.innerHTML = clientesOrdenados.map(c => {
-            const telefoneClean = c.telefone ? c.telefone.replace(/\D/g, '') : '';
-            const linkZap = telefoneClean ? `https://wa.me/55${telefoneClean}?text=Olá ${c.nome}, Funcional do Ari passando para confirmar seu horário!` : '#';
-            const ehAniversarioHoje = c.dataNasc && c.dataNasc.slice(5, 10) === hojeMesDia;
-            const linkZapAniversario = telefoneClean ? `https://wa.me/55${telefoneClean}?text=${encodeURIComponent(`Feliz Aniversário, ${c.nome}! 🎉🎂 A equipe Funcional do Ari deseja um dia repleto de alegria. Contamos com sua visita para comemorar com um mimo especial! 💖`)}` : '#';
+        tbody.innerHTML = clientesOrdenados.map(cli => {
+            // Tratamento para exibir "-" caso o aluno não tenha aquele dado preenchido
+            const sexo = cli.sexo || '-';
+            const idade = cli.idade || '-';
+            const telefone = cli.telefone || '-';
+            const email = cli.email || '-';
+            const objetivo = cli.objetivo || '-';
+            const frequencia = cli.frequencia || '-';
+            const tempo = cli.tempoTreino || '-';
             
-            return `<tr data-cliente-id="${c.id}">
-                <td style="display:flex; align-items:center; gap:10px">
-                    <div class="avatar" style="background-image:url('${c.foto || ''}'); background-size:cover;">${c.foto ? '' : c.nome[0]}</div>
-                    <div>
-                        <strong style="cursor:pointer; color:var(--primary)" onclick="abrirModalAnamnese(${c.id})" title="Ver Histórico Completo">${c.nome}</strong> ${ehAniversarioHoje ? '<span title="Aniversário hoje!">🎂</span>' : ''}<br>
-                        <span style="font-size:12px; opacity:0.7">${c.telefone || 'Sem telefone'}</span>
-                    </div>
-                </td>
-                <td><span class="badge" style="background:#d946ef20; color:#d946ef">💎 ${c.pontos || 0} pts</span></td>
-                <td>${c.ultimaVisita ? formatarData(c.ultimaVisita) : '-'}</td>
-                <td>${c.previsaoRetorno ? formatarData(c.previsaoRetorno) : '-'}</td>
-                <td>
-                    <button class="btn-small bg-yellow" onclick="editarCliente(${c.id})" title="Editar Dados">
+            // Formata a data de YYYY-MM-DD para DD/MM/YYYY
+            const inicio = cli.inicio ? cli.inicio.split('-').reverse().join('/') : '-';
+            const vencimento = cli.vencimento ? `Dia ${cli.vencimento}` : '-';
+
+            // Formata o número para o link do WhatsApp (tira parênteses e traços)
+            const telefoneClean = cli.telefone ? cli.telefone.replace(/\D/g, '') : '';
+            const zapLink = telefoneClean ? `https://wa.me/55${telefoneClean}?text=Olá ${cli.nome.split(' ')[0]}, passando para lembrar do vencimento da sua mensalidade dia ${cli.vencimento} no Funcional do Ari!` : '#';
+
+            return `<tr data-cliente-id="${cli.id}">
+                <td><div class="avatar" style="background-image:url('${cli.foto || ''}'); background-size:cover;">${cli.foto ? '' : cli.nome.charAt(0).toUpperCase()}</div></td>
+                <td><strong style="cursor:pointer; color:var(--primary)" onclick="abrirModalAnamnese(${cli.id})" title="Ver Histórico Completo">${cli.nome}</strong></td>
+                <td>${sexo}</td>
+                <td>${idade}</td>
+                <td>${telefone}</td>
+                <td>${email}</td>
+                <td>${objetivo}</td>
+                <td>${frequencia}</td>
+                <td>${tempo}</td>
+                <td>${inicio}</td>
+                <td><span class="badge bg-purple">${vencimento}</span></td>
+                <td style="white-space: nowrap; display: flex; gap: 6px;">
+                    <button class="btn-small bg-yellow" onclick="editarCliente(${cli.id})" title="Editar">
                         <i data-lucide="pencil" style="width:16px; height:16px;"></i>
                     </button>
-                    <button class="btn-small bg-purple" onclick="abrirModalAnamnese(${c.id})" title="Histórico e Fotos">
+                    <button class="btn-small bg-purple" onclick="abrirModalAnamnese(${cli.id})" title="Ficha do Aluno">
                         <i data-lucide="clipboard-list" style="width:16px; height:16px;"></i>
                     </button>
-                    ${telefoneClean ? `<a href="${linkZap}" target="_blank"><button class="btn-small bg-green" title="WhatsApp"><i data-lucide="message-circle" style="width:16px; height:16px;"></i></button></a>` : ''}
-                    ${ehAniversarioHoje && telefoneClean ? `<a href="${linkZapAniversario}" target="_blank"><button class="btn-small" style="background:#f59e0b; color:white;" title="Enviar Parabéns no WhatsApp"><i data-lucide="cake" style="width:16px; height:16px;"></i></button></a>` : ''}
-                    <button class="btn-small" onclick="excluirCliente(${c.id})" title="Excluir" style="background: var(--danger); color: white;">
+                    ${telefoneClean ? `<a href="${zapLink}" target="_blank" class="btn-small bg-green" style="display:flex; align-items:center; text-decoration:none;" title="Cobrar no WhatsApp"><i data-lucide="message-circle" style="width:16px; height:16px;"></i></a>` : ''}
+                    <button class="btn-small" style="background: rgba(248,113,113,0.1); color: var(--danger); border: 1px solid rgba(248,113,113,0.2);" onclick="excluirCliente(${cli.id})" title="Excluir">
                         <i data-lucide="trash-2" style="width:16px; height:16px;"></i>
                     </button>
                 </td>
-            </tr>`
+            </tr>`;
         }).join("");
         
         lucide.createIcons();
@@ -1192,12 +1204,32 @@
     }
 
     function abrirModalCliente() {
-        idClienteEdicao = null;
-        document.getElementById("titulo-modal-cliente").innerText = "Novo Cadastro";
-        document.getElementById("novo-cli-nome").value = "";
-        document.getElementById("novo-cli-tel").value = "";
-        document.getElementById("novo-cli-nasc").value = "";
-        document.getElementById("modal-novo-cliente").style.display = 'flex';
+        // 1. Atualiza o título para garantir que é um cadastro novo
+        const titulo = document.getElementById('titulo-modal-cliente');
+        if (titulo) titulo.innerText = 'Cadastrar Novo Aluno';
+
+        // 2. Lista de todos os IDs de inputs que o modal pode ter
+        const campos = [
+            'id-cliente-edicao', 'novo-cli-nome', 'novo-cli-sexo', 'novo-cli-idade',
+            'novo-cli-tel', 'novo-cli-email', 'novo-cli-objetivo', 'novo-cli-frequencia',
+            'novo-cli-tempo', 'novo-cli-inicio', 'novo-cli-vencimento', 'novo-cli-nasc', 'novo-cli-foto'
+        ];
+
+        // 3. Limpa os campos de forma SEGURA (se o campo não existir, ele ignora e não trava)
+        campos.forEach(id => {
+            const elemento = document.getElementById(id);
+            if (elemento) {
+                elemento.value = '';
+            }
+        });
+
+        // 4. Exibe o modal na tela
+        const modal = document.getElementById('modal-novo-cliente');
+        if (modal) {
+            modal.style.display = 'flex';
+        } else {
+            console.error('Erro: Modal modal-novo-cliente não encontrado no HTML.');
+        }
     }
 
     function editarCliente(id) {
@@ -1205,12 +1237,32 @@
         if (!c) return;
 
         idClienteEdicao = id;
-        document.getElementById("titulo-modal-cliente").innerText = "Editar Cliente";
-        document.getElementById("novo-cli-nome").value = c.nome;
-        document.getElementById("novo-cli-tel").value = c.telefone || "";
-        document.getElementById("novo-cli-nasc").value = c.dataNasc || "";
         
-        document.getElementById("modal-novo-cliente").style.display = 'flex';
+        // Atualiza o título do modal
+        const titulo = document.getElementById("titulo-modal-cliente");
+        if(titulo) titulo.innerText = "Editar Aluno";
+
+        // Função auxiliar para preencher os dados de forma segura sem travar o código
+        const preencherCampo = (idElemento, valor) => {
+            const el = document.getElementById(idElemento);
+            if (el) el.value = valor || "";
+        };
+
+        // Puxa todos os dados do banco e preenche no formulário novo
+        preencherCampo("novo-cli-nome", c.nome);
+        preencherCampo("novo-cli-sexo", c.sexo);
+        preencherCampo("novo-cli-idade", c.idade);
+        preencherCampo("novo-cli-tel", c.telefone);
+        preencherCampo("novo-cli-email", c.email);
+        preencherCampo("novo-cli-objetivo", c.objetivo);
+        preencherCampo("novo-cli-frequencia", c.frequencia);
+        preencherCampo("novo-cli-tempo", c.tempoTreino);
+        preencherCampo("novo-cli-inicio", c.inicio);
+        preencherCampo("novo-cli-vencimento", c.vencimento);
+
+        // Exibe o modal na tela
+        const modal = document.getElementById("modal-novo-cliente");
+        if (modal) modal.style.display = 'flex';
     }
 
     function fecharModal(id) {
@@ -1237,40 +1289,75 @@
     }
 
     function salvarNovoClienteModal() {
-        const nome = document.getElementById("novo-cli-nome").value;
-        const tel = document.getElementById("novo-cli-tel").value;
-        const nasc = document.getElementById("novo-cli-nasc").value;
+        const nome = document.getElementById("novo-cli-nome").value.trim();
+        const sexo = document.getElementById("novo-cli-sexo")?.value || "";
+        const idade = document.getElementById("novo-cli-idade")?.value || "";
+        const tel = document.getElementById("novo-cli-tel").value.trim();
+        const email = document.getElementById("novo-cli-email")?.value.trim() || "";
+        const objetivo = document.getElementById("novo-cli-objetivo")?.value.trim() || "";
+        const frequencia = document.getElementById("novo-cli-frequencia")?.value.trim() || "";
+        const tempoTreino = document.getElementById("novo-cli-tempo")?.value.trim() || "";
+        const inicio = document.getElementById("novo-cli-inicio")?.value || new Date().toISOString().split('T')[0];
+        const vencimento = document.getElementById("novo-cli-vencimento")?.value || "10"; // Padrão dia 10 se não preenchido
         const fotoInput = document.getElementById("novo-cli-foto");
         
         if(!nome) return dispararToast("Nome é obrigatório", "error");
+        if(!sexo) return dispararToast("Selecione o sexo", "error");
+        if(!tel) return dispararToast("Contato (WhatsApp) é obrigatório", "error");
         
         const salvarNoBanco = (fotoBase64) => {
-            if (idClienteEdicao) {
-                const updates = { nome, telefone: tel, dataNasc: nasc };
+            if (typeof idClienteEdicao !== 'undefined' && idClienteEdicao) {
+                const updates = { 
+                    nome, sexo, idade, telefone: tel, email, 
+                    objetivo, frequencia, tempoTreino, inicio, vencimento 
+                };
                 if(fotoBase64) updates.foto = fotoBase64;
                 db.ref(`clientes/${idClienteEdicao}`).update(updates);
-                dispararToast("Dados do cliente atualizados!");
+                dispararToast("Dados do aluno atualizados!");
             } else {
                 const id = Date.now();
                 db.ref(`clientes/${id}`).set({ 
-                    id, nome, telefone: tel, dataNasc: nasc, 
+                    id, 
+                    nome, 
+                    sexo, 
+                    idade, 
+                    telefone: tel, 
+                    email, 
+                    objetivo, 
+                    frequencia, 
+                    tempoTreino, 
+                    inicio,
+                    vencimento,
                     dataCadastro: new Date().toISOString(),
                     pontos: 0,
                     foto: fotoBase64 || null
                 });
-                dispararToast("Cliente cadastrado!");
+                dispararToast("Aluno cadastrado!");
             }
             fecharModal('modal-novo-cliente');
+            
+            // Limpa os campos após salvar
             document.getElementById("novo-cli-nome").value = "";
+            document.getElementById("novo-cli-sexo").value = "";
+            document.getElementById("novo-cli-idade").value = "";
+            document.getElementById("novo-cli-tel").value = "";
+            document.getElementById("novo-cli-email").value = "";
+            document.getElementById("novo-cli-objetivo").value = "";
+            document.getElementById("novo-cli-frequencia").value = "";
+            document.getElementById("novo-cli-tempo").value = "";
+            document.getElementById("novo-cli-inicio").value = "";
+            if(document.getElementById("novo-cli-vencimento")) {
+                document.getElementById("novo-cli-vencimento").value = "";
+            }
+            if(fotoInput) fotoInput.value = "";
         };
 
-        if(fotoInput.files[0]) {
+        if(fotoInput && fotoInput.files[0]) {
             processarImagem(fotoInput.files[0], salvarNoBanco);
         } else {
             salvarNoBanco(null);
         }
     }
-
     function abrirModalAnamnese(id) {
         clienteAnamneseAtual = store.clientes.find(c => c.id == id);
         if(!clienteAnamneseAtual) return;
@@ -2594,3 +2681,103 @@ function atualizarGraficos() {
             </div>
         `;
     }
+
+    // ==========================================
+// PAINEL DE COBRANÇAS E MENSALIDADES
+// ==========================================
+let filtroAtualCobranca = 'atrasados';
+
+function filtrarCobrancas(filtro, btnElement) {
+    filtroAtualCobranca = filtro;
+    
+    // Atualiza o visual das abas
+    if(btnElement) {
+        const botoes = btnElement.parentElement.querySelectorAll('.tab-btn');
+        botoes.forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+    }
+    
+    renderPainelCobrancas();
+}
+
+function renderPainelCobrancas() {
+    const tbody = document.getElementById("tabela-cobrancas");
+    if(!tbody) return;
+
+    const hoje = new Date();
+    const diaHoje = hoje.getDate();
+    let clientesFiltrados = [];
+
+    store.clientes.forEach(c => {
+        if(!c.vencimento) return;
+        const diaVenc = parseInt(c.vencimento);
+        if(isNaN(diaVenc)) return;
+
+        let status = '';
+        let corStatus = '';
+
+        if (diaVenc < diaHoje) {
+            status = 'atrasados';
+            corStatus = 'var(--danger)'; // Vermelho
+        } else if (diaVenc === diaHoje) {
+            status = 'hoje';
+            corStatus = 'var(--warning)'; // Amarelo
+        } else if (diaVenc > diaHoje && diaVenc <= diaHoje + 7) {
+            status = 'proximos';
+            corStatus = 'var(--success)'; // Verde
+        }
+
+        if (status === filtroAtualCobranca) {
+            clientesFiltrados.push({ ...c, diaVenc, statusVisual: status, corStatus });
+        }
+    });
+
+    // Ordena pelo dia de vencimento
+    clientesFiltrados.sort((a,b) => a.diaVenc - b.diaVenc);
+
+    if (clientesFiltrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; opacity:0.5;">Nenhum aluno nesta categoria no momento. 🙌</td></tr>`;
+        return;
+    }
+
+    const chavePix = configSistema.chavePix || "sua chave Pix";
+
+    tbody.innerHTML = clientesFiltrados.map(c => {
+        const telefoneClean = c.telefone ? c.telefone.replace(/\D/g, '') : '';
+        const primeiroNome = c.nome.split(' ')[0];
+        let msg = '';
+        let statusLabel = '';
+
+        // Cria a mensagem personalizada dependendo do status do aluno
+        if(filtroAtualCobranca === 'atrasados') {
+            msg = `Olá ${primeiroNome}, tudo bem? Notamos que a sua mensalidade do Funcional do Ari (vencimento dia ${c.vencimento}) ficou pendente. Segue a chave Pix: ${chavePix} - Qualquer dúvida, estamos à disposição! 💪`;
+            statusLabel = `Atrasado (Dia ${c.vencimento})`;
+        } else if (filtroAtualCobranca === 'hoje') {
+            msg = `Olá ${primeiroNome}! Passando para lembrar que sua mensalidade do Funcional vence HOJE (dia ${c.vencimento}). Segue a chave Pix para facilitar: ${chavePix} - Bom treino! 🏋️‍♂️`;
+            statusLabel = `Vence Hoje!`;
+        } else {
+            msg = `Olá ${primeiroNome}! Passando para lembrar que sua mensalidade do Funcional vencerá no dia ${c.vencimento}. Segue a chave Pix para agilizar: ${chavePix} - Bom treino! 🏋️‍♀️`;
+            statusLabel = `Vence dia ${c.vencimento}`;
+        }
+
+        const zapLink = telefoneClean ? `https://wa.me/55${telefoneClean}?text=${encodeURIComponent(msg)}` : '#';
+
+        return `
+        <tr>
+            <td><strong>${c.nome}</strong></td>
+            <td>Dia ${c.vencimento}</td>
+            <td><span class="badge" style="background:${c.corStatus}20; color:${c.corStatus}; border: 1px solid ${c.corStatus}40;">${statusLabel}</span></td>
+            <td>
+                ${telefoneClean ? 
+                    `<a href="${zapLink}" target="_blank" class="btn-small bg-green" style="display:flex; align-items:center; width:fit-content; text-decoration:none;" title="Enviar cobrança via WhatsApp">
+                        <i data-lucide="message-circle" style="width:16px; height:16px; margin-right:6px;"></i> Enviar Cobrança
+                    </a>` 
+                    : '<small class="text-muted">Sem Contato</small>'
+                }
+            </td>
+        </tr>
+        `;
+    }).join('');
+
+    if(window.lucide) lucide.createIcons();
+}

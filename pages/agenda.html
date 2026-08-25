@@ -1,19 +1,41 @@
-<div class="glass-panel" style="min-height: 80vh; padding-bottom: 80px;">
-    <div class="agenda-header-flex" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-        <div>
-            <h3 class="text-gradient" style="margin: 0;">Agenda</h3>
-            <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px; flex-wrap: wrap;">
-                <input type="date" id="agenda-date-input" class="modern-input" style="width: auto;" onchange="renderAgenda()">
-                <span id="agenda-dia-semana" class="text-muted" style="font-size: 12px;"></span>
-            </div>
-        </div>
-        <button onclick="abrirAba('novo_atendimento')" class="btn-primary">+ Novo</button>
+<!-- 1. AGENDA DO DIA (FOCO EM ALUNOS NOVOS) -->
+<div class="glass-panel" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+        <input type="date" id="agenda-date-input" class="modern-input" style="width: auto;" onchange="renderAgenda()">
+        <h3 id="agenda-dia-semana" style="margin: 0; min-width: 200px;">Data</h3>
     </div>
-    <div class="mt-10">
-        <select id="agenda-filtro-profissional" class="modern-input" onchange="renderAgenda()">
-            <option value="">Todos os Instrutores</option>
-        </select>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <button onclick="abrirModalCliente()" class="btn-primary" style="margin: 0; height: 48px;">+ Cadastrar Aluno</button>
     </div>
-    <div class="timeline-container mt-20" id="lista-agenda">
-        </div>
+</div>
+<div id="lista-agenda" style="margin-bottom: 40px;"></div>
+
+<!-- 2. PAINEL DE COBRANÇAS / MENSALIDADES -->
+<div class="glass-panel" style="border: 1px solid var(--danger);">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+        <i data-lucide="alert-circle" style="color: var(--danger); width: 24px; height: 24px;"></i>
+        <h3 style="color: var(--danger); margin: 0;">Controle de Mensalidades</h3>
+    </div>
+    
+    <div class="tab-controls" style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+        <button class="tab-btn active" onclick="filtrarCobrancas('atrasados', this)">⚠️ Atrasados</button>
+        <button class="tab-btn" onclick="filtrarCobrancas('hoje', this)">📅 Vencem Hoje</button>
+        <button class="tab-btn" onclick="filtrarCobrancas('proximos', this)">⏳ Próximos 7 Dias</button>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                    <th>Cobrança Rápida</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-cobrancas">
+                <tr><td colspan="4" style="text-align:center; opacity:0.5;">Carregando dados...</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
