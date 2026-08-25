@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funcional do Ari | Treinos Funcionais</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== VARIÁVEIS DE ALTO PADRÃO ===== */
+        :root {
+            --bg-dark: #0a0605;
+            --bg-surface: rgba(30, 20, 18, 0.6);
+            --primary: #e6432f; /* Vermelho-laranja Funcional do Ari */
+            --primary-glow: rgba(230, 67, 47, 0.4);
+            --gold: #ff8a4c;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --font-display: 'Anton', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ===== ANIMAÇÕES ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up {
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* ===== HERO SECTION (Capa) ===== */
+        .vt-hero {
+            position: relative;
+            text-align: center;
+            padding: 100px 20px 60px;
+            background: radial-gradient(circle at top, #2d1b3d 0%, var(--bg-dark) 70%);
+            min-height: 45vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .vt-hero.tem-capa {
+            padding-top: 180px;
+            background: transparent;
+        }
+        .vt-hero-capa {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            z-index: 0;
+            opacity: 0.6;
+        }
+        .vt-hero-conteudo {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        #vt-selo {
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: inline-block;
+            background: rgba(229, 169, 169, 0.1);
+            padding: 6px 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(229, 169, 169, 0.2);
+        }
+        .vt-hero h1 {
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            background: linear-gradient(to right, #fff, #e6432f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .vt-hero p {
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* ===== BOTÃO PRINCIPAL ===== */
+        .btn-glow {
+            display: inline-block;
+            background: linear-gradient(135deg, #c471ed, #f64f59);
+            color: white;
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 16px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(246, 79, 89, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(246, 79, 89, 0.5);
+        }
+
+        /* ===== SEÇÕES ===== */
+        .vt-section {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .vt-section-titulo {
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* ===== FILTROS (NOVO) ===== */
+        .vt-filters {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .vt-filter-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .vt-filter-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .vt-filter-btn.active {
+            background: var(--primary);
+            color: #000;
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(229, 169, 169, 0.3);
+        }
+
+        /* ===== GRID DE CARDS ===== */
+        .vt-menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .vt-card {
+            background: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .vt-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(229, 169, 169, 0.3);
+        }
+        .vt-card.destaque {
+            border: 1px solid var(--gold);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.15);
+        }
+
+        .vt-card-img-wrapper {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            background: #151122;
+        }
+        .vt-card-foto {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .vt-card-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            background: linear-gradient(45deg, #1e1a2b, #2d2640);
+        }
+        .vt-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--gold);
+            color: #000;
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .vt-card-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .vt-card-nome {
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .vt-card-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        .vt-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .vt-card-preco {
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.05);
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .vt-btn-mini {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .vt-btn-mini:hover {
+            background: var(--primary);
+            color: #000;
+            border-color: var(--primary);
+        }
+
+        /* ===== CONTATO E FOOTER ===== */
+        .vt-contato-box {
+            background: var(--bg-surface);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .vt-contato-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+            margin-top: 24px;
+        }
+        .vt-link-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 14px 24px;
+            border-radius: 16px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            width: 100%;
+            max-width: 320px;
+            transition: background 0.2s;
+        }
+        .vt-link-btn:hover { background: rgba(255,255,255,0.08); }
+        .vt-link-icon { font-size: 20px; }
+
+        .vt-footer {
+            text-align: center;
+            padding: 20px 20px 100px;
+            color: rgba(255,255,255,0.3);
+            font-size: 13px;
+        }
+
+        /* ===== CTA FLUTUANTE MOBILE ===== */
+        .vt-fixed-cta {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            z-index: 50;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+        @media (min-width: 768px) {
+            .vt-fixed-cta { display: none; }
+            .vt-hero h1 { font-size: 56px; }
+            .vt-contato-links { flex-direction: row; justify-content: center; }
+            .vt-link-btn { width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO SECTION -->
+    <header class="vt-hero animate-up" id="vt-hero">
+        <div class="vt-hero-conteudo">
+            <span id="vt-selo">Funcional do Ari</span>
+            <h1 id="vt-titulo">Não é sobre ser perfeito. É sobre começar!</h1>
+            <p id="vt-subtitulo">Treinos adaptados para você evoluir no seu ritmo, com acompanhamento de verdade.</p>
+            <a href="agendar.html" class="btn-glow">🔥 QUERO MINHA AULA GRÁTIS</a>
+        </div>
+    </header>
+
+    <!-- DESTAQUES -->
+    <section class="vt-section animate-up" style="animation-delay: 0.2s;">
+        <h2 class="vt-section-titulo">🔥 Mais Procurados</h2>
+        <div id="vt-lista-destaques" class="vt-menu-grid"></div>
+    </section>
+
+    <!-- TODOS OS SERVIÇOS -->
+    <section class="vt-section animate-up" style="animation-delay: 0.3s;">
+        <h2 class="vt-section-titulo">🏋️ Nossos Planos e Treinos</h2>
+        
+        <!-- BOTÕES DE FILTRO -->
+        <div class="vt-filters">
+            <button class="vt-filter-btn active" onclick="filtrarVitrine('todos', this)">✨ Todos</button>
+            <button class="vt-filter-btn" onclick="filtrarVitrine('cabelo', this)">🏋️ Funcional</button>
+            <button class="vt-filter-btn" onclick="filtrarVitrine('manicure', this)">🥊 Grupo</button>
+        </div>
+
+        <div id="vt-lista-servicos" class="vt-menu-grid">
+            <!-- Loading -->
+            <div class="vt-card" style="align-items:center; padding: 40px; color: var(--text-muted); grid-column: 1 / -1;">
+                <i>Carregando os planos de treino...</i>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTATO / LOCALIZAÇÃO -->
+    <section class="vt-section animate-up" style="animation-delay: 0.4s;">
+        <div class="vt-contato-box">
+            <h2 style="font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px; font-size: 24px; margin-bottom: 8px;">Visite nosso espaço</h2>
+            <p style="color: var(--text-muted); font-size: 15px;">Estamos prontos para te receber e começar seu treino hoje mesmo.</p>
+            
+            <div class="vt-contato-links">
+                <a id="vt-endereco-link" href="#" target="_blank" class="vt-link-btn">
+                    <span class="vt-link-icon">📍</span>
+                    <span id="vt-endereco-texto">Endereço não configurado</span>
+                </a>
+                <a id="vt-whatsapp-link" href="#" target="_blank" class="vt-link-btn">
+                    <span class="vt-link-icon">📱</span>
+                    <span>WhatsApp</span>
+                </a>
+                <a id="vt-instagram-link" href="#" target="_blank" class="vt-link-btn" style="display:none;">
+                    <span class="vt-link-icon">📷</span>
+                    <span>Instagram</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="vt-footer">
+        Funcional do Ari &copy; <span id="vt-ano"></span> • Feito com ❤️
+    </footer>
+
+    <!-- Botão Flutuante Mobile -->
+    <a href="agendar.html" class="btn-glow vt-fixed-cta">🔥 AGENDAR AULA GRÁTIS</a>
+
+    <!-- Firebase SDK -->
+    <script src="js/local-db.js"></script>
+
+    <script>
+        document.getElementById("vt-ano").innerText = new Date().getFullYear();
+
+        // Configuração Oficial
+        if (!firebase.apps.length) firebase.initializeApp({});
+        const db = firebase.database();
+
+        // Carrega Configurações (Vitrine)
+        db.ref('landingConfig').once('value').then(snap => {
+            const cfg = snap.val() || {};
+
+            if(cfg.titulo) {
+                document.getElementById("vt-titulo").innerHTML = cfg.titulo;
+                document.title = cfg.titulo + " | Treinos Funcionais";
+            }
+            if(cfg.subtitulo) document.getElementById("vt-subtitulo").innerText = cfg.subtitulo;
+
+            if(cfg.capa) {
+                const hero = document.getElementById("vt-hero");
+                hero.classList.add("tem-capa");
+                const img = document.createElement("img");
+                img.src = cfg.capa;
+                img.className = "vt-hero-capa";
+                hero.prepend(img);
+            }
+
+            const whatsapp = cfg.whatsapp || "";
+            const linkWhats = document.getElementById("vt-whatsapp-link");
+            if(whatsapp) {
+                linkWhats.href = `https://wa.me/55${whatsapp}?text=${encodeURIComponent("Olá! Vim pelo site e gostaria de agendar um horário 💅")}`;
+            } else {
+                linkWhats.style.display = "none";
+            }
+
+            if(cfg.endereco) document.getElementById("vt-endereco-texto").innerText = cfg.endereco;
+            document.getElementById("vt-endereco-link").href = cfg.googleMapsUrl || "#";
+
+            if(cfg.instagram) {
+                const linkInsta = document.getElementById("vt-instagram-link");
+                linkInsta.href = cfg.instagram;
+                linkInsta.style.display = "flex";
+            }
+        }).catch(err => console.error("Erro config vitrine:", err));
+
+        // Variável global para armazenar serviços para o filtro funcionar rápido
+        let servicosGlobais = [];
+
+        // ===== CARREGAMENTO DE SERVIÇOS =====
+        db.ref('servicos').on('value', snap => {
+            const servicosObj = snap.val() ? snap.val() : {};
+            servicosGlobais = Object.values(servicosObj);
+
+            if(servicosGlobais.length === 0) {
+                document.getElementById("vt-lista-servicos").innerHTML = `<div class="vt-card" style="padding: 30px; text-align:center; grid-column: 1 / -1;">Em breve, novidades no nosso cardápio!</div>`;
+                document.getElementById("vt-lista-destaques").closest('.vt-section').style.display = "none";
+                return;
+            }
+
+            // Ordena alfabeticamente
+            servicosGlobais.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            // Renderiza Destaques Fixos
+            const destaques = servicosGlobais.filter(s => s.destaque);
+            const secDestaques = document.getElementById("vt-lista-destaques").closest('.vt-section');
+            if(destaques.length === 0) {
+                secDestaques.style.display = "none";
+            } else {
+                secDestaques.style.display = "block";
+                document.getElementById("vt-lista-destaques").innerHTML = destaques.map(renderCard).join('');
+            }
+
+            // Descobre qual botão de filtro está ativo no momento para manter a tela certa
+            let filtroAtual = 'todos';
+            const btnAtivo = document.querySelector('.vt-filter-btn.active');
+            if(btnAtivo) {
+                if(btnAtivo.innerText.includes('Cabelo')) filtroAtual = 'cabelo';
+                else if(btnAtivo.innerText.includes('Manicure')) filtroAtual = 'manicure';
+            }
+
+            renderizarVitrine(filtroAtual);
+        });
+
+        // ===== FUNÇÃO DE RENDERIZAR CARD INDIVIDUAL =====
+        function renderCard(s) {
+            // Descobre se é unha ou cabelo lendo do banco ou usando as palavras-chave (fallback)
+            let isManicure = false;
+            if (s.categoria) {
+                isManicure = (s.categoria === 'manicure');
+            } else {
+                const palavrasManicure = ['manicure', 'pé', 'esmalta', 'unha', 'pedicure', 'gel'];
+                isManicure = palavrasManicure.some(palavra => s.nome.toLowerCase().includes(palavra));
+            }
+
+            // Se for unha e tiver preço, formata pra Reais. Se for cabelo, fica "Sob avaliação"
+            let textoPreco = "🔍 Sob avaliação";
+            if (isManicure && s.preco) {
+                textoPreco = parseFloat(s.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }
+
+            return `
+            <div class="vt-card ${s.destaque ? 'destaque' : ''}">
+                <div class="vt-card-img-wrapper">
+                    ${s.foto 
+                        ? `<img src="${s.foto}" class="vt-card-foto" alt="${s.nome}" loading="lazy">` 
+                        : `<div class="vt-card-placeholder">✨</div>`
+                    }
+                    ${s.destaque ? '<div class="vt-badge">★ DESTAQUE</div>' : ''}
+                </div>
+                <div class="vt-card-body">
+                    <h3 class="vt-card-nome">${s.nome}</h3>
+                    ${s.descricao ? `<p class="vt-card-desc">${s.descricao}</p>` : '<p class="vt-card-desc"></p>'}
+                    <div class="vt-card-footer">
+                        <span class="vt-card-preco" style="font-weight: ${isManicure ? '800' : '500'}; color: ${isManicure ? 'var(--primary)' : 'var(--text-muted)'};">${textoPreco}</span>
+                        <a href="agendar.html" class="vt-btn-mini">Agendar</a>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // ===== FUNÇÕES DE FILTRAR =====
+        window.filtrarVitrine = function(filtro, btnElement) {
+            // Troca a cor do botão ativo
+            document.querySelectorAll('.vt-filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            renderizarVitrine(filtro);
+        };
+
+        function renderizarVitrine(filtro) {
+            const divTodos = document.getElementById("vt-lista-servicos");
+
+            const filtrados = servicosGlobais.filter(s => {
+                let isManicure = false;
+                if (s.categoria) {
+                    isManicure = (s.categoria === 'manicure');
+                } else {
+                    const palavrasManicure = ['manicure', 'pé', 'esmalta', 'unha', 'pedicure', 'gel'];
+                    isManicure = palavrasManicure.some(palavra => s.nome.toLowerCase().includes(palavra));
+                }
+
+                if (filtro === 'todos') return true;
+                if (filtro === 'manicure') return isManicure;
+                if (filtro === 'cabelo') return !isManicure;
+                return true;
+            });
+
+            if(filtrados.length === 0) {
+                divTodos.innerHTML = `<div class="vt-card" style="padding: 30px; text-align:center; grid-column: 1 / -1; width: 100%;">Nenhum plano encontrado nesta categoria.</div>`;
+            } else {
+                divTodos.innerHTML = filtrados.map(renderCard).join('');
+            }
+        }
+    </script>
+</body>
+</html>

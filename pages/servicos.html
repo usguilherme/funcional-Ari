@@ -1,0 +1,38 @@
+<div class="glass-panel form-inline">
+    <input type="hidden" id="id-servico-edicao">
+    
+    <div class="mobile-stack" style="display:flex; gap:10px; width:100%;">
+        <input type="text" id="serv-nome" placeholder="Nome do Plano/Treino" class="modern-input" style="flex:2;">
+        
+        <!-- Caixinha de Categoria -->
+        <select id="serv-categoria" class="modern-input" style="flex:1.2;">
+            <option value="cabelo">🏋️ Funcional</option>
+            <option value="manicure">🥊 Treino em Grupo</option>
+        </select>
+        
+        <input type="number" id="serv-preco" placeholder="Valor (R$)" class="modern-input" style="flex:1;">
+    </div>
+
+    <div class="mt-10">
+        <textarea id="serv-descricao" placeholder="Descrição curta (aparece na página de agendamento e no site, ex: 'Aula funcional de alta intensidade em grupo')" class="modern-input" rows="2" style="resize:vertical;"></textarea>
+    </div>
+
+    <div class="mt-10" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <div style="flex:1; min-width:200px;">
+            <label class="label-small">Foto do plano (opcional)</label>
+            <input type="file" id="serv-foto" accept="image/*" class="modern-input">
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; font-size:13px; white-space:nowrap; padding-top:18px;">
+            <input type="checkbox" id="serv-destaque"> ⭐ Destacar no site
+        </label>
+    </div>
+    <div id="serv-foto-preview" style="margin-top:8px;"></div>
+    
+    <div class="action-buttons mt-10 mobile-stack">
+        <button onclick="salvarServicoCad()" id="btn-salvar-servico" class="btn-primary full-width">Salvar</button>
+        <button onclick="cancelarEdicaoServico()" id="btn-cancelar-servico" class="btn-danger full-width" style="display:none; margin-top:10px;">✕</button>
+    </div>
+</div>
+
+<div id="lista-servicos-cad" class="grid-cards mt-15" style="margin-bottom: 80px;"></div>
+<button onclick="abrirAba('financeiro')" class="btn-small mt-15 mobile-only" style="width:100%; opacity:0.7; margin-bottom: 30px;">Voltar ao Menu</button>

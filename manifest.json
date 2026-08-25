@@ -1,0 +1,21 @@
+{
+  "name": "Funcional do Ari Gestão",
+  "short_name": "Funcional do Ari",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#e6432f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Aula | Funcional do Ari</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== VARIÁVEIS DE ALTO PADRÃO ===== */
+        :root {
+            --bg-dark: #0a0605;
+            --bg-surface: rgba(30, 20, 18, 0.7);
+            --primary: #e6432f;
+            --gold: #ff8a4c;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --font-display: 'Anton', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at top, #2d1b3d 0%, var(--bg-dark) 80%);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* ===== ANIMAÇÃO ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up {
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* ===== CONTAINER DO FORMULÁRIO ===== */
+        .agendar-container {
+            background: var(--bg-surface);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 480px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+        }
+
+        /* ===== HEADER DO FORM ===== */
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .selo-marca {
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: inline-block;
+            background: rgba(229, 169, 169, 0.1);
+            padding: 4px 12px;
+            border-radius: 30px;
+            border: 1px solid rgba(229, 169, 169, 0.2);
+        }
+        .form-header h2 {
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, #e6432f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        /* ===== INPUTS ===== */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .label-small {
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 4px;
+        }
+        .modern-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: var(--font-body);
+            font-size: 15px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            outline: none;
+            width: 100%;
+        }
+        .modern-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(229, 169, 169, 0.15);
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .modern-input::placeholder { color: rgba(255,255,255,0.3); }
+        
+        select.modern-input option {
+            background-color: var(--bg-dark);
+            color: white;
+        }
+        select.modern-input optgroup {
+            background-color: #1e1a2b;
+            color: var(--primary);
+            font-weight: bold;
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        /* ===== AVISOS ===== */
+        .aviso-caixa {
+            font-size: 13px;
+            border-radius: 12px;
+            padding: 12px 16px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            display: none;
+        }
+        #pub-horarios-ocupados {
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        #pub-aviso-conflito {
+            color: #fca5a5;
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        /* ===== BOTÃO ===== */
+        .btn-glow {
+            display: inline-block;
+            background: linear-gradient(135deg, #c471ed, #f64f59);
+            color: white;
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
+            font-weight: 700;
+            font-size: 15px;
+            padding: 16px 32px;
+            border-radius: 50px;
+            text-align: center;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(246, 79, 89, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-glow:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(246, 79, 89, 0.5);
+        }
+        
+        /* Botão Voltar */
+        .btn-voltar {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .btn-voltar:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="agendar-container animate-up">
+        <div class="form-header">
+            <span class="selo-marca">Reserva Online</span>
+            <h2>Agendar Aula</h2>
+            <p>Preencha os dados e fale conosco pelo WhatsApp para agendar seu treino.</p>
+        </div>
+        
+        <div>
+            <div class="form-group">
+                <label class="label-small">Seu Nome Completo</label>
+                <input type="text" id="pub-nome" class="modern-input" placeholder="Ex: João Silva">
+            </div>
+            
+            <div class="form-group">
+                <label class="label-small">Seu WhatsApp</label>
+                <input type="text" id="pub-tel" class="modern-input" placeholder="(83) 99999-9999">
+            </div>
+
+            <div class="form-group">
+                <label class="label-small">Instrutor Preferido</label>
+                <select id="pub-profissional" class="modern-input">
+                    <option value="">Qualquer instrutor disponível</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="label-small">Escolha o Plano/Treino</label>
+                <select id="pub-servico" class="modern-input">
+                    <option value="">Carregando planos...</option>
+                </select>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="label-small">Data Desejada</label>
+                    <input type="date" id="pub-data" class="modern-input">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="label-small">Horário</label>
+                    <input type="time" id="pub-hora" class="modern-input">
+                </div>
+            </div>
+
+            <div id="pub-horarios-ocupados" class="aviso-caixa"></div>
+            <div id="pub-aviso-conflito" class="aviso-caixa">
+                ⚠️ Esse horário já está ocupado com esse instrutor. Escolha outro, por favor.
+            </div>
+
+            <button onclick="salvarAgendamentoPublico()" class="btn-glow">AGENDAR E IR PARA WHATSAPP</button>
+            
+            <a href="index.html" class="btn-voltar">← Voltar para a vitrine</a>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="js/local-db.js"></script>
+    
+    <script>
+        // Configuração Oficial
+        if (!firebase.apps.length) firebase.initializeApp({});
+        const db = firebase.database();
+
+        // ========================================================
+        // CONFIGURAÇÃO DE EQUIPE (EDITAR AQUI)
+        // Coloque abaixo os nomes das profissionais que SÃO MANICURES.
+        // O sistema usará isso para saber quando limpar a lista de cabelos.
+        // ========================================================
+        const nomesDasManicures = ["Thay"]; // Ex: ["Thay", "Joana"]
+
+        // Variável global para guardar os serviços lidos do banco
+        let todosServicosGlobais = [];
+
+        // 1. Carrega os Serviços do Banco de Dados
+        db.ref('servicos').once('value').then(snap => {
+            const servicosObj = snap.val() ? snap.val() : {};
+            todosServicosGlobais = Object.values(servicosObj).sort((a, b) => a.nome.localeCompare(b.nome));
+            
+            renderizarServicos("todos");
+        }).catch(err => console.error("Erro ao carregar serviços:", err));
+
+        // 2. Carrega as Profissionais do Banco de Dados
+        db.ref('profissionais').once('value').then(snap => {
+            const profsObj = snap.val() ? snap.val() : {};
+            let profissionais = Object.values(profsObj);
+
+            const sel = document.getElementById("pub-profissional");
+            profissionais.sort((a, b) => a.nome.localeCompare(b.nome));
+            
+            sel.innerHTML = '<option value="">Qualquer profissional disponível</option>' + 
+                profissionais.map(p => `<option value="${p.id}" data-nome="${p.nome}" data-cargo="${p.cargo || ''}">${p.nome}</option>`).join('');
+        }).catch(err => console.error("Erro ao carregar profissionais:", err));
+
+
+        // ===== FUNÇÃO QUE MONTA A CAIXA DE SERVIÇOS (COM FILTRO) =====
+        function renderizarServicos(tipoProfissional) {
+            const sel = document.getElementById("pub-servico");
+            
+            if (todosServicosGlobais.length === 0) {
+                sel.innerHTML = '<option value="">Nenhum plano cadastrado</option>';
+                return;
+            }
+
+            let htmlBase = '<option value="">Selecione o plano...</option>';
+            let htmlCabelo = '<optgroup label="💇‍♀️ Cabelo (Valor sob avaliação)">';
+            let htmlUnhas = '<optgroup label="💅 Unhas (Valor Fixo)">';
+            
+            let temCabelo = false;
+            let temUnhas = false;
+
+            todosServicosGlobais.forEach(s => {
+                // Checa a categoria salva no banco. Se não existir (serviços antigos), usa o plano B.
+                let isManicure = false;
+                if (s.categoria) {
+                    isManicure = (s.categoria === 'manicure');
+                } else {
+                    const palavrasManicure = ['manicure', 'pé', 'esmalta', 'unha', 'pedicure', 'gel'];
+                    isManicure = palavrasManicure.some(palavra => s.nome.toLowerCase().includes(palavra));
+                }
+
+                // Se for unha E (estamos mostrando todos OU a profissional é manicure)
+                if (isManicure && (tipoProfissional === "todos" || tipoProfissional === "manicure")) {
+                    htmlUnhas += `<option value="${s.nome}" data-preco="${s.preco}" data-is-manicure="true">${s.nome} - R$ ${parseFloat(s.preco).toFixed(2)}</option>`;
+                    temUnhas = true;
+                } 
+                // Se for cabelo E (estamos mostrando todos OU a profissional é do cabelo)
+                else if (!isManicure && (tipoProfissional === "todos" || tipoProfissional === "cabelo")) {
+                    htmlCabelo += `<option value="${s.nome}" data-preco="${s.preco}" data-is-manicure="false">${s.nome} - Valor sob avaliação</option>`;
+                    temCabelo = true;
+                }
+            });
+
+            htmlCabelo += '</optgroup>';
+            htmlUnhas += '</optgroup>';
+
+            if (temCabelo) htmlBase += htmlCabelo;
+            if (temUnhas) htmlBase += htmlUnhas;
+
+            sel.innerHTML = htmlBase;
+        }
+
+        // ===== LÓGICA DE DETECTAR QUEM FOI SELECIONADA =====
+        function filtrarServicosPorProfissional() {
+            const selectProf = document.getElementById("pub-profissional");
+            const nomeProfissional = selectProf.options[selectProf.selectedIndex]?.getAttribute('data-nome') || "";
+            const cargo = selectProf.options[selectProf.selectedIndex]?.getAttribute('data-cargo') || "";
+
+            let tipo = "todos";
+            
+            if (nomeProfissional !== "") {
+                const isManicure = cargo.toLowerCase().includes("manicure") || 
+                                   nomesDasManicures.some(nomeConfig => nomeProfissional.toLowerCase().includes(nomeConfig.toLowerCase()));
+                
+                tipo = isManicure ? "manicure" : "cabelo";
+            }
+            
+            renderizarServicos(tipo);
+        }
+
+        // ===== EVENTOS DE MUDANÇA NA TELA =====
+        let horariosOcupadosCache = [];
+        function chaveHora(hora) { return hora.replace(':', '-'); }
+
+        function carregarHorariosOcupados() {
+            const data = document.getElementById("pub-data").value;
+            const profId = document.getElementById("pub-profissional").value;
+            const divAviso = document.getElementById("pub-horarios-ocupados");
+            horariosOcupadosCache = [];
+
+            if(!data) {
+                divAviso.style.display = "none"; return;
+            }
+
+            if(!profId) {
+                divAviso.style.display = "block";
+                divAviso.innerHTML = "ℹ️ <strong>Dica:</strong> Escolha um instrutor específico para vermos os horários já ocupados dele.";
+                return;
+            }
+
+            db.ref(`disponibilidade/${data}/${profId}`).once('value').then(snap => {
+                const ocupados = snap.val() ? Object.keys(snap.val()) : [];
+                horariosOcupadosCache = ocupados.map(h => h.replace('-', ':'));
+
+                if(horariosOcupadosCache.length === 0) {
+                    divAviso.style.display = "block";
+                    divAviso.innerHTML = "✅ <strong>Agenda livre!</strong> Nenhum horário ocupado neste dia com esse instrutor.";
+                } else {
+                    divAviso.style.display = "block";
+                    divAviso.innerHTML = "🕐 <strong>Horários já ocupados:</strong><br>" + horariosOcupadosCache.sort().join(", ");
+                }
+                verificarConflitoHorario();
+            }).catch(err => {
+                console.error("Erro ao checar horários:", err);
+                divAviso.style.display = "none";
+            });
+        }
+
+        function verificarConflitoHorario() {
+            const hora = document.getElementById("pub-hora").value;
+            const avisoConflito = document.getElementById("pub-aviso-conflito");
+            const temConflito = hora && horariosOcupadosCache.includes(hora);
+            avisoConflito.style.display = temConflito ? "block" : "none";
+            return temConflito;
+        }
+
+        document.getElementById("pub-profissional").addEventListener("change", () => {
+            carregarHorariosOcupados();
+            filtrarServicosPorProfissional();
+        });
+        
+        document.getElementById("pub-data").addEventListener("change", carregarHorariosOcupados);
+        document.getElementById("pub-hora").addEventListener("change", verificarConflitoHorario);
+
+        // ===== SALVAR E IR PARA O WHATSAPP =====
+        function salvarAgendamentoPublico() {
+            const nome = document.getElementById("pub-nome").value.trim();
+            const tel = document.getElementById("pub-tel").value.trim();
+            
+            const servicoSelect = document.getElementById("pub-servico");
+            const opcaoSelecionada = servicoSelect.options[servicoSelect.selectedIndex];
+            
+            const servicoNome = servicoSelect.value;
+            const precoServico = parseFloat(opcaoSelecionada?.getAttribute('data-preco')) || 0;
+            const isManicure = opcaoSelecionada?.getAttribute('data-is-manicure') === 'true';
+
+            const profSelect = document.getElementById("pub-profissional");
+            const profId = profSelect.value;
+            const profNome = profSelect.options[profSelect.selectedIndex]?.getAttribute('data-nome') || "Geral";
+
+            const data = document.getElementById("pub-data").value;
+            const hora = document.getElementById("pub-hora").value;
+
+            if(!nome || !tel || !servicoNome || !data || !hora) {
+                alert("Por favor, preencha todos os campos obrigatórios!");
+                return;
+            }
+
+            if(profId && verificarConflitoHorario()) {
+                alert("⚠️ Esse horário já está ocupado com esse instrutor. Por favor, escolha outro.");
+                return;
+            }
+
+            const id = Date.now();
+            const novoAtendimento = {
+                id: id,
+                data: data,
+                hora: hora,
+                timestamp: Date.now(),
+                nomeCliente: nome,
+                telefoneCliente: tel,
+                profissionalId: profId || null,
+                nomeProfissional: profNome,
+                status: "Confirmado",
+                servicos: [{ id: Date.now(), nome: servicoNome, preco: precoServico, tipo: 'servico' }],
+                total: precoServico,
+                pagamento: "Pendente",
+                obs: "Agendado via Link Público - Aguardando validação via WhatsApp"
+            };
+
+            const btn = document.querySelector(".btn-glow");
+            btn.innerText = "PROCESSANDO...";
+            btn.style.opacity = "0.7";
+            btn.style.pointerEvents = "none";
+
+            db.ref(`atendimentos/${id}`).set(novoAtendimento)
+                .then(() => {
+                    if(profId) {
+                        db.ref(`disponibilidade/${data}/${profId}/${chaveHora(hora)}`).set(true)
+                            .catch(err => console.error("Erro ao registrar disponibilidade:", err));
+                    }
+                    
+                    const dataFormatada = data.split('-').reverse().join('/');
+
+                    db.ref('landingConfig/whatsapp').once('value').then(snap => {
+                        let numeroWhats = snap.val() || "83999999999";
+                        numeroWhats = numeroWhats.replace(/\D/g, ''); 
+                        if(!numeroWhats.startsWith('55')) numeroWhats = '55' + numeroWhats;
+
+                        let msg = "";
+                        if (isManicure) {
+                            msg = `Olá! Meu nome é ${nome}.%0A%0AQuero confirmar minha aula:%0A🏋️ *Plano:* ${servicoNome}%0A🧑‍🏫 *Instrutor:* ${profNome}%0A📅 *Data:* ${dataFormatada}%0A⏰ *Horário:* ${hora}%0A💰 *Valor:* R$ ${precoServico.toFixed(2)}`;
+                        } else {
+                            msg = `Olá! Meu nome é ${nome}.%0A%0AQuero confirmar minha aula e saber mais informações:%0A🏋️ *Plano:* ${servicoNome}%0A🧑‍🏫 *Instrutor:* ${profNome}%0A📅 *Data:* ${dataFormatada}%0A⏰ *Horário:* ${hora}`;
+                        }
+
+                        alert("🎉 Horário reservado no sistema! Vamos te direcionar para o nosso WhatsApp para finalizar.");
+                        window.location.href = `https://wa.me/${numeroWhats}?text=${msg}`;
+                    });
+                })
+                .catch(err => {
+                    alert("Erro ao realizar o agendamento. Tente novamente.");
+                    console.error(err);
+                    btn.innerText = "AGENDAR E IR PARA WHATSAPP";
+                    btn.style.opacity = "1";
+                    btn.style.pointerEvents = "auto";
+                });
+        }
+    </script>
+</body>
+</html>
