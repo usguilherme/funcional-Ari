@@ -6,6 +6,8 @@
     <title>Funcional do Ari</title>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Biblioteca para gerar o QR Code do Pix -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         :root {
             --bg-dark: #121212;
@@ -34,6 +36,13 @@
         
         .btn-primary { background-color: var(--primary); color: white; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 14px; text-decoration: none; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; }
         .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
+        
+        .btn-outline { background-color: transparent; color: var(--primary); padding: 12px 20px; border-radius: 6px; font-weight: 600; font-size: 14px; text-decoration: none; border: 1px solid var(--primary); cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-outline:hover { background-color: rgba(201, 59, 59, 0.1); }
+        
+        @media(max-width: 600px) {
+            .btn-outline span { display: none; } /* Esconde o texto no celular para caber no menu */
+        }
 
         section { padding: 80px 5%; max-width: 1200px; margin: 0 auto; }
         .section-header { text-align: center; margin-bottom: 50px; }
@@ -143,13 +152,24 @@
         .main-footer { text-align: center; padding: 60px 20px 100px; background: #0a0a0a; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 20px; }
         .main-footer .brand { justify-content: center; margin-bottom: 15px; }
         .main-footer p { color: var(--text-muted); font-size: 13px; margin: 5px 0; }
+
+        /* ===== MODAL ÁREA DO ALUNO ===== */
+        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .glass-modal { background: var(--bg-card); padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1); position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; opacity: 0.7; }
+        .close-btn:hover { opacity: 1; }
+        .modern-input { width: 100%; padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; font-family: var(--font-body); font-size: 15px; margin-bottom: 15px; outline: none; transition: 0.3s; }
+        .modern-input:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
     <header class="topbar">
         <div class="brand"><i data-lucide="triangle" class="brand-icon"></i> <span id="vt-header-titulo">FUNCIONALDOARI</span></div>
-        <a href="agendar.html" class="btn-primary">Agendar aula grátis</a>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-outline" onclick="abrirAreaAluno()"><i data-lucide="user" style="width:16px; margin-right:5px;"></i> <span>Área do Aluno</span></button>
+            <a href="agendar.html" class="btn-primary">Agendar aula</a>
+        </div>
     </header>
 
     <section class="hero" id="vt-hero">
@@ -281,7 +301,7 @@
         </div>
     </section>
 
-    <!-- SEÇÃO DÚVIDAS FREQUENTES (ATUALIZADA) -->
+    <!-- SEÇÃO DÚVIDAS FREQUENTES -->
     <section>
         <div class="section-header"><h2 class="section-title">DÚVIDAS FREQUENTES</h2></div>
         <div class="faq-list">
@@ -323,10 +343,9 @@
         <p style="opacity:0.6; margin-top:15px;">&copy; <span id="ano-atual"></span> Funcional do Ari</p>
     </footer>
 
-    <!-- FABS FLUTUANTES (ÍCONE DO INSTAGRAM CORRIGIDO COM SVG NATIVO) -->
+    <!-- FABS FLUTUANTES -->
     <div class="fabs">
         <a href="#" id="vt-fab-ig" class="fab ig" target="_blank" style="display:none; align-items:center; justify-content:center;">
-            <!-- SVG Nativo para garantir exibição -->
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16.11 7.5v-.01"/><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
         </a>
         <a href="#" id="vt-fab-wa" class="fab wa" target="_blank" style="display:flex; align-items:center; justify-content:center;">
@@ -334,7 +353,39 @@
         </a>
     </div>
 
-    <!-- FIREBASE -->
+    <!-- MODAL ÁREA DO ALUNO -->
+    <div id="modal-aluno" class="modal-backdrop">
+        <div class="glass-modal">
+            <button onclick="document.getElementById('modal-aluno').style.display='none'" class="close-btn">×</button>
+            
+            <div id="etapa-busca">
+                <h3 style="font-family:var(--font-display); font-size:24px; color:var(--primary); margin-bottom:10px;">ÁREA DO ALUNO</h3>
+                <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Digite seu WhatsApp cadastrado para consultar sua mensalidade.</p>
+                <input type="tel" id="aluno-tel-busca" class="modern-input" placeholder="(83) 99999-9999" oninput="this.value = this.value.replace(/[^0-9() -]/g, '')">
+                <button onclick="buscarAluno()" class="btn-primary" style="width:100%; padding:15px; font-size:16px;">Consultar</button>
+                <p id="erro-busca" style="color:#f87171; font-size:13px; margin-top:10px; display:none; text-align:center;">Aluno não encontrado. Verifique o número.</p>
+            </div>
+
+            <div id="etapa-resultado" style="display:none; text-align:center;">
+                <h3 id="res-nome" style="font-family:var(--font-display); font-size:22px; color:white; margin-bottom:5px;">Olá, Aluno</h3>
+                <div id="res-status" style="display:inline-block; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:bold; margin-bottom:15px;">Status</div>
+                
+                <div id="area-pagamento" style="display:none; background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
+                    <p style="color:var(--text-muted); font-size:13px; margin-bottom:5px;">Vencimento: <strong id="res-vencimento" style="color:white;"></strong></p>
+                    <p style="font-size:24px; font-weight:bold; color:var(--primary); margin-bottom:15px;" id="res-valor">R$ 0,00</p>
+                    
+                    <canvas id="qr-pix-aluno" style="margin:0 auto 15px auto; border-radius:8px; background:white; padding:5px; display:block;"></canvas>
+                    
+                    <input type="text" id="pix-copia-cola-aluno" readonly style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.3); color:var(--text-muted); font-size:12px; margin-bottom:10px; text-align:center;">
+                    <button onclick="copiarPixAluno()" class="btn-primary" style="width:100%; padding:12px; font-size:14px; margin-bottom:10px;">Copiar Código Pix</button>
+                    
+                    <a href="#" id="btn-enviar-comprovante" target="_blank" style="display:inline-block; color:#22c55e; font-size:14px; text-decoration:none; margin-top:10px; font-weight:600;"><i data-lucide="message-circle" style="width:14px; vertical-align:middle; margin-right:4px;"></i> Enviar comprovante</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE E SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
@@ -359,6 +410,24 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Variáveis Globais para o Pix e Serviços
+        let configPix = {};
+        let mapServicos = {};
+        let numeroWhatsappLoja = "83999999999";
+
+        // Carrega as configurações do Pix do administrador
+        db.ref('config').once('value').then(snap => { 
+            configPix = snap.val() || {}; 
+        });
+
+        // Carrega o valor dos planos para a cobrança
+        db.ref('servicos').once('value').then(snap => {
+            const srvs = snap.val() || {};
+            Object.values(srvs).forEach(s => { 
+                mapServicos[s.nome] = parseFloat(s.preco) || 0; 
+            });
+        });
+
         db.ref('landingConfig').once('value').then(snap => {
             const cfg = snap.val() || {};
 
@@ -378,11 +447,13 @@
 
             const whatsapp = cfg.whatsapp || "";
             if (whatsapp) {
-                const waUrl = `https://wa.me/55${whatsapp}?text=Olá! Vim pelo site e gostaria de agendar um horário 🔥`;
+                numeroWhatsappLoja = whatsapp.replace(/\D/g, '');
+                if(!numeroWhatsappLoja.startsWith('55')) numeroWhatsappLoja = '55' + numeroWhatsappLoja;
+
+                const waUrl = `https://wa.me/${numeroWhatsappLoja}?text=Olá! Vim pelo site e gostaria de agendar um horário 🔥`;
                 document.getElementById("vt-btn-whatsapp").href = waUrl;
                 document.getElementById("vt-fab-wa").href = waUrl;
                 
-                // Formata número para o rodapé
                 let celFormatado = whatsapp;
                 if(whatsapp.length === 11) {
                     celFormatado = `(${whatsapp.substring(0,2)}) ${whatsapp.substring(2,3)} ${whatsapp.substring(3,7)}-${whatsapp.substring(7)}`;
@@ -395,7 +466,6 @@
                 fabIg.href = cfg.instagram;
                 fabIg.style.display = "flex";
                 
-                // Extrai o @ do link para colocar no rodapé
                 let arroba = cfg.instagram.split('instagram.com/')[1];
                 if(arroba) {
                     arroba = arroba.replace('/', '');
@@ -447,6 +517,175 @@
                 document.getElementById("section-evolucao").style.display = "block"; 
             }
         });
+
+        // ==========================================
+        // LÓGICA DA ÁREA DO ALUNO E PIX AUTOMÁTICO
+        // ==========================================
+        function abrirAreaAluno() {
+            document.getElementById('modal-aluno').style.display = 'flex';
+            document.getElementById('etapa-busca').style.display = 'block';
+            document.getElementById('etapa-resultado').style.display = 'none';
+            document.getElementById('aluno-tel-busca').value = '';
+            document.getElementById('erro-busca').style.display = 'none';
+        }
+
+        function buscarAluno() {
+            const inputTel = document.getElementById('aluno-tel-busca').value;
+            const telLimpo = inputTel.replace(/\D/g, '');
+            const erroMsg = document.getElementById('erro-busca');
+
+            if (telLimpo.length < 8) {
+                erroMsg.innerText = "Digite um número válido.";
+                erroMsg.style.display = 'block';
+                return;
+            }
+
+            const btn = document.querySelector('#etapa-busca button');
+            const txtOriginal = btn.innerText;
+            btn.innerText = "Buscando...";
+            btn.disabled = true;
+
+            db.ref('clientes').once('value').then(snap => {
+                const clientes = snap.val() ? Object.values(snap.val()) : [];
+                
+                // Procura um cliente cujo telefone limpo contenha os números digitados (ou seja exatamente igual)
+                const alunoEncontrado = clientes.find(c => {
+                    const cTelLimpo = (c.telefone || "").replace(/\D/g, '');
+                    return cTelLimpo.length >= 8 && cTelLimpo === telLimpo;
+                });
+
+                if (alunoEncontrado) {
+                    mostrarResultadoAluno(alunoEncontrado);
+                } else {
+                    erroMsg.innerText = "Aluno não encontrado. Verifique se o número foi digitado igual ao cadastro (com DDD).";
+                    erroMsg.style.display = 'block';
+                }
+            }).catch(err => {
+                console.error(err);
+                erroMsg.innerText = "Erro de conexão.";
+                erroMsg.style.display = 'block';
+            }).finally(() => {
+                btn.innerText = txtOriginal;
+                btn.disabled = false;
+            });
+        }
+
+        function mostrarResultadoAluno(aluno) {
+            document.getElementById('etapa-busca').style.display = 'none';
+            document.getElementById('etapa-resultado').style.display = 'block';
+
+            // Pega apenas o primeiro nome
+            const primeiroNome = aluno.nome.split(' ')[0];
+            document.getElementById('res-nome').innerText = `Olá, ${primeiroNome}!`;
+
+            const statusEl = document.getElementById('res-status');
+            const areaPagamento = document.getElementById('area-pagamento');
+            const statusBanco = aluno.statusMensalidade || 'atrasado'; // Padrão pendente se não existir
+
+            if (statusBanco === 'pago') {
+                statusEl.innerText = "✓ MENSALIDADE EM DIA";
+                statusEl.style.background = "rgba(34, 197, 94, 0.2)";
+                statusEl.style.color = "#22c55e";
+                statusEl.style.border = "1px solid rgba(34, 197, 94, 0.3)";
+                areaPagamento.style.display = 'none';
+            } else {
+                statusEl.innerText = "⚠️ PAGAMENTO PENDENTE";
+                statusEl.style.background = "rgba(248, 113, 113, 0.2)";
+                statusEl.style.color = "#f87171";
+                statusEl.style.border = "1px solid rgba(248, 113, 113, 0.3)";
+                
+                document.getElementById('res-vencimento').innerText = `Dia ${aluno.vencimento || '10'}`;
+                
+                // Busca o preço baseado no plano do aluno
+                const precoPlano = mapServicos[aluno.frequencia] || 0;
+                
+                if (precoPlano > 0) {
+                    document.getElementById('res-valor').innerText = `R$ ${precoPlano.toFixed(2)}`;
+                    areaPagamento.style.display = 'block';
+                    gerarPixAluno(precoPlano);
+                    
+                    // Configura o link do WhatsApp para enviar o comprovante
+                    const btnZap = document.getElementById('btn-enviar-comprovante');
+                    const msgComprovante = `Olá! Sou ${primeiroNome}, acabo de realizar o pagamento da minha mensalidade (R$ ${precoPlano.toFixed(2)}) via Pix do site. Segue o comprovante:`;
+                    btnZap.href = `https://wa.me/${numeroWhatsappLoja}?text=${encodeURIComponent(msgComprovante)}`;
+                } else {
+                    document.getElementById('res-valor').innerText = `Valor sob consulta`;
+                    document.getElementById('pix-copia-cola-aluno').value = "O seu plano precisa ser configurado com preço no painel.";
+                    areaPagamento.style.display = 'block';
+                }
+            }
+        }
+
+        // Funções matemáticas e de formatação exigidas pelo Banco Central para o Payload do Pix
+        function formatField(id, value) {
+            const valStr = value.toString();
+            const len = valStr.length.toString().padStart(2, '0');
+            return `${id}${len}${valStr}`;
+        }
+        function removeAcentos(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "");
+        }
+        function crc16(buffer) {
+            let crc = 0xFFFF;
+            for (let i = 0; i < buffer.length; i++) {
+                let x = ((crc >> 8) ^ buffer.charCodeAt(i)) & 0xFF;
+                x ^= x >> 4;
+                crc = ((crc << 8) ^ (x << 12) ^ (x << 5) ^ x) & 0xFFFF;
+            }
+            return crc.toString(16).toUpperCase().padStart(4, '0');
+        }
+
+        function gerarPixAluno(valor) {
+            if(!configPix.chavePix || !configPix.nomePix) {
+                document.getElementById("pix-copia-cola-aluno").value = "Aviso: A chave Pix do estúdio não está configurada.";
+                return;
+            }
+
+            const chave = configPix.chavePix.trim();
+            const nome = removeAcentos(configPix.nomePix.trim()).substring(0, 25); 
+            const cidade = removeAcentos(configPix.cidadePix || "Cidade").trim().substring(0, 15);
+            const valorFormatado = valor.toFixed(2);
+
+            let payload = 
+                formatField("00", "01") +                           
+                formatField("26",                                  
+                    formatField("00", "BR.GOV.BCB.PIX") +
+                    formatField("01", chave)
+                ) +
+                formatField("52", "0000") +                        
+                formatField("53", "986") +                         
+                formatField("54", valorFormatado) +                
+                formatField("58", "BR") +                          
+                formatField("59", nome) +                          
+                formatField("60", cidade) +                        
+                formatField("62",                                  
+                    formatField("05", "***")                       
+                );
+
+            payload += "6304";
+            payload += crc16(payload);
+
+            new QRious({
+                element: document.getElementById('qr-pix-aluno'),
+                value: payload, 
+                size: 200,
+                level: 'M' 
+            });
+            
+            document.getElementById("pix-copia-cola-aluno").value = payload;
+        }
+
+        function copiarPixAluno() {
+            const input = document.getElementById("pix-copia-cola-aluno");
+            input.select();
+            document.execCommand("copy");
+            
+            // Muda o texto do botão temporariamente para dar feedback visual
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Copiado! ✅";
+            setTimeout(() => { btn.innerText = originalText; }, 2000);
+        }
     </script>
 </body>
 </html>
