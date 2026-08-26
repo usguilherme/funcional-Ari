@@ -1,54 +1,108 @@
-<div class="glass-panel form-inline">
-    <h3 style="margin-bottom: 15px;">🌐 Vitrine Online</h3>
-    <p class="text-muted" style="font-size:13px; margin-bottom:15px;">
-        Essas informações aparecem na página pública de vendas do funcional (a vitrine de planos que você compartilha nas redes sociais).
-    </p>
-
-    <label class="label-small">Título de destaque (ex: nome do funcional)</label>
-    <input type="text" id="land-titulo" placeholder="Funcional do Ari" class="modern-input">
-
-    <label class="label-small mt-10">Frase de efeito (subtítulo)</label>
-    <input type="text" id="land-subtitulo" placeholder="Não é sobre ser perfeito. É sobre começar!" class="modern-input">
-
-    <div class="mobile-stack mt-10" style="display:flex; gap:10px; width:100%;">
-        <div style="flex:1;">
-            <label class="label-small">WhatsApp (com DDD, só números)</label>
-            <input type="text" id="land-whatsapp" placeholder="83999999999" class="modern-input">
+<div id="config-landing" class="view-section">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+            <h2 style="color: var(--primary); margin: 0; display:flex; align-items:center; gap:8px;"><i data-lucide="globe"></i> Vitrine Online</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Configure as informações da sua página de vendas pública.</p>
         </div>
-        <div style="flex:1;">
-            <label class="label-small">Instagram (link completo, opcional)</label>
-            <input type="text" id="land-instagram" placeholder="https://instagram.com/seu_perfil" class="modern-input">
+    </div>
+    
+    <div class="glass-panel" style="padding: 24px;">
+        <div class="grid-2 mobile-stack">
+            <div>
+                <label class="label-small">Título de Destaque</label>
+                <input type="text" id="landing-titulo" class="modern-input" placeholder="Ex: Funcional do Ari">
+            </div>
+            <div>
+                <label class="label-small">Frase de Efeito (Subtítulo)</label>
+                <input type="text" id="landing-subtitulo" class="modern-input" placeholder="Ex: Não é sobre ser perfeito. É sobre começar!">
+            </div>
+        </div>
+        
+        <div class="grid-2 mobile-stack mt-10">
+            <div>
+                <label class="label-small">WhatsApp (DDD + Número)</label>
+                <input type="text" id="landing-whatsapp" class="modern-input" placeholder="Ex: 83999999999">
+            </div>
+            <div>
+                <label class="label-small">Instagram (Link Completo)</label>
+                <input type="text" id="landing-instagram" class="modern-input" placeholder="https://instagram.com/seu_perfil">
+            </div>
+        </div>
+        
+        <div class="grid-2 mobile-stack mt-10">
+            <div>
+                <label class="label-small">Endereço Físico</label>
+                <input type="text" id="landing-endereco" class="modern-input" placeholder="Rua, Número - Bairro, Cidade">
+            </div>
+            <div>
+                <label class="label-small">Link do Google Maps (Opcional)</label>
+                <input type="text" id="landing-maps" class="modern-input" placeholder="https://maps.google.com/?q=...">
+            </div>
+        </div>
+
+        <div class="grid-2 mobile-stack mt-10">
+            <div>
+                <label class="label-small">Foto de Capa (Opcional)</label>
+                <input type="file" id="landing-capa" accept="image/*" class="modern-input">
+            </div>
+            <div>
+                <label class="label-small">Foto da Equipe (Opcional)</label>
+                <input type="file" id="landing-equipe-foto" accept="image/*" class="modern-input">
+            </div>
+        </div>
+
+        <div class="divider" style="margin: 30px 0; border-top: 1px solid rgba(255,255,255,0.05);"></div>
+        
+        <h4 style="color: var(--primary); margin-bottom: 15px; display:flex; align-items:center; gap:8px;"><i data-lucide="image"></i> Alunos Destaque (Antes e Depois)</h4>
+
+        <div class="grid-2 mobile-stack">
+            <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px;">
+                <h5 style="color: #fff; margin: 0 0 15px 0;">Evolução 1</h5>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div>
+                        <label class="label-small">Foto ANTES</label>
+                        <input type="file" id="ba1-antes" accept="image/*" class="modern-input">
+                    </div>
+                    <div>
+                        <label class="label-small">Foto DEPOIS</label>
+                        <input type="file" id="ba1-depois" accept="image/*" class="modern-input">
+                    </div>
+                    <div>
+                        <label class="label-small">Texto (Ex: -22KG)</label>
+                        <input type="text" id="ba1-texto" class="modern-input" placeholder="-22KG">
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 12px;">
+                <h5 style="color: #fff; margin: 0 0 15px 0;">Evolução 2</h5>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div>
+                        <label class="label-small">Foto ANTES</label>
+                        <input type="file" id="ba2-antes" accept="image/*" class="modern-input">
+                    </div>
+                    <div>
+                        <label class="label-small">Foto DEPOIS</label>
+                        <input type="file" id="ba2-depois" accept="image/*" class="modern-input">
+                    </div>
+                    <div>
+                        <label class="label-small">Texto (Ex: -11KG)</label>
+                        <input type="text" id="ba2-texto" class="modern-input" placeholder="-11KG">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn-glow full-width mt-15" onclick="salvarConfigLanding()" style="margin-top:24px;">SALVAR VITRINE</button>
+        
+        <div style="text-align:center; margin-top:20px;">
+            <a href="vitrine.html" target="_blank" class="btn-small bg-purple" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none;"><i data-lucide="external-link" style="width:16px; height:16px;"></i> Ver página pública</a>
         </div>
     </div>
 
-    <label class="label-small mt-10">Endereço</label>
-    <input type="text" id="land-endereco" placeholder="Rua Exemplo, 123 - Centro, Cidade/UF" class="modern-input">
-
-    <label class="label-small mt-10">Link do Google Maps (opcional)</label>
-    <input type="text" id="land-maps" placeholder="https://maps.google.com/?q=..." class="modern-input">
-
-    <div class="mt-15" style="display:flex; align-items:center; gap:10px;">
-        <div style="flex:1;">
-            <label class="label-small">Foto de capa da vitrine (opcional)</label>
-            <input type="file" id="land-capa" accept="image/*" class="modern-input">
-        </div>
+    <div class="glass-panel" style="margin-top:20px; padding:20px; border-left:4px solid var(--warning);">
+        <h4 style="margin:0 0 10px 0; color:var(--warning); display:flex; align-items:center; gap:8px;"><i data-lucide="star" style="width:18px;"></i> Planos em destaque</h4>
+        <p style="margin:0; font-size:13px; color:var(--text-muted);">Marque "Destacar no site" na edição de cada plano (aba Planos/Treinos) para que ele apareça com evidência na vitrine. Foto e descrição também são editados por lá.</p>
+        <button onclick="abrirAba('servicos')" class="btn-small mt-10" style="margin-top: 15px;">Ir para Planos/Treinos</button>
     </div>
-    <div id="land-capa-preview" style="margin-top:8px;"></div>
-
-    <button onclick="salvarLandingConfig()" class="btn-glow full-width mt-15">SALVAR VITRINE</button>
-
-    <div class="mt-15" style="text-align:center;">
-        <a href="vitrine.html" target="_blank" class="btn-small bg-purple" style="text-decoration:none; display:inline-block;">
-            👀 Ver página pública
-        </a>
-    </div>
-</div>
-
-<div class="glass-panel mt-15" style="margin-bottom: 80px;">
-    <h3 style="margin-bottom: 10px;">⭐ Planos em destaque</h3>
-    <p class="text-muted" style="font-size:13px; margin-bottom:10px;">
-        Marque "Destacar no site" na edição de cada plano (aba Planos) para que ele apareça com mais evidência na vitrine.
-        Foto e descrição de cada plano também são editadas por lá.
-    </p>
-    <button onclick="abrirAba('servicos')" class="btn-small bg-glass" style="width:100%;">Ir para Cadastro de Planos</button>
 </div>

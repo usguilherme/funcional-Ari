@@ -256,12 +256,21 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script src="js/local-db.js"></script>
-    
+    <!-- SDKs oficiais do Firebase (mesmo projeto usado no painel admin e na vitrine) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <script>
-        // Configuração Oficial
-        if (!firebase.apps.length) firebase.initializeApp({});
+        // Mesma config do projeto real (igual à usada no index.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBY4nfykJETa-Vw6E5TLOVAkuPVXva0Bx4",
+            authDomain: "funcional-ari.firebaseapp.com",
+            projectId: "funcional-ari",
+            storageBucket: "funcional-ari.firebasestorage.app",
+            messagingSenderId: "790601708418",
+            appId: "1:790601708418:web:048f04d9d498096460159b"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         // ========================================================

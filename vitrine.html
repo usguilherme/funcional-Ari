@@ -3,585 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Funcional do Ari | Treinos Funcionais</title>
+    <title>Funcional do Ari</title>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-dark: #0a0605;
-            --bg-surface: rgba(30, 20, 18, 0.6);
-            --bg-surface-2: rgba(255,255,255,0.03);
-            --primary: #e6432f;
-            --primary-glow: rgba(230, 67, 47, 0.4);
-            --gold: #ff8a4c;
+            --bg-dark: #121212;
+            --bg-card: #1a1a1a;
+            --bg-card-hover: #222222;
+            --primary: #c93b3b;
+            --primary-hover: #e04444;
             --text-main: #ffffff;
-            --text-muted: #9ca3af;
+            --text-muted: #a0a0a0;
             --font-display: 'Anton', sans-serif;
             --font-body: 'Plus Jakarta Sans', sans-serif;
         }
+
         * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: var(--font-body);
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
-        h1,h2,h3,.vt-display { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+        h1, h2, h3, .font-display { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* ===== TOPBAR ===== */
-        .vt-topbar {
-            position: sticky; top:0; z-index: 100;
-            display:flex; align-items:center; justify-content:space-between;
-            padding: 16px 24px;
-            background: rgba(10,6,5,0.85);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        .vt-brand { display:flex; align-items:center; gap:10px; font-family:var(--font-display); letter-spacing:1px; font-size:18px; }
-        .vt-brand-mark { width:32px; height:32px; border-radius:8px; background: linear-gradient(135deg, var(--primary), var(--gold)); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); }
-        .vt-topbar .btn-glow { padding: 10px 20px; font-size: 13px; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        @keyframes fadeUp { from { opacity:0; transform: translateY(30px);} to {opacity:1; transform:translateY(0);} }
-        .animate-up { animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards; }
+        .topbar { position: fixed; top:0; left:0; width:100%; z-index: 100; display:flex; align-items:center; justify-content:space-between; padding: 15px 5%; background: rgba(18,18,18,0.95); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .brand { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:20px; letter-spacing:1px; }
+        .brand-icon { color: var(--primary); font-size:24px; }
+        
+        .btn-primary { background-color: var(--primary); color: white; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 14px; text-decoration: none; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
-        /* ===== HERO ===== */
-        .vt-hero {
-            position: relative; text-align:center; padding: 100px 20px 60px;
-            background: radial-gradient(circle at top, #2d120c 0%, var(--bg-dark) 70%);
-            min-height: 50vh; display:flex; align-items:center; justify-content:center;
-        }
-        .vt-hero.tem-capa { padding-top: 180px; background: transparent; }
-        .vt-hero-capa {
-            position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;
-            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-            z-index:0; opacity:0.6;
-        }
-        .vt-hero-conteudo { position:relative; z-index:2; max-width:640px; margin:0 auto; }
-        #vt-selo {
-            font-size:13px; letter-spacing:3px; text-transform:uppercase; color: var(--primary);
-            margin-bottom:16px; display:inline-block; background: rgba(230,67,47,0.1);
-            padding:6px 16px; border-radius:30px; border:1px solid rgba(230,67,47,0.25);
-        }
-        .vt-hero h1 {
-            font-size: 46px; font-weight:800; line-height:1.05; margin-bottom:18px;
-        }
-        .vt-hero h1 .accent { color: var(--primary); }
-        .vt-hero p { color: var(--text-muted); font-size:16px; line-height:1.6; margin-bottom:30px; }
+        section { padding: 80px 5%; max-width: 1200px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 50px; }
+        .eyebrow { color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .section-title { font-size: 40px; color: #fff; line-height: 1.1; }
+        .section-subtitle { color: var(--text-muted); font-size: 15px; margin-top: 15px; max-width: 600px; margin-left: auto; margin-right: auto; }
 
-        .btn-glow {
-            display:inline-block; background: linear-gradient(135deg, var(--primary), var(--gold));
-            color:white; font-family:var(--font-display); font-weight:700; font-size:15px;
-            padding:16px 32px; border-radius:50px; text-decoration:none; text-transform:uppercase;
-            letter-spacing:1px; box-shadow: 0 10px 20px rgba(230,67,47,0.35);
-            transition: all 0.3s ease; border:none; cursor:pointer;
-        }
-        .btn-glow:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(230,67,47,0.5); }
+        .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-top: 80px; position: relative; background: radial-gradient(circle at center, #2a1515 0%, var(--bg-dark) 60%); }
+        .hero-pin { display: inline-flex; align-items: center; gap: 6px; background: rgba(201, 59, 59, 0.1); border: 1px solid rgba(201, 59, 59, 0.3); color: var(--primary); padding: 6px 16px; border-radius: 30px; font-size: 12px; font-weight: 700; letter-spacing: 1px; margin-bottom: 20px; text-transform: uppercase; }
+        .hero h1 { font-size: clamp(50px, 8vw, 90px); line-height: 0.95; margin-bottom: 20px; }
+        .hero h1 .highlight { color: var(--primary); }
+        .hero p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin-bottom: 40px; }
+        .hero-btn { width: 100%; max-width: 600px; padding: 20px; font-size: 18px; border-radius: 8px; margin-bottom: 20px; }
+        
+        .hero-trust { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; max-width: 600px; width: 100%; }
+        .trust-badge { flex: 1; min-width: 250px; display: flex; align-items: center; gap: 15px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 8px; text-align: left; }
+        .trust-badge i { color: #4ade80; }
+        .trust-badge.alert i { color: #fbbf24; }
+        .trust-badge strong { display: block; font-size: 14px; }
+        .trust-badge span { font-size: 12px; color: var(--text-muted); }
 
-        .vt-trust-row { display:flex; gap:12px; margin-top:24px; flex-wrap:wrap; justify-content:center; }
-        .vt-trust-chip {
-            display:flex; align-items:center; gap:10px; text-align:left;
-            background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
-            padding:12px 18px; border-radius:14px; font-size:13px;
-        }
-        .vt-trust-chip .ic { font-size:16px; }
-        .vt-trust-chip b { display:block; font-size:13px; }
-        .vt-trust-chip span.sub { color: var(--text-muted); font-size:12px; }
+        .video-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .video-wrapper { width: 100%; max-width: 350px; aspect-ratio: 9/16; background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .video-wrapper iframe { width: 100%; height: 100%; border: none; }
 
-        /* ===== SECTIONS ===== */
-        .vt-section { max-width:1000px; margin:0 auto; padding:60px 20px; }
-        .vt-eyebrow { color: var(--primary); font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; text-align:center; margin-bottom:10px; }
-        .vt-section-titulo { font-size:30px; font-weight:700; margin-bottom:14px; text-align:center; }
-        .vt-section-sub { text-align:center; color: var(--text-muted); font-size:15px; margin-bottom:36px; }
+        .target-list { display: flex; flex-direction: column; gap: 15px; max-width: 800px; margin: 0 auto; }
+        .target-item { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 20px 25px; border-radius: 8px; display: flex; align-items: center; gap: 15px; font-size: 15px; color: #ddd; transition: 0.3s; }
+        .target-item:hover { background: var(--bg-card-hover); border-color: rgba(255,255,255,0.1); }
+        .target-item i { color: var(--primary); }
 
-        /* Bullet list "esse treino é para você que" */
-        .vt-bullet-list { display:flex; flex-direction:column; gap:14px; }
-        .vt-bullet-item {
-            display:flex; align-items:center; gap:14px; background: var(--bg-surface-2);
-            border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:18px 22px; font-size:15px;
-        }
-        .vt-bullet-item .arrow { color: var(--primary); font-weight:700; }
+        .method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .method-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 30px; border-radius: 12px; text-align: center; transition: 0.3s; }
+        .method-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .method-card .icon-box { width: 60px; height: 60px; margin: 0 auto 20px; border-radius: 50%; background: rgba(201, 59, 59, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .method-card h3 { font-size: 20px; margin-bottom: 10px; }
+        .method-card p { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
 
-        /* Feature grid */
-        .vt-feature-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; }
-        .vt-feature-card {
-            background: var(--bg-surface-2); border:1px solid rgba(255,255,255,0.08); border-radius:16px;
-            padding:26px 20px; text-align:center;
-        }
-        .vt-feature-card .ic { font-size:26px; margin-bottom:10px; }
-        .vt-feature-card h4 { font-size:15px; margin-bottom:6px; font-weight:700; }
-        .vt-feature-card p { color: var(--text-muted); font-size:13px; line-height:1.4; }
+        .ba-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .ba-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; width: 100%; max-width: 450px; }
+        .ba-images { display: flex; position: relative; }
+        .ba-images img { width: 50%; height: 300px; object-fit: cover; }
+        .ba-images .tag { position: absolute; top: 15px; padding: 4px 10px; font-size: 10px; font-weight: 800; border-radius: 4px; color: white; letter-spacing: 1px; }
+        .ba-images .tag.antes { left: 15px; background: var(--primary); }
+        .ba-images .tag.depois { right: 15px; background: #22c55e; }
+        .ba-footer { padding: 20px; text-align: center; font-family: var(--font-display); font-size: 24px; color: var(--primary); }
 
-        /* Before / After */
-        .vt-ba-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:24px; }
-        .vt-ba-card { border-radius:18px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); background: var(--bg-surface-2); }
-        .vt-ba-imgs { display:grid; grid-template-columns: 1fr 1fr; position:relative; }
-        .vt-ba-imgs img { width:100%; height:220px; object-fit:cover; display:block; }
-        .vt-ba-tag { position:absolute; top:10px; font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; letter-spacing:1px; }
-        .vt-ba-tag.antes { left:10px; background: var(--primary); color:#fff; }
-        .vt-ba-tag.depois { right:10px; background:#2ecc71; color:#062; }
-        .vt-ba-result { text-align:center; padding:16px; font-family:var(--font-display); font-size:22px; color: var(--primary); }
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .test-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 30px; border-radius: 12px; }
+        .stars { color: #fbbf24; margin-bottom: 15px; letter-spacing: 2px; }
+        .test-card p { font-size: 15px; line-height: 1.6; font-style: italic; color: #ccc; margin-bottom: 20px; }
+        .author { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .author-info strong { display: block; font-size: 14px; }
+        .author-info span { font-size: 12px; color: var(--text-muted); }
 
-        /* Testimonials */
-        .vt-test-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:20px; }
-        .vt-test-card { background: var(--bg-surface-2); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:24px; }
-        .vt-stars { color: var(--gold); letter-spacing:2px; margin-bottom:12px; }
-        .vt-test-card p { font-size:14px; line-height:1.6; font-style:italic; margin-bottom:18px; color:#ddd; }
-        .vt-test-author { display:flex; align-items:center; gap:10px; }
-        .vt-avatar { width:36px; height:36px; border-radius:50%; background: linear-gradient(135deg, var(--primary), var(--gold)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; }
-        .vt-test-author b { font-size:13px; display:block; }
-        .vt-test-author span { font-size:12px; color: var(--text-muted); }
+        .team-container { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+        @media(min-width: 800px) { .team-container { flex-direction: row; align-items: center; } }
+        .team-img { flex: 1; min-height: 300px; background-size: cover; background-position: center; background-color: #333; }
+        .team-content { flex: 1; padding: 40px; }
+        .team-content p { color: #ccc; line-height: 1.6; margin-bottom: 20px; font-size: 15px; }
+        .specialties { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 30px; }
+        .spec-badge { background: rgba(201, 59, 59, 0.05); border: 1px solid rgba(201, 59, 59, 0.2); color: var(--primary); padding: 8px 16px; border-radius: 30px; font-size: 12px; font-weight: 600; }
 
-        /* Steps */
-        .vt-steps { display:grid; grid-template-columns: repeat(3,1fr); gap:20px; counter-reset: step; }
-        .vt-step-card { background: var(--bg-surface-2); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:24px; position:relative; }
-        .vt-step-num { font-family: var(--font-display); font-size:34px; color: var(--primary); margin-bottom:8px; }
-        .vt-step-card h4 { font-size:15px; margin-bottom:6px; }
-        .vt-step-card p { font-size:13px; color: var(--text-muted); line-height:1.5; }
+        .steps-list { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
+        .step-item { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; display: flex; align-items: flex-start; gap: 20px; }
+        .step-num { width: 40px; height: 40px; min-width: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 20px; color: #fff; }
+        .step-content h4 { font-size: 18px; margin-bottom: 5px; color: #fff; }
+        .step-content p { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
 
-        /* Schedule */
-        .vt-schedule-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:18px; margin-bottom:24px; }
-        .vt-schedule-card {
-            background: var(--bg-surface-2); border:1px solid rgba(255,255,255,0.08); border-radius:16px;
-            padding:22px; text-align:center; cursor:pointer; transition: border-color .2s, transform .2s;
-        }
-        .vt-schedule-card:hover { transform: translateY(-3px); border-color: var(--primary); }
-        .vt-schedule-card .ic { font-size:24px; margin-bottom:8px; }
-        .vt-schedule-card .dia { font-family: var(--font-display); font-size:17px; margin-bottom:4px; }
-        .vt-schedule-card .tipo { color: var(--primary); font-size:13px; font-weight:700; margin-bottom:8px; }
-        .vt-schedule-card .horario { font-size:12px; color: var(--text-muted); }
+        .faq-list { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+        .faq-item { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; }
+        .faq-q { padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 600; font-size: 15px; }
+        .faq-q i { color: var(--primary); transition: 0.3s; }
+        .faq-item.open .faq-q i { transform: rotate(45deg); }
+        .faq-a { max-height: 0; padding: 0 20px; color: var(--text-muted); font-size: 14px; line-height: 1.6; transition: 0.3s; }
+        .faq-item.open .faq-a { padding-bottom: 20px; max-height: 200px; }
+        .faq-footer { background: #152218; border: 1px solid #1a3a22; padding: 30px; text-align: center; border-radius: 12px; margin-top: 30px; }
+        
+        .btn-whatsapp { background: #25D366; color: #000; }
+        .btn-whatsapp:hover { background: #20bd5a; }
 
-        /* Location */
-        .vt-contato-box { background: var(--bg-surface); border:1px solid rgba(255,255,255,0.06); border-radius:24px; padding:40px; text-align:center; backdrop-filter: blur(10px); }
-        .vt-contato-links { display:flex; flex-direction:column; gap:16px; align-items:center; margin-top:24px; }
-        .vt-link-btn { display:flex; align-items:center; gap:12px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:14px 24px; border-radius:16px; color:white; text-decoration:none; font-weight:500; width:100%; max-width:360px; transition: background .2s; }
-        .vt-link-btn:hover { background: rgba(255,255,255,0.08); }
-        .vt-link-icon { font-size:20px; }
-
-        /* FAQ */
-        .vt-faq-item { border-bottom:1px solid rgba(255,255,255,0.08); }
-        .vt-faq-q { display:flex; justify-content:space-between; align-items:center; padding:20px 4px; cursor:pointer; font-weight:600; font-size:15px; }
-        .vt-faq-q .plus { color: var(--primary); font-family: var(--font-display); font-size:20px; transition: transform .2s; }
-        .vt-faq-item.open .plus { transform: rotate(45deg); }
-        .vt-faq-a { max-height:0; overflow:hidden; color: var(--text-muted); font-size:14px; line-height:1.6; transition: max-height .3s ease; }
-        .vt-faq-item.open .vt-faq-a { padding-bottom:18px; }
-
-        /* Menu grid (from original) */
-        .vt-filters { display:flex; justify-content:center; gap:12px; margin-bottom:30px; flex-wrap:wrap; }
-        .vt-filter-btn { background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color: var(--text-muted); padding:10px 20px; border-radius:50px; font-family:var(--font-display); font-size:14px; font-weight:600; cursor:pointer; transition: all .3s ease; }
-        .vt-filter-btn:hover { background: rgba(255,255,255,0.1); color:white; }
-        .vt-filter-btn.active { background: var(--primary); color:#000; border-color: var(--primary); box-shadow: 0 4px 15px rgba(230,67,47,0.3); }
-        .vt-menu-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:24px; }
-        .vt-card { background: var(--bg-surface); border:1px solid rgba(255,255,255,0.05); border-radius:20px; overflow:hidden; backdrop-filter: blur(10px); transition: transform .3s ease, border-color .3s ease; display:flex; flex-direction:column; }
-        .vt-card:hover { transform: translateY(-5px); border-color: rgba(230,67,47,0.3); }
-        .vt-card.destaque { border:1px solid var(--gold); box-shadow: 0 10px 30px rgba(255,138,76,0.15); }
-        .vt-card-img-wrapper { width:100%; height:200px; position:relative; background:#151122; }
-        .vt-card-foto { width:100%; height:100%; object-fit:cover; }
-        .vt-card-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:40px; background: linear-gradient(45deg, #241210, #331a12); }
-        .vt-badge { position:absolute; top:12px; right:12px; background: var(--gold); color:#000; font-family:var(--font-display); font-size:11px; font-weight:800; padding:4px 12px; border-radius:20px; letter-spacing:1px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .vt-card-body { padding:24px; display:flex; flex-direction:column; flex-grow:1; }
-        .vt-card-nome { font-family:var(--font-display); font-size:20px; font-weight:700; margin-bottom:8px; color:#fff; }
-        .vt-card-desc { color: var(--text-muted); font-size:14px; line-height:1.5; margin-bottom:20px; flex-grow:1; }
-        .vt-card-footer { display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid rgba(255,255,255,0.05); }
-        .vt-card-preco { font-family:var(--font-display); font-size:14px; font-weight:500; color: var(--text-muted); background: rgba(255,255,255,0.05); padding:6px 12px; border-radius:8px; }
-        .vt-btn-mini { background: rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); padding:8px 16px; border-radius:50px; font-size:13px; font-weight:600; text-decoration:none; transition: all .2s; }
-        .vt-btn-mini:hover { background: var(--primary); color:#000; border-color: var(--primary); }
-
-        .vt-footer { text-align:center; padding:20px 20px 100px; color: rgba(255,255,255,0.3); font-size:13px; }
-
-        .vt-fixed-cta { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:calc(100% - 40px); max-width:400px; z-index:50; text-align:center; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
-
-        .vt-fab { position:fixed; right:20px; width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; text-decoration:none; z-index:60; box-shadow: 0 6px 16px rgba(0,0,0,0.4); }
-        .vt-fab.wa { bottom:20px; background:#25D366; }
-        .vt-fab.ig { bottom:78px; background: radial-gradient(circle at 30% 107%, #fdf497, #fd5949, #d6249f, #285AEB); }
-
-        @media (min-width: 768px) {
-            .vt-fixed-cta { display:none; }
-            .vt-hero h1 { font-size: 60px; }
-            .vt-contato-links { flex-direction:row; justify-content:center; }
-            .vt-link-btn { width:auto; }
-        }
-        @media (max-width: 700px) {
-            .vt-feature-grid { grid-template-columns: 1fr 1fr; }
-            .vt-steps { grid-template-columns: 1fr; }
-        }
+        .fabs { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .fab { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; text-decoration: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.3s; }
+        .fab:hover { transform: scale(1.1); }
+        .fab.ig { display:none; background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+        .fab.wa { background: #25D366; }
     </style>
 </head>
 <body>
 
-    <div class="vt-topbar">
-        <div class="vt-brand"><span class="vt-brand-mark">🔺</span> FUNCIONALDOARI</div>
-        <a href="agendar.html" class="btn-glow">Agendar aula grátis</a>
-    </div>
-
-    <!-- HERO -->
-    <header class="vt-hero animate-up" id="vt-hero">
-        <div class="vt-hero-conteudo">
-            <span id="vt-selo">📍 Queimadas, PB</span>
-            <h1 id="vt-titulo">Não é sobre ser perfeito.<br>É sobre <span class="accent">começar!</span></h1>
-            <p id="vt-subtitulo">Treinos adaptados para você evoluir no seu ritmo, com acompanhamento de verdade.</p>
-            <a href="agendar.html" class="btn-glow">🔥 Quero minha aula grátis</a>
-            <div class="vt-trust-row">
-                <div class="vt-trust-chip"><span class="ic">✅</span><div><b>1ª aula 100% grátis</b><span class="sub">Sem compromisso</span></div></div>
-                <div class="vt-trust-chip"><span class="ic">⚠️</span><div><b>Vagas limitadas</b><span class="sub">Reserve a sua hoje</span></div></div>
-            </div>
-        </div>
+    <header class="topbar">
+        <div class="brand"><i data-lucide="triangle" class="brand-icon"></i> <span id="vt-header-titulo">FUNCIONALDOARI</span></div>
+        <a href="agendar.html" class="btn-primary">Agendar aula grátis</a>
     </header>
 
-    <!-- FRASE DE IMPACTO -->
-    <div style="background: linear-gradient(135deg, var(--primary), var(--gold)); text-align:center; padding: 22px 20px; font-weight:700; font-size:16px;">
-        "Você não precisa estar preparado. O treino se adapta a você. Só precisa <span style="text-decoration:underline;">COMEÇAR</span>!"
-    </div>
-
-    <!-- PARA QUEM É -->
-    <section class="vt-section animate-up">
-        <p class="vt-eyebrow">Esse treino é para você</p>
-        <h2 class="vt-section-titulo">Esse treino é para você que…</h2>
-        <div class="vt-bullet-list">
-            <div class="vt-bullet-item"><span class="arrow">→</span> Já tentou treinar e desistiu</div>
-            <div class="vt-bullet-item"><span class="arrow">→</span> Não gosta de academia</div>
-            <div class="vt-bullet-item"><span class="arrow">→</span> Precisa de alguém te acompanhando</div>
-            <div class="vt-bullet-item"><span class="arrow">→</span> Gosta de treino dinâmico e divertido</div>
-            <div class="vt-bullet-item"><span class="arrow">→</span> Quer voltar a se sentir bem com seu corpo</div>
-            <div class="vt-bullet-item"><span class="arrow">→</span> Busca resultados com acompanhamento real</div>
+    <section class="hero" id="vt-hero">
+        <div class="hero-pin"><i data-lucide="map-pin" style="width: 14px;"></i> QUEIMADAS, PB</div>
+        <h1 id="vt-titulo">NÃO É SOBRE SER PERFEITO.<br><span class="highlight">É SOBRE COMEÇAR!</span></h1>
+        <p id="vt-subtitulo">Treinos adaptados para você evoluir no seu ritmo, com acompanhamento de verdade.</p>
+        <a href="agendar.html" class="btn-primary hero-btn">Quero minha aula GRÁTIS</a>
+        <div class="hero-trust">
+            <div class="trust-badge"><i data-lucide="check-circle-2"></i><div><strong>1ª aula 100% grátis</strong><span>Sem compromisso</span></div></div>
+            <div class="trust-badge alert"><i data-lucide="alert-triangle"></i><div><strong>Vagas limitadas</strong><span>Reserve a sua hoje</span></div></div>
         </div>
     </section>
 
-    <!-- MÉTODO -->
-    <section class="vt-section animate-up">
-        <p class="vt-eyebrow">O método</p>
-        <h2 class="vt-section-titulo">Treine do seu jeito, evolua de verdade!</h2>
-        <p class="vt-section-sub">Chega de treinos genéricos. Cada aula pensada para o seu corpo e rotina.</p>
-        <div class="vt-feature-grid">
-            <div class="vt-feature-card"><div class="ic">🎯</div><h4>Feito para você</h4><p>No seu nível, sem comparação com ninguém</p></div>
-            <div class="vt-feature-card"><div class="ic">🤝</div><h4>Acompanhamento</h4><p>O Ari está do seu lado em cada movimento</p></div>
-            <div class="vt-feature-card"><div class="ic">📈</div><h4>Progressão segura</h4><p>Cada semana um passo a mais</p></div>
-            <div class="vt-feature-card"><div class="ic">⚡</div><h4>Menos estresse</h4><p>Treino que te dá energia, não te esgota</p></div>
-            <div class="vt-feature-card"><div class="ic">💪</div><h4>Mais disposição</h4><p>Mais ânimo e qualidade de vida</p></div>
-            <div class="vt-feature-card"><div class="ic">👥</div><h4>Comunidade</h4><p>Um grupo que te motiva a continuar</p></div>
+    <section>
+        <div class="section-header">
+            <span class="eyebrow">Veja na prática</span>
+            <h2 class="section-title">COMO É TREINAR COM A GENTE</h2>
+            <p class="section-subtitle">Cada aula é diferente, dinâmica e feita para você evoluir.</p>
+        </div>
+        <div class="video-container">
+            <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/kStbv10TS40" allowfullscreen></iframe></div>
         </div>
     </section>
 
-    <!-- ANTES E DEPOIS -->
-    <section class="vt-section animate-up">
-        <p class="vt-eyebrow">Transformações reais</p>
-        <h2 class="vt-section-titulo">Resultados de quem começou</h2>
-        <p class="vt-section-sub">Antes e depois de quem deu o primeiro passo.</p>
-        <div class="vt-ba-grid" id="vt-ba-grid">
-            <!-- Preenchido via config, ou estático como fallback -->
+    <section>
+        <div class="section-header"><h2 class="section-title">ESSE TREINO É PARA VOCÊ QUE...</h2></div>
+        <div class="target-list">
+            <div class="target-item"><i data-lucide="arrow-right"></i> Já tentou treinar e desistiu</div>
+            <div class="target-item"><i data-lucide="arrow-right"></i> Não gosta de academia</div>
+            <div class="target-item"><i data-lucide="arrow-right"></i> Precisa de alguém te acompanhando</div>
+            <div class="target-item"><i data-lucide="arrow-right"></i> Gosta de treino dinâmico e divertido</div>
+            <div class="target-item"><i data-lucide="arrow-right"></i> Quer voltar a se sentir bem com seu corpo</div>
+            <div class="target-item"><i data-lucide="arrow-right"></i> Busca resultados com acompanhamento real</div>
         </div>
     </section>
 
-    <!-- DEPOIMENTOS -->
-    <section class="vt-section animate-up">
-        <p class="vt-eyebrow">Quem vive, recomenda</p>
-        <h2 class="vt-section-titulo">O que dizem os alunos</h2>
-        <div class="vt-test-grid" id="vt-test-grid">
-            <!-- Preenchido via config, ou estático como fallback -->
+    <section>
+        <div class="section-header">
+            <span class="eyebrow">O Método</span>
+            <h2 class="section-title">TREINE DO SEU JEITO,<br>EVOLUA DE VERDADE!</h2>
+        </div>
+        <div class="method-grid">
+            <div class="method-card"><div class="icon-box"><i data-lucide="target"></i></div><h3 class="font-display">Feito para você</h3><p>No seu nível, sem comparação com ninguém.</p></div>
+            <div class="method-card"><div class="icon-box"><i data-lucide="handshake"></i></div><h3 class="font-display">Acompanhamento</h3><p>O Ari está do seu lado em cada movimento.</p></div>
+            <div class="method-card"><div class="icon-box"><i data-lucide="trending-up"></i></div><h3 class="font-display">Progressão segura</h3><p>Cada semana um passo a mais na sua evolução.</p></div>
         </div>
     </section>
 
-    <!-- SERVIÇOS / PLANOS (dinâmico via Firebase) -->
-    <section class="vt-section animate-up">
-        <p class="vt-eyebrow">É simples</p>
-        <h2 class="vt-section-titulo">🏋️ Nossos Planos e Treinos</h2>
-        <div class="vt-filters">
-            <button class="vt-filter-btn active" onclick="filtrarVitrine('todos', this)">✨ Todos</button>
-            <button class="vt-filter-btn" onclick="filtrarVitrine('cabelo', this)">🏋️ Funcional</button>
-            <button class="vt-filter-btn" onclick="filtrarVitrine('manicure', this)">🥊 Grupo</button>
+    <!-- SEÇÃO ANTES E DEPOIS DINÂMICA -->
+    <section id="section-evolucao" style="display:none;">
+        <div class="section-header">
+            <span class="eyebrow">Transformações reais</span>
+            <h2 class="section-title">Resultados de quem começou</h2>
         </div>
-        <div id="vt-lista-servicos" class="vt-menu-grid">
-            <div class="vt-card" style="align-items:center; padding:40px; color: var(--text-muted); grid-column: 1 / -1;">
-                <i>Carregando os planos de treino...</i>
-            </div>
+        <div class="ba-grid" id="vt-ba-grid">
+            <!-- Povoado pelo Firebase -->
         </div>
     </section>
 
-    <!-- PASSOS -->
-    <section class="vt-section animate-up">
-        <p class="vt-eyebrow">Da decisão ao primeiro treino</p>
-        <h2 class="vt-section-titulo">3 passos simples</h2>
-        <div class="vt-steps">
-            <div class="vt-step-card"><div class="vt-step-num">1</div><h4>Agende sua aula grátis</h4><p>Manda uma mensagem. A gente marca o melhor dia. Sem compromisso.</p></div>
-            <div class="vt-step-card"><div class="vt-step-num">2</div><h4>Treine no seu ritmo</h4><p>Sem pressão, sem julgamento. Venha como você é.</p></div>
-            <div class="vt-step-card"><div class="vt-step-num">3</div><h4>Evolua com acompanhamento</h4><p>O Ari acompanha cada avaliação e ajusta tudo para você evoluir sempre.</p></div>
+    <section>
+        <div class="section-header"><span class="eyebrow">Quem vive, recomenda</span><h2 class="section-title">O QUE DIZEM OS ALUNOS</h2></div>
+        <div class="test-grid">
+            <div class="test-card"><div class="stars">★★★★★</div><p>"O Funcional é a prática que acho melhor de fazer! Sempre muda, é descontraído..."</p><div class="author"><div class="avatar">L</div><div class="author-info"><strong>Laís</strong><span>Aluna do Funcional do Ari</span></div></div></div>
+            <div class="test-card"><div class="stars">★★★★★</div><p>"Gostei bastante! A atenção dos professores é muito boa..."</p><div class="author"><div class="avatar">E</div><div class="author-info"><strong>Maria Eloiza</strong><span>Aluna do Funcional do Ari</span></div></div></div>
+            <div class="test-card"><div class="stars">★★★★★</div><p>"Funcional top, equipe top e super atenciosos!"</p><div class="author"><div class="avatar">N</div><div class="author-info"><strong>Naiara Pereira</strong><span>Aluna do Funcional do Ari</span></div></div></div>
         </div>
     </section>
 
-    <!-- HORÁRIOS -->
-    <section class="vt-section animate-up">
-        <p class="vt-eyebrow">Escolha seu dia</p>
-        <h2 class="vt-section-titulo">Comece sua transformação!</h2>
-        <div class="vt-schedule-grid" id="vt-schedule-grid">
-            <div class="vt-schedule-card" onclick="window.open('https://wa.me/5583991233073?text=' + encodeURIComponent('Quero reservar minha aula de Segunda (Step)!'), '_blank')">
-                <div class="ic">🔥</div><div class="dia">Segunda</div><div class="tipo">Step</div><div class="horario">19h20 às 20h20</div>
-            </div>
-            <div class="vt-schedule-card" onclick="window.open('https://wa.me/5583991233073?text=' + encodeURIComponent('Quero reservar minha aula de Quarta (Funcional)!'), '_blank')">
-                <div class="ic">⚡</div><div class="dia">Quarta</div><div class="tipo">Funcional</div><div class="horario">19h20 às 20h20</div>
-            </div>
-            <div class="vt-schedule-card" onclick="window.open('https://wa.me/5583991233073?text=' + encodeURIComponent('Quero reservar minha aula de Sexta (Funcional)!'), '_blank')">
-                <div class="ic">💪</div><div class="dia">Sexta</div><div class="tipo">Funcional</div><div class="horario">19h20 às 20h20</div>
-            </div>
-        </div>
-        <p style="text-align:center; color: var(--text-muted); font-size:13px; margin-bottom:20px;">Vagas limitadas por turma — reserve a sua hoje</p>
-        <div style="text-align:center;">
-            <a href="agendar.html" class="btn-glow">Reservar minha aula grátis</a>
+    <section>
+        <div class="video-container">
+            <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/kStbv10TS40" allowfullscreen></iframe></div>
+            <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/4JhrbBkTjHk" allowfullscreen></iframe></div>
         </div>
     </section>
 
-    <!-- LOCALIZAÇÃO / CONTATO -->
-    <section class="vt-section animate-up">
-        <div class="vt-contato-box">
-            <h2 style="font-size:24px; margin-bottom:8px;">Onde treinamos</h2>
-            <p style="color: var(--text-muted); font-size:15px;">Estamos prontos para te receber e começar seu treino hoje mesmo.</p>
-            <div class="vt-contato-links">
-                <a id="vt-endereco-link" href="#" target="_blank" class="vt-link-btn">
-                    <span class="vt-link-icon">📍</span>
-                    <span id="vt-endereco-texto">Endereço não configurado</span>
-                </a>
-                <a id="vt-whatsapp-link" href="#" target="_blank" class="vt-link-btn">
-                    <span class="vt-link-icon">📱</span><span>WhatsApp</span>
-                </a>
-                <a id="vt-instagram-link" href="#" target="_blank" class="vt-link-btn" style="display:none;">
-                    <span class="vt-link-icon">📷</span><span>Instagram</span>
-                </a>
+    <!-- SEÇÃO EQUIPE DINÂMICA -->
+    <section>
+        <div class="section-header"><span class="eyebrow">Nossa equipe</span><h2 class="section-title">CONHEÇA NOSSA EQUIPE DE PROFISSIONAIS</h2></div>
+        <div class="team-container">
+            <div class="team-img" id="vt-equipe-foto"></div>
+            <div class="team-content">
+                <p>Por trás de cada treino, existe uma equipe comprometida em fazer você se sentir seguro, confiante e em constante evolução.</p>
+                <p>Nosso trabalho vai além de orientar exercícios. Estamos aqui para acompanhar sua caminhada, respeitar seu ritmo e ajudar você a conquistar resultados reais.</p>
+                <div class="specialties">
+                    <span class="spec-badge">Personal Trainer</span>
+                    <span class="spec-badge">Treino Funcional</span>
+                    <span class="spec-badge">Avaliação Física</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- FAQ -->
-    <section class="vt-section animate-up">
-        <p class="vt-eyebrow">Dúvidas frequentes</p>
-        <h2 class="vt-section-titulo">Ainda ficou com dúvida?</h2>
-        <div id="vt-faq-list">
-            <div class="vt-faq-item">
-                <div class="vt-faq-q" onclick="toggleFaq(this)">Nunca treinei, vou conseguir acompanhar? <span class="plus">+</span></div>
-                <div class="vt-faq-a">Sim! O treino se adapta ao seu nível, do zero ao avançado. O Ari acompanha cada movimento e ajusta a intensidade para você.</div>
-            </div>
-            <div class="vt-faq-item">
-                <div class="vt-faq-q" onclick="toggleFaq(this)">Tenho limitação ou dor, posso treinar? <span class="plus">+</span></div>
-                <div class="vt-faq-a">Pode sim. Conte sua limitação antes da aula e os exercícios são adaptados para o seu caso.</div>
-            </div>
-            <div class="vt-faq-item">
-                <div class="vt-faq-q" onclick="toggleFaq(this)">Como funciona o acompanhamento? <span class="plus">+</span></div>
-                <div class="vt-faq-a">Cada aluno tem progressão acompanhada de perto, com ajustes semanais conforme sua evolução.</div>
-            </div>
-            <div class="vt-faq-item">
-                <div class="vt-faq-q" onclick="toggleFaq(this)">Preciso estar preparado para começar? <span class="plus">+</span></div>
-                <div class="vt-faq-a">Não. O único pré-requisito é vontade de começar — o treino se adapta a você.</div>
-            </div>
-            <div class="vt-faq-item">
-                <div class="vt-faq-q" onclick="toggleFaq(this)">Como funciona a aula experimental? <span class="plus">+</span></div>
-                <div class="vt-faq-a">Você agenda pelo WhatsApp, escolhe o melhor dia e participa de uma aula completa, sem compromisso.</div>
-            </div>
-            <div class="vt-faq-item">
-                <div class="vt-faq-q" onclick="toggleFaq(this)">Vocês acompanham a evolução dos alunos? <span class="plus">+</span></div>
-                <div class="vt-faq-a">Sim, com avaliações periódicas para medir e comemorar cada resultado junto com você.</div>
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:30px;">
-            <p style="color: var(--text-muted); margin-bottom:14px;">Me chama no WhatsApp!</p>
-            <a href="#" id="vt-whatsapp-link-2" class="btn-glow">Falar no WhatsApp agora</a>
+    <section>
+        <div class="section-header"><span class="eyebrow">É Simples</span><h2 class="section-title">DA DECISÃO AO PRIMEIRO TREINO EM 3 PASSOS</h2></div>
+        <div class="steps-list">
+            <div class="step-item"><div class="step-num">1</div><div class="step-content"><h4>Agende sua aula grátis</h4><p>Manda uma mensagem. A gente marca o melhor dia. Sem compromisso.</p></div></div>
+            <div class="step-item"><div class="step-num">2</div><div class="step-content"><h4>Treine no seu ritmo</h4><p>Sem pressão, sem julgamento. Venha como você é.</p></div></div>
+            <div class="step-item"><div class="step-num">3</div><div class="step-content"><h4>Evolua com acompanhamento</h4><p>A equipe acompanha cada avaliação e ajusta tudo para você evoluir sempre.</p></div></div>
         </div>
     </section>
 
-    <footer class="vt-footer">
-        Funcional do Ari &copy; <span id="vt-ano"></span> • Feito com ❤️
+    <section>
+        <div class="section-header"><h2 class="section-title">DÚVIDAS FREQUENTES</h2></div>
+        <div class="faq-list">
+            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Nunca treinei, vou conseguir acompanhar? <i data-lucide="plus"></i></div><div class="faq-a">Sim! O treino se adapta ao seu nível, do zero ao avançado. A equipe acompanha cada movimento e ajusta a intensidade para você.</div></div>
+            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Tenho limitação ou dor, posso treinar? <i data-lucide="plus"></i></div><div class="faq-a">Pode sim. Conte sua limitação antes da aula e os exercícios são adaptados para o seu caso.</div></div>
+            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Como funciona a aula experimental? <i data-lucide="plus"></i></div><div class="faq-a">Você agenda pelo WhatsApp, escolhe o melhor dia e participa de uma aula completa, sem compromisso.</div></div>
+        </div>
+        <div class="faq-footer">
+            <h3 style="color: #fff; margin-bottom: 5px;">Ainda ficou com dúvida?</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Me chama no WhatsApp!</p>
+            <a href="#" id="vt-btn-whatsapp" target="_blank" class="btn-primary btn-whatsapp"><i data-lucide="message-circle" style="margin-right: 8px;"></i> Falar no WhatsApp agora</a>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; border-top: 1px solid rgba(255,255,255,0.05);">
+        Funcional do Ari &copy; 2026 • Termos e Condições
     </footer>
 
-    <a href="agendar.html" class="btn-glow vt-fixed-cta">🔥 Agendar aula grátis</a>
+    <!-- FABS FLUTUANTES -->
+    <div class="fabs">
+        <a href="#" id="vt-fab-ig" class="fab ig" target="_blank"><i data-lucide="instagram"></i></a>
+        <a href="#" id="vt-fab-wa" class="fab wa" target="_blank"><i data-lucide="phone"></i></a>
+    </div>
 
-    <a href="#" id="vt-fab-ig" class="vt-fab ig" style="display:none;" target="_blank">📷</a>
-    <a href="#" id="vt-fab-wa" class="vt-fab wa" target="_blank">📱</a>
-
-    <!-- Firebase SDK -->
-    <script src="js/local-db.js"></script>
-
+    <!-- FIREBASE (Seu projeto) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
-        document.getElementById("vt-ano").innerText = new Date().getFullYear();
+        lucide.createIcons();
 
-        // FAQ toggle
-        window.toggleFaq = function(el) {
-            const item = el.parentElement;
-            const answer = item.querySelector('.vt-faq-a');
+        function toggleFaq(element) {
+            const item = element.parentElement;
             const isOpen = item.classList.contains('open');
-            document.querySelectorAll('.vt-faq-item').forEach(i => {
-                i.classList.remove('open');
-                i.querySelector('.vt-faq-a').style.maxHeight = null;
-            });
-            if (!isOpen) {
-                item.classList.add('open');
-                answer.style.maxHeight = answer.scrollHeight + "px";
-            }
-        };
+            document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+            if(!isOpen) item.classList.add('open');
+        }
 
-        if (!firebase.apps.length) firebase.initializeApp({});
+        const firebaseConfig = {
+            apiKey: "AIzaSyBY4nfykJETa-Vw6E5TLOVAkuPVXva0Bx4",
+            authDomain: "funcional-ari.firebaseapp.com",
+            projectId: "funcional-ari",
+            storageBucket: "funcional-ari.firebasestorage.app",
+            messagingSenderId: "790601708418",
+            appId: "1:790601708418:web:048f04d9d498096460159b"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Configurações (Vitrine)
         db.ref('landingConfig').once('value').then(snap => {
             const cfg = snap.val() || {};
 
             if (cfg.titulo) {
                 document.getElementById("vt-titulo").innerHTML = cfg.titulo;
-                document.title = cfg.titulo + " | Treinos Funcionais";
+                document.getElementById("vt-header-titulo").innerText = cfg.titulo;
+                document.title = cfg.titulo;
             }
             if (cfg.subtitulo) document.getElementById("vt-subtitulo").innerText = cfg.subtitulo;
 
             if (cfg.capa) {
-                const hero = document.getElementById("vt-hero");
-                hero.classList.add("tem-capa");
-                const img = document.createElement("img");
-                img.src = cfg.capa;
-                img.className = "vt-hero-capa";
-                hero.prepend(img);
+                document.getElementById("vt-hero").style.backgroundImage = `radial-gradient(circle at center, rgba(42,21,21,0.8) 0%, var(--bg-dark) 100%), url('${cfg.capa}')`;
+                document.getElementById("vt-hero").style.backgroundSize = 'cover';
+                document.getElementById("vt-hero").style.backgroundPosition = 'center';
             }
 
+            // Whatsapp Config
             const whatsapp = cfg.whatsapp || "";
-            const linkWhats = document.getElementById("vt-whatsapp-link");
-            const linkWhats2 = document.getElementById("vt-whatsapp-link-2");
-            const fabWa = document.getElementById("vt-fab-wa");
             if (whatsapp) {
-                const waUrl = `https://wa.me/55${whatsapp}?text=${encodeURIComponent("Olá! Vim pelo site e gostaria de agendar um horário 🔥")}`;
-                linkWhats.href = waUrl;
-                linkWhats2.href = waUrl;
-                fabWa.href = waUrl;
-            } else {
-                linkWhats.style.display = "none";
+                const waUrl = `https://wa.me/55${whatsapp}?text=Olá! Vim pelo site e gostaria de agendar um horário 🔥`;
+                document.getElementById("vt-btn-whatsapp").href = waUrl;
+                document.getElementById("vt-fab-wa").href = waUrl;
             }
 
-            if (cfg.endereco) document.getElementById("vt-endereco-texto").innerText = cfg.endereco;
-            document.getElementById("vt-endereco-link").href = cfg.googleMapsUrl || "#";
-
+            // Instagram Config
             if (cfg.instagram) {
-                const linkInsta = document.getElementById("vt-instagram-link");
-                linkInsta.href = cfg.instagram;
-                linkInsta.style.display = "flex";
                 const fabIg = document.getElementById("vt-fab-ig");
                 fabIg.href = cfg.instagram;
                 fabIg.style.display = "flex";
             }
 
-            // Antes/depois e depoimentos, se configurados no banco
-            const baGrid = document.getElementById("vt-ba-grid");
-            if (cfg.antesDepois && cfg.antesDepois.length) {
-                baGrid.innerHTML = cfg.antesDepois.map(item => `
-                    <div class="vt-ba-card">
-                        <div class="vt-ba-imgs">
-                            <span class="vt-ba-tag antes">ANTES</span>
-                            <img src="${item.fotoAntes}" alt="Antes">
-                            <span class="vt-ba-tag depois">DEPOIS</span>
-                            <img src="${item.fotoDepois}" alt="Depois">
-                        </div>
-                        <div class="vt-ba-result">${item.resultado || ''}</div>
-                    </div>`).join('');
+            // Equipe Foto Config
+            if (cfg.equipeFoto) {
+                document.getElementById("vt-equipe-foto").style.backgroundImage = `url('${cfg.equipeFoto}')`;
             } else {
-                baGrid.closest('.vt-section').style.display = 'none';
+                // Foto padrão caso não envie nada no painel
+                document.getElementById("vt-equipe-foto").style.backgroundImage = `url('image_5b327d.jpg')`;
             }
 
-            const testGrid = document.getElementById("vt-test-grid");
-            if (cfg.depoimentos && cfg.depoimentos.length) {
-                testGrid.innerHTML = cfg.depoimentos.map(d => `
-                    <div class="vt-test-card">
-                        <div class="vt-stars">${'★'.repeat(d.estrelas || 5)}</div>
-                        <p>"${d.texto}"</p>
-                        <div class="vt-test-author">
-                            <div class="vt-avatar">${(d.nome || '?').charAt(0)}</div>
-                            <div><b>${d.nome}</b><span>Aluno(a) do Funcional do Ari</span></div>
-                        </div>
-                    </div>`).join('');
-            } else {
-                testGrid.closest('.vt-section').style.display = 'none';
-            }
-
-        }).catch(err => console.error("Erro config vitrine:", err));
-
-        let servicosGlobais = [];
-
-        db.ref('servicos').on('value', snap => {
-            const servicosObj = snap.val() ? snap.val() : {};
-            servicosGlobais = Object.values(servicosObj);
-
-            if (servicosGlobais.length === 0) {
-                document.getElementById("vt-lista-servicos").innerHTML = `<div class="vt-card" style="padding:30px; text-align:center; grid-column: 1 / -1;">Em breve, novidades no nosso cardápio!</div>`;
-                return;
-            }
-
-            servicosGlobais.sort((a, b) => a.nome.localeCompare(b.nome));
-
-            let filtroAtual = 'todos';
-            const btnAtivo = document.querySelector('.vt-filter-btn.active');
-            if (btnAtivo) {
-                if (btnAtivo.innerText.includes('Funcional')) filtroAtual = 'cabelo';
-                else if (btnAtivo.innerText.includes('Grupo')) filtroAtual = 'manicure';
-            }
-
-            renderizarVitrine(filtroAtual);
-        });
-
-        function renderCard(s) {
-            let isManicure = false;
-            if (s.categoria) {
-                isManicure = (s.categoria === 'manicure');
-            } else {
-                const palavrasManicure = ['manicure', 'pé', 'esmalta', 'unha', 'pedicure', 'gel'];
-                isManicure = palavrasManicure.some(palavra => s.nome.toLowerCase().includes(palavra));
-            }
-
-            let textoPreco = "🔍 Sob avaliação";
-            if (isManicure && s.preco) {
-                textoPreco = parseFloat(s.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            }
-
-            return `
-            <div class="vt-card ${s.destaque ? 'destaque' : ''}">
-                <div class="vt-card-img-wrapper">
-                    ${s.foto
-                        ? `<img src="${s.foto}" class="vt-card-foto" alt="${s.nome}" loading="lazy">`
-                        : `<div class="vt-card-placeholder">🏋️</div>`
-                    }
-                    ${s.destaque ? '<div class="vt-badge">★ DESTAQUE</div>' : ''}
-                </div>
-                <div class="vt-card-body">
-                    <h3 class="vt-card-nome">${s.nome}</h3>
-                    ${s.descricao ? `<p class="vt-card-desc">${s.descricao}</p>` : '<p class="vt-card-desc"></p>'}
-                    <div class="vt-card-footer">
-                        <span class="vt-card-preco" style="font-weight:${isManicure ? '800' : '500'}; color:${isManicure ? 'var(--primary)' : 'var(--text-muted)'};">${textoPreco}</span>
-                        <a href="agendar.html" class="vt-btn-mini">Agendar</a>
+            // Evoluções Antes e Depois
+            let baHTML = "";
+            if (cfg.ba1Antes && cfg.ba1Depois) {
+                baHTML += `
+                <div class="ba-card">
+                    <div class="ba-images">
+                        <span class="tag antes">ANTES</span>
+                        <img src="${cfg.ba1Antes}" alt="Antes">
+                        <span class="tag depois">DEPOIS</span>
+                        <img src="${cfg.ba1Depois}" alt="Depois">
                     </div>
-                </div>
-            </div>`;
-        }
-
-        window.filtrarVitrine = function(filtro, btnElement) {
-            document.querySelectorAll('.vt-filter-btn').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
-            renderizarVitrine(filtro);
-        };
-
-        function renderizarVitrine(filtro) {
-            const divTodos = document.getElementById("vt-lista-servicos");
-
-            const filtrados = servicosGlobais.filter(s => {
-                let isManicure = false;
-                if (s.categoria) {
-                    isManicure = (s.categoria === 'manicure');
-                } else {
-                    const palavrasManicure = ['manicure', 'pé', 'esmalta', 'unha', 'pedicure', 'gel'];
-                    isManicure = palavrasManicure.some(palavra => s.nome.toLowerCase().includes(palavra));
-                }
-                if (filtro === 'todos') return true;
-                if (filtro === 'manicure') return isManicure;
-                if (filtro === 'cabelo') return !isManicure;
-                return true;
-            });
-
-            if (filtrados.length === 0) {
-                divTodos.innerHTML = `<div class="vt-card" style="padding:30px; text-align:center; grid-column: 1 / -1; width:100%;">Nenhum plano encontrado nesta categoria.</div>`;
-            } else {
-                divTodos.innerHTML = filtrados.map(renderCard).join('');
+                    <div class="ba-footer">${cfg.ba1Texto || ''}</div>
+                </div>`;
             }
-        }
+            if (cfg.ba2Antes && cfg.ba2Depois) {
+                baHTML += `
+                <div class="ba-card">
+                    <div class="ba-images">
+                        <span class="tag antes">ANTES</span>
+                        <img src="${cfg.ba2Antes}" alt="Antes">
+                        <span class="tag depois">DEPOIS</span>
+                        <img src="${cfg.ba2Depois}" alt="Depois">
+                    </div>
+                    <div class="ba-footer">${cfg.ba2Texto || ''}</div>
+                </div>`;
+            }
+
+            if (baHTML !== "") {
+                document.getElementById("vt-ba-grid").innerHTML = baHTML;
+                document.getElementById("section-evolucao").style.display = "block"; // Exibe a seção se tiver fotos cadastradas
+            }
+        });
     </script>
 </body>
 </html>
