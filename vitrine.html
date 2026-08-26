@@ -55,7 +55,7 @@
         .trust-badge strong { display: block; font-size: 14px; }
         .trust-badge span { font-size: 12px; color: var(--text-muted); }
 
-        .video-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .video-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 20px; }
         .video-wrapper { width: 100%; max-width: 350px; aspect-ratio: 9/16; background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
         .video-wrapper iframe { width: 100%; height: 100%; border: none; }
 
@@ -120,7 +120,7 @@
         .faq-item.open .faq-a { padding-bottom: 20px; max-height: 200px; }
         .faq-footer { background: #152218; border: 1px solid #1a3a22; padding: 30px; text-align: center; border-radius: 12px; margin-top: 30px; }
         
-        .btn-whatsapp { background: #25D366; color: #000; }
+        .btn-whatsapp { background: #25D366; color: #000; font-weight: 700; }
         .btn-whatsapp:hover { background: #20bd5a; }
 
         .fabs { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
@@ -212,12 +212,25 @@
         </div>
     </section>
 
+    <!-- O QUE DIZEM OS ALUNOS -->
     <section>
         <div class="section-header"><span class="eyebrow">Quem vive, recomenda</span><h2 class="section-title">O QUE DIZEM OS ALUNOS</h2></div>
         <div class="test-grid">
-            <div class="test-card"><div class="stars">★★★★★</div><p>"O Funcional é a prática que acho melhor de fazer! Sempre muda, é descontraído..."</p><div class="author"><div class="avatar">L</div><div class="author-info"><strong>Laís</strong><span>Aluna do Funcional do Ari</span></div></div></div>
-            <div class="test-card"><div class="stars">★★★★★</div><p>"Gostei bastante! A atenção dos professores é muito boa..."</p><div class="author"><div class="avatar">E</div><div class="author-info"><strong>Maria Eloiza</strong><span>Aluna do Funcional do Ari</span></div></div></div>
+            <div class="test-card"><div class="stars">★★★★★</div><p>"O Funcional é a prática que acho melhor de fazer! Sempre muda, é descontraído e isso faz com que eu me encaixe nessas atividades."</p><div class="author"><div class="avatar">L</div><div class="author-info"><strong>Laís</strong><span>Aluna do Funcional do Ari</span></div></div></div>
+            <div class="test-card"><div class="stars">★★★★★</div><p>"Gostei bastante! A atenção dos professores é muito boa. Tenho problema de cansaço mas vou acompanhando o ritmo aos poucos."</p><div class="author"><div class="avatar">E</div><div class="author-info"><strong>Maria Eloiza</strong><span>Aluna do Funcional do Ari</span></div></div></div>
             <div class="test-card"><div class="stars">★★★★★</div><p>"Funcional top, equipe top e super atenciosos!"</p><div class="author"><div class="avatar">N</div><div class="author-info"><strong>Naiara Pereira</strong><span>Aluna do Funcional do Ari</span></div></div></div>
+        </div>
+    </section>
+
+    <!-- VÍDEOS SHORTS EXTRAS -->
+    <section style="padding-top: 0;">
+        <div class="video-container">
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/kStbv10TS40" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/4JhrbBkTjHk" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
         </div>
     </section>
 
@@ -268,16 +281,19 @@
         </div>
     </section>
 
-    <!-- SEÇÃO DÚVIDAS FREQUENTES -->
+    <!-- SEÇÃO DÚVIDAS FREQUENTES (ATUALIZADA) -->
     <section>
         <div class="section-header"><h2 class="section-title">DÚVIDAS FREQUENTES</h2></div>
         <div class="faq-list">
-            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Nunca treinei, vou conseguir acompanhar? <i data-lucide="plus"></i></div><div class="faq-a">Sim! O treino se adapta ao seu nível, do zero ao avançado. A equipe acompanha cada movimento e ajusta a intensidade para você.</div></div>
-            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Tenho limitação ou dor, posso treinar? <i data-lucide="plus"></i></div><div class="faq-a">Pode sim. Conte sua limitação antes da aula e os exercícios são adaptados para o seu caso.</div></div>
-            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Como funciona a aula experimental? <i data-lucide="plus"></i></div><div class="faq-a">Você agenda pelo WhatsApp, escolhe o melhor dia e participa de uma aula completa, sem compromisso.</div></div>
+            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Nunca treinei, vou conseguir acompanhar? <i data-lucide="plus"></i></div><div class="faq-a">Sim. O treino é adaptado ao seu nível. Você começa do seu jeito e evolui com segurança.</div></div>
+            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Tenho limitação ou dor, posso treinar? <i data-lucide="plus"></i></div><div class="faq-a">Sim. Os exercícios são adaptados conforme sua necessidade, priorizando sempre sua segurança. </div></div>
+            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Como funciona o acompanhamento? <i data-lucide="plus"></i></div><div class="faq-a">Você não treina sozinho. Acompanhamos de perto, ajustando exercícios e corrigindo a execução em cada aula.</div></div>
+            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Preciso estar preparado para começar? <i data-lucide="plus"></i></div><div class="faq-a">Não. Você não precisa estar preparado. O treino é que se adapta a você.</div></div>
+            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Como funciona a aula experimental? <i data-lucide="plus"></i></div><div class="faq-a">Você participa de uma aula normal, conhece o ambiente e o método na prática. Sem compromisso.</div></div>
+            <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Vocês acompanham a evolução dos alunos? <i data-lucide="plus"></i></div><div class="faq-a">Sim! Fazemos avaliações periódicas para ajustar o treino e garantir que você continue evoluindo.</div></div>
         </div>
         <div class="faq-footer">
-            <h3 style="color: #fff; margin-bottom: 5px;">Ainda ficou com dúvida?</h3>
+            <h3 class="font-display" style="color: #fff; margin-bottom: 5px; font-size: 26px;">AINDA FICOU COM DÚVIDA?</h3>
             <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Me chama no WhatsApp!</p>
             <a href="#" id="vt-btn-whatsapp" target="_blank" class="btn-primary btn-whatsapp"><i data-lucide="message-circle" style="margin-right: 8px;"></i> Falar no WhatsApp agora</a>
         </div>
