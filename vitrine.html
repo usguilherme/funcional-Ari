@@ -6,7 +6,6 @@
     <title>Funcional do Ari</title>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Biblioteca para gerar o QR Code do Pix -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         :root {
@@ -41,7 +40,7 @@
         .btn-outline:hover { background-color: rgba(201, 59, 59, 0.1); }
         
         @media(max-width: 600px) {
-            .btn-outline span { display: none; } /* Esconde o texto no celular para caber no menu */
+            .btn-outline span { display: none; }
         }
 
         section { padding: 80px 5%; max-width: 1200px; margin: 0 auto; }
@@ -183,7 +182,6 @@
         </div>
     </section>
 
-    <!-- VÍDEO PRINCIPAL ATUALIZADO -->
     <section>
         <div class="section-header">
             <span class="eyebrow">Veja na prática</span>
@@ -221,7 +219,6 @@
         </div>
     </section>
 
-    <!-- SEÇÃO ANTES E DEPOIS DINÂMICA -->
     <section id="section-evolucao" style="display:none;">
         <div class="section-header">
             <span class="eyebrow">Transformações reais</span>
@@ -232,7 +229,6 @@
         </div>
     </section>
 
-    <!-- O QUE DIZEM OS ALUNOS -->
     <section>
         <div class="section-header"><span class="eyebrow">Quem vive, recomenda</span><h2 class="section-title">O QUE DIZEM OS ALUNOS</h2></div>
         <div class="test-grid">
@@ -242,7 +238,6 @@
         </div>
     </section>
 
-    <!-- VÍDEOS SHORTS EXTRAS -->
     <section style="padding-top: 0;">
         <div class="video-container">
             <div class="video-wrapper">
@@ -254,7 +249,6 @@
         </div>
     </section>
 
-    <!-- SEÇÃO EQUIPE -->
     <section>
         <div class="section-header"><span class="eyebrow">Nossa equipe</span><h2 class="section-title">CONHEÇA NOSSA EQUIPE DE PROFISSIONAIS</h2></div>
         <div class="team-container">
@@ -271,14 +265,12 @@
         </div>
     </section>
 
-    <!-- SEÇÃO LOCALIZAÇÃO -->
     <section>
         <div class="section-header">
             <span class="eyebrow">Localização</span>
             <h2 class="section-title">ONDE TREINAMOS</h2>
         </div>
         <div class="location-card">
-            <!-- Imagem da Escola -->
             <div class="location-img" style="background-image: url('fotoescola.jpg');"></div>
             
             <div class="location-content">
@@ -301,7 +293,6 @@
         </div>
     </section>
 
-    <!-- SEÇÃO DÚVIDAS FREQUENTES -->
     <section>
         <div class="section-header"><h2 class="section-title">DÚVIDAS FREQUENTES</h2></div>
         <div class="faq-list">
@@ -410,17 +401,14 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Variáveis Globais para o Pix e Serviços
         let configPix = {};
         let mapServicos = {};
         let numeroWhatsappLoja = "83999999999";
 
-        // Carrega as configurações do Pix do administrador
         db.ref('config').once('value').then(snap => { 
             configPix = snap.val() || {}; 
         });
 
-        // Carrega o valor dos planos para a cobrança
         db.ref('servicos').once('value').then(snap => {
             const srvs = snap.val() || {};
             Object.values(srvs).forEach(s => { 
@@ -548,7 +536,6 @@
             db.ref('clientes').once('value').then(snap => {
                 const clientes = snap.val() ? Object.values(snap.val()) : [];
                 
-                // Procura um cliente cujo telefone limpo contenha os números digitados (ou seja exatamente igual)
                 const alunoEncontrado = clientes.find(c => {
                     const cTelLimpo = (c.telefone || "").replace(/\D/g, '');
                     return cTelLimpo.length >= 8 && cTelLimpo === telLimpo;
@@ -574,13 +561,12 @@
             document.getElementById('etapa-busca').style.display = 'none';
             document.getElementById('etapa-resultado').style.display = 'block';
 
-            // Pega apenas o primeiro nome
             const primeiroNome = aluno.nome.split(' ')[0];
             document.getElementById('res-nome').innerText = `Olá, ${primeiroNome}!`;
 
             const statusEl = document.getElementById('res-status');
             const areaPagamento = document.getElementById('area-pagamento');
-            const statusBanco = aluno.statusMensalidade || 'atrasado'; // Padrão pendente se não existir
+            const statusBanco = aluno.statusMensalidade || 'atrasado'; 
 
             if (statusBanco === 'pago') {
                 statusEl.innerText = "✓ MENSALIDADE EM DIA";
@@ -596,7 +582,6 @@
                 
                 document.getElementById('res-vencimento').innerText = `Dia ${aluno.vencimento || '10'}`;
                 
-                // Busca o preço baseado no plano do aluno
                 const precoPlano = mapServicos[aluno.frequencia] || 0;
                 
                 if (precoPlano > 0) {
@@ -604,7 +589,6 @@
                     areaPagamento.style.display = 'block';
                     gerarPixAluno(precoPlano);
                     
-                    // Configura o link do WhatsApp para enviar o comprovante
                     const btnZap = document.getElementById('btn-enviar-comprovante');
                     const msgComprovante = `Olá! Sou ${primeiroNome}, acabo de realizar o pagamento da minha mensalidade (R$ ${precoPlano.toFixed(2)}) via Pix do site. Segue o comprovante:`;
                     btnZap.href = `https://wa.me/${numeroWhatsappLoja}?text=${encodeURIComponent(msgComprovante)}`;
@@ -616,15 +600,16 @@
             }
         }
 
-        // Funções matemáticas e de formatação exigidas pelo Banco Central para o Payload do Pix
         function formatField(id, value) {
             const valStr = value.toString();
             const len = valStr.length.toString().padStart(2, '0');
             return `${id}${len}${valStr}`;
         }
+        
         function removeAcentos(str) {
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, "");
         }
+        
         function crc16(buffer) {
             let crc = 0xFFFF;
             for (let i = 0; i < buffer.length; i++) {
@@ -635,13 +620,55 @@
             return crc.toString(16).toUpperCase().padStart(4, '0');
         }
 
+        // ========================================================
+        // GERAÇÃO DE PIX COM FORMATAÇÃO AUTOMÁTICA DE CHAVE (CORREÇÃO)
+        // ========================================================
         function gerarPixAluno(valor) {
             if(!configPix.chavePix || !configPix.nomePix) {
                 document.getElementById("pix-copia-cola-aluno").value = "Aviso: A chave Pix do estúdio não está configurada.";
                 return;
             }
 
-            const chave = configPix.chavePix.trim();
+            let chaveOriginal = configPix.chavePix.trim();
+            let chave = chaveOriginal;
+
+            // --- SANITIZAÇÃO INTELIGENTE DA CHAVE PIX ---
+            // O Banco Central exige +55 no início para telefones.
+            if (chave.includes('@')) {
+                // É e-mail, apenas converte para minúsculas
+                chave = chave.toLowerCase();
+            } else if (chave.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+                // Chave Aleatória (EVP)
+            } else {
+                let limpa = chave.replace(/\D/g, ''); // Pega apenas números
+                
+                if (chave.startsWith('+')) {
+                    // Já formatado corretamente com o código do país
+                    chave = '+' + limpa;
+                } else if (limpa.length === 11) {
+                    // Tem 11 dígitos. Pode ser CPF ou Celular sem +55.
+                    // Se o usuário digitou com () ou -, é obviamente um telefone
+                    if (chave.includes('(') || chave.includes(')') || (chave.includes('-') && !chave.includes('.'))) {
+                        chave = '+55' + limpa;
+                    } 
+                    // Se for apenas números, e o 3º dígito for 9 (ex: 83 9...), no Brasil é celular!
+                    else if (limpa.charAt(2) === '9') {
+                        chave = '+55' + limpa; 
+                    } else {
+                        // Se não tem formato de celular, assume CPF
+                        chave = limpa;
+                    }
+                } else if (limpa.length === 14) {
+                    // CNPJ
+                    chave = limpa; 
+                } else if (limpa.length === 10) {
+                    // Fixo
+                    chave = '+55' + limpa; 
+                } else {
+                    chave = limpa; // Fallback final
+                }
+            }
+
             const nome = removeAcentos(configPix.nomePix.trim()).substring(0, 25); 
             const cidade = removeAcentos(configPix.cidadePix || "Cidade").trim().substring(0, 15);
             const valorFormatado = valor.toFixed(2);
@@ -680,7 +707,6 @@
             input.select();
             document.execCommand("copy");
             
-            // Muda o texto do botão temporariamente para dar feedback visual
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = "Copiado! ✅";
