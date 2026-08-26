@@ -1873,18 +1873,15 @@
         });
     }
 
-    function atualizarKPIs() {
+    // Substitua a função atualizarKPIs() atual por esta versão completa:
+function atualizarKPIs() {
         try {
             const hojeIso = new Date().toISOString().split('T')[0];
-            const mesAtualIso = hojeIso.slice(0, 7); // "2026-08"
+            const mesAtualIso = hojeIso.slice(0, 7); // Ex: "2026-08"
 
-            // CORRIGIDO: cada filtro lê SÓ o seu próprio select, sem "adivinhar"
-            // com querySelector('select') (que pegava o primeiro select da página
-            // inteira, geralmente o do Dashboard, mesmo estando no Financeiro).
             const profFiltroDash = document.getElementById('dash-filtro-profissional')?.value || "";
             const profFiltroFin = document.getElementById('financeiro-filtro-profissional')?.value || "";
 
-            // Inputs de período do gráfico/dashboard
             const inputInicio = document.getElementById('dash-grafico-inicio');
             const inputFim = document.getElementById('dash-grafico-fim');
 
@@ -1898,26 +1895,62 @@
             let retornosPendentes = 0;
             let pontosDistribuidos = 0;
 
-            // 2. Processa os Atendimentos
+            // ====================================================
+            // 1. CÁLCULO DE MENSALIDADES (MOTOR FINANCEIRO)
+            // ====================================================
+            let receitaPlanosTotal = 0;
+            let receitaPlanosPagos = 0;
+
+            const clientes = store.clientes || [];
+            const listaClientes = Array.isArray(clientes) ? clientes : Object.values(clientes);
+
+            listaClientes.forEach(c => {
+                // KPIs padrão do dashboard
+                if (c.previsaoRetorno && c.previsaoRetorno <= hojeIso) retornosPendentes++;
+                if (c.pontos) pontosDistribuidos += (Number(c.pontos) || 0);
+
+                // Se o aluno está ativo e tem uma frequência definida, calcula o plano
+                if (c.status !== 'Inativo' && c.frequencia) {
+                    let valorPlano = 0;
+                    
+                    // === EDITAR PREÇOS AQUI ===
+                    // Como a planilha não tinha os preços de todos, coloquei uma lógica base.
+                    // Você pode alterar os valores aqui embaixo livremente!
+                    if (c.frequencia.includes("1x")) valorPlano = 35;
+                    else if (c.frequencia.includes("2x")) valorPlano = 45;
+                    else if (c.frequencia.includes("3x")) valorPlano = 55; // Estimado
+                    else if (c.frequencia.includes("4x")) valorPlano = 65; // Estimado
+                    else if (c.frequencia.includes("5x")) valorPlano = 75; // Estimado
+                    else if (c.frequencia.includes("6x")) valorPlano = 85; // Estimado
+
+                    receitaPlanosTotal += valorPlano;
+                    
+                    // Se você marcou como PAGO lá na aba Atualização, soma nas Entradas reais
+                    if (c.statusMensalidade === 'pago') {
+                        receitaPlanosPagos += valorPlano;
+                    }
+                }
+            });
+
+            // ====================================================
+            // 2. PROCESSA ATENDIMENTOS (Vendas Avulsas no Caixa)
+            // ====================================================
             const atendimentos = store.atendimentos || [];
             atendimentos.forEach(a => {
                 if (!a.data) return;
 
-                // Faturamento do Dashboard (respeita o filtro de período + profissional DO DASHBOARD)
                 if (a.data >= dataInicio && a.data <= dataFim) {
                     if (!profFiltroDash || a.profissionalId == profFiltroDash) {
                         faturamentoPeriodo += (Number(a.total) || 0);
                     }
                 }
 
-                // Faturamento do Mês (para a aba Financeiro) - respeita o filtro DO FINANCEIRO
                 if (a.data.startsWith(mesAtualIso)) {
                     if (!profFiltroFin || a.profissionalId == profFiltroFin) {
                         faturamentoMesFin += (Number(a.total) || 0);
                     }
                 }
 
-                // Agendamentos de hoje (Dashboard) - respeita o filtro DO DASHBOARD
                 if (a.data === hojeIso) {
                     if (!profFiltroDash || a.profissionalId == profFiltroDash) {
                         agendamentosHoje++;
@@ -1925,9 +1958,9 @@
                 }
             });
 
-            // 3. Processa as Despesas (Saídas do Mês para o Financeiro)
-            // Despesas gerais (sem profissionalId) sempre entram; despesas específicas
-            // de uma profissional só entram se o filtro bater com ela.
+            // ====================================================
+            // 3. PROCESSA DESPESAS
+            // ====================================================
             const despesas = store.despesas || [];
             despesas.forEach(d => {
                 if (d.data && d.data.startsWith(mesAtualIso)) {
@@ -1937,40 +1970,80 @@
                 }
             });
 
-            // 4. Processa Clientes (Retornos e Pontos)
-            const clientes = store.clientes || [];
-            const listaClientes = Array.isArray(clientes) ? clientes : Object.values(clientes);
-
-            listaClientes.forEach(c => {
-                if (c.previsaoRetorno && c.previsaoRetorno <= hojeIso) {
-                    retornosPendentes++;
-                }
-                if (c.pontos) {
-                    pontosDistribuidos += (Number(c.pontos) || 0);
-                }
-            });
-
-            // 5. Atualiza os elementos do Dashboard
+            // ====================================================
+            // 4. ATUALIZA OS TEXTOS NO DASHBOARD E FINANCEIRO
+            // ====================================================
             const elFaturamento = document.getElementById('dash-faturamento');
             const elAtendimentos = document.getElementById('dash-atendimentos');
             const elRetornos = document.getElementById('dash-retornos');
             const elPontos = document.getElementById('dash-pontos');
 
-            if (elFaturamento) elFaturamento.innerText = `R$ ${faturamentoPeriodo.toFixed(2)}`;
+            // Faturamento do Dashboard = Mensalidades Pagas + Vendas Avulsas
+            if (elFaturamento) elFaturamento.innerText = `R$ ${(faturamentoPeriodo + receitaPlanosPagos).toFixed(2)}`;
             if (elAtendimentos) elAtendimentos.innerText = agendamentosHoje;
             if (elRetornos) elRetornos.innerText = retornosPendentes;
             if (elPontos) elPontos.innerText = pontosDistribuidos;
 
-            // 6. Atualiza os cards da aba Financeiro (busca pelo ID correto, sem "adivinhação")
+            // Financeiro
             const elEntradasFin = document.getElementById('fin-entradas') || document.getElementById('fin-entradas-mes');
             const elSaidasFin = document.getElementById('fin-saidas') || document.getElementById('fin-saidas-mes');
             const elLucroFin = document.getElementById('fin-lucro') || document.getElementById('fin-lucro-mes');
 
-            if (elEntradasFin) elEntradasFin.innerText = `R$ ${faturamentoMesFin.toFixed(2)}`;
+            const totalEntradasReais = faturamentoMesFin + receitaPlanosPagos;
+
+            if (elEntradasFin) elEntradasFin.innerText = `R$ ${totalEntradasReais.toFixed(2)}`;
             if (elSaidasFin) elSaidasFin.innerText = `R$ ${saidasMesFin.toFixed(2)}`;
             if (elLucroFin) {
-                const lucro = faturamentoMesFin - saidasMesFin;
+                const lucro = totalEntradasReais - saidasMesFin;
                 elLucroFin.innerText = `R$ ${lucro.toFixed(2)}`;
+            }
+
+            // ====================================================
+            // 5. CRIA O CARD RESUMO DE MENSALIDADES (AUTOMÁTICO)
+            // ====================================================
+            const financeiroContainer = document.querySelector('#financeiro');
+            if (financeiroContainer && financeiroContainer.innerHTML.trim() !== "") {
+                let cardMensalidades = document.getElementById('card-resumo-mensalidades');
+                
+                if (!cardMensalidades) {
+                    cardMensalidades = document.createElement('div');
+                    cardMensalidades.id = 'card-resumo-mensalidades';
+                    cardMensalidades.className = 'glass-panel';
+                    cardMensalidades.style.padding = '20px';
+                    cardMensalidades.style.marginBottom = '20px';
+                    cardMensalidades.style.background = 'rgba(139, 92, 246, 0.1)';
+                    cardMensalidades.style.border = '1px solid rgba(139, 92, 246, 0.3)';
+                    
+                    financeiroContainer.insertBefore(cardMensalidades, financeiroContainer.firstChild);
+                }
+
+                const pendente = receitaPlanosTotal - receitaPlanosPagos;
+
+                cardMensalidades.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+                        <div>
+                            <h3 style="margin:0; color:var(--primary); display:flex; align-items:center; gap:8px;">
+                                <i data-lucide="wallet" style="width:20px;"></i> Resumo de Mensalidades (Alunos Ativos)
+                            </h3>
+                            <p style="margin:5px 0 0 0; font-size:13px; color:var(--text-muted);">Calculado pela frequência dos alunos. Marque como 'Pago' na aba de Atualização.</p>
+                        </div>
+                        <div style="display:flex; gap:20px; text-align:right; flex-wrap:wrap;">
+                            <div>
+                                <small style="color:var(--text-muted)">Previsão Total (Se todos pagarem)</small>
+                                <h2 style="margin:0; color:#fff;">R$ ${receitaPlanosTotal.toFixed(2)}</h2>
+                            </div>
+                            <div>
+                                <small style="color:var(--success)">Receita Paga (Garantida)</small>
+                                <h2 style="margin:0; color:var(--success);">R$ ${receitaPlanosPagos.toFixed(2)}</h2>
+                            </div>
+                            <div>
+                                <small style="color:var(--danger)">Pendente (Em aberto)</small>
+                                <h2 style="margin:0; color:var(--danger);">R$ ${pendente.toFixed(2)}</h2>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                if(window.lucide) lucide.createIcons();
             }
 
         } catch (erro) {
