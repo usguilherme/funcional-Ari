@@ -1,6 +1,23 @@
     // ==========================================
-    // 1. CONFIGURAÇÃO GERAL
+    // 1. CONFIGURAÇÃO GERAL E FIREBASE REAL
     // ==========================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyBY4nfykJETa-Vw6E5TLOVAkuPVXva0Bx4",
+        authDomain: "funcional-ari.firebaseapp.com",
+        projectId: "funcional-ari",
+        storageBucket: "funcional-ari.firebasestorage.app",
+        messagingSenderId: "790601708418",
+        appId: "1:790601708418:web:048f04d9d498096460159b"
+    };
+
+    // Inicializa o Firebase com as chaves reais
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    
+    const db = firebase.database();
+    const auth = firebase.auth(); 
+
     let configSistema = {
         chavePix: "",
         nomePix: "",
@@ -8,13 +25,6 @@
         metaMensal: 0
     };
     let landingConfig = {};
-
-    // Local-DB: não precisa de config real, os dados ficam no navegador (localStorage)
-    if (!firebase.apps.length) {
-        firebase.initializeApp({});
-    }
-    const db = firebase.database();
-    const auth = firebase.auth(); 
 
     // Estado Global
     let store = {
