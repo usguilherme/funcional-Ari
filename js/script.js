@@ -467,12 +467,55 @@
     // VITRINE / LANDING PAGE PÚBLICA
     // ==========================================
     
-    // Helper para converter arquivos de imagem pesados em texto leve (Base64) para o banco
-    const fileToBase64 = (file) => new Promise((resolve, reject) => {
-        if(!file) return resolve(null);
+    // Helper para COMPRIMIR a imagem antes de salvar (Evita o erro de tamanho no Firebase)
+    const otimizarImagem = (file) => new Promise((resolve) => {
+        if (!file) return resolve(null);
         const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800; // Tamanho ideal para web (leve e com boa qualidade)
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Converte para JPEG com 70% de qualidade para ficar bem leve
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // ==========================================
+    // VITRINE / LANDING PAGE PÚBLICA
+    // ==========================================
+    
+    // Helper para COMPRIMIR a imagem antes de salvar (Evita o erro de tamanho no Firebase)
+    const otimizarImagem = (file) => new Promise((resolve) => {
+        if (!file) return resolve(null);
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800; // Tamanho ideal para web (leve e com boa qualidade)
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Converte para JPEG com 70% de qualidade para ficar bem leve
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+        };
         reader.readAsDataURL(file);
     });
 
@@ -495,13 +538,13 @@
         if(!btn) return;
         
         const txtOriginal = btn.innerText;
-        btn.innerText = "SALVANDO...";
+        btn.innerText = "COMPRIMINDO E SALVANDO...";
         btn.disabled = true;
 
         try {
             const titulo = document.getElementById("landing-titulo").value.trim();
             const subtitulo = document.getElementById("landing-subtitulo").value.trim();
-            const whatsapp = document.getElementById("landing-whatsapp").value.replace(/\D/g, ''); // Limpa e deixa só os números
+            const whatsapp = document.getElementById("landing-whatsapp").value.replace(/\D/g, ''); 
             const instagram = document.getElementById("landing-instagram").value.trim();
             const endereco = document.getElementById("landing-endereco").value.trim();
             const maps = document.getElementById("landing-maps").value.trim();
@@ -510,12 +553,12 @@
 
             // CAPA PRINCIPAL
             const capaInput = document.getElementById("landing-capa");
-            if (capaInput && capaInput.files[0]) updates.capa = await fileToBase64(capaInput.files[0]);
+            if (capaInput && capaInput.files[0]) updates.capa = await otimizarImagem(capaInput.files[0]);
             else if (landingConfig.capa) updates.capa = landingConfig.capa;
 
             // FOTO DA EQUIPE
             const equipeInput = document.getElementById("landing-equipe-foto");
-            if (equipeInput && equipeInput.files[0]) updates.equipeFoto = await fileToBase64(equipeInput.files[0]);
+            if (equipeInput && equipeInput.files[0]) updates.equipeFoto = await otimizarImagem(equipeInput.files[0]);
             else if (landingConfig.equipeFoto) updates.equipeFoto = landingConfig.equipeFoto;
 
             // ALUNO DESTAQUE 1 (ANTES E DEPOIS)
@@ -523,10 +566,10 @@
             const ba1Depois = document.getElementById("ba1-depois");
             updates.ba1Texto = document.getElementById("ba1-texto").value.trim();
             
-            if (ba1Antes && ba1Antes.files[0]) updates.ba1Antes = await fileToBase64(ba1Antes.files[0]);
+            if (ba1Antes && ba1Antes.files[0]) updates.ba1Antes = await otimizarImagem(ba1Antes.files[0]);
             else if (landingConfig.ba1Antes) updates.ba1Antes = landingConfig.ba1Antes;
             
-            if (ba1Depois && ba1Depois.files[0]) updates.ba1Depois = await fileToBase64(ba1Depois.files[0]);
+            if (ba1Depois && ba1Depois.files[0]) updates.ba1Depois = await otimizarImagem(ba1Depois.files[0]);
             else if (landingConfig.ba1Depois) updates.ba1Depois = landingConfig.ba1Depois;
 
             // ALUNO DESTAQUE 2 (ANTES E DEPOIS)
@@ -534,10 +577,10 @@
             const ba2Depois = document.getElementById("ba2-depois");
             updates.ba2Texto = document.getElementById("ba2-texto").value.trim();
             
-            if (ba2Antes && ba2Antes.files[0]) updates.ba2Antes = await fileToBase64(ba2Antes.files[0]);
+            if (ba2Antes && ba2Antes.files[0]) updates.ba2Antes = await otimizarImagem(ba2Antes.files[0]);
             else if (landingConfig.ba2Antes) updates.ba2Antes = landingConfig.ba2Antes;
             
-            if (ba2Depois && ba2Depois.files[0]) updates.ba2Depois = await fileToBase64(ba2Depois.files[0]);
+            if (ba2Depois && ba2Depois.files[0]) updates.ba2Depois = await otimizarImagem(ba2Depois.files[0]);
             else if (landingConfig.ba2Depois) updates.ba2Depois = landingConfig.ba2Depois;
 
             // Salva no banco de dados
