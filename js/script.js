@@ -1356,7 +1356,10 @@
         const nome = document.getElementById("novo-cli-nome").value.trim();
         const sexo = document.getElementById("novo-cli-sexo")?.value || "";
         const idade = document.getElementById("novo-cli-idade")?.value || "";
-        const tel = document.getElementById("novo-cli-tel").value.trim();
+        
+        // CORREÇÃO: Força a aceitação do campo vazio e preenche automaticamente com "Não informado"
+        const tel = document.getElementById("novo-cli-tel").value.trim() || "Não informado";
+        
         const email = document.getElementById("novo-cli-email")?.value.trim() || "";
         const objetivo = document.getElementById("novo-cli-objetivo")?.value.trim() || "";
         const frequencia = document.getElementById("novo-cli-frequencia")?.value.trim() || "";
@@ -1419,6 +1422,7 @@
             salvarNoBanco(null);
         }
     }
+
     function abrirModalAnamnese(id) {
         clienteAnamneseAtual = store.clientes.find(c => c.id == id);
         if(!clienteAnamneseAtual) return;
