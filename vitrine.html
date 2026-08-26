@@ -89,15 +89,6 @@
         .author-info strong { display: block; font-size: 14px; }
         .author-info span { font-size: 12px; color: var(--text-muted); }
 
-        /* ===== NOVA SEÇÃO: LOCALIZAÇÃO (CARD) ===== */
-        .location-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; max-width: 800px; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .location-img { width: 100%; height: 350px; background-color: #222; background-size: cover; background-position: center; }
-        .location-content { padding: 30px; text-align: left; }
-        .loc-eyebrow { color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 8px; }
-        .loc-title { font-size: 24px; font-family: var(--font-display); color: #fff; margin-bottom: 5px; }
-        .loc-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 5px; }
-        .loc-schedule { color: var(--text-muted); font-size: 13px; opacity: 0.8; }
-
         .team-container { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
         @media(min-width: 800px) { .team-container { flex-direction: row; align-items: center; } }
         .team-img { flex: 1; min-height: 300px; background-size: cover; background-position: center; background-color: #333; }
@@ -105,6 +96,14 @@
         .team-content p { color: #ccc; line-height: 1.6; margin-bottom: 20px; font-size: 15px; }
         .specialties { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 30px; }
         .spec-badge { background: rgba(201, 59, 59, 0.05); border: 1px solid rgba(201, 59, 59, 0.2); color: var(--primary); padding: 8px 16px; border-radius: 30px; font-size: 12px; font-weight: 600; }
+
+        .location-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; max-width: 800px; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .location-img { width: 100%; height: 350px; background-color: #222; background-size: cover; background-position: center; }
+        .location-content { padding: 30px; text-align: left; }
+        .loc-eyebrow { color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 8px; }
+        .loc-title { font-size: 24px; font-family: var(--font-display); color: #fff; margin-bottom: 5px; }
+        .loc-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 5px; }
+        .loc-schedule { color: var(--text-muted); font-size: 13px; opacity: 0.8; }
 
         .steps-list { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
         .step-item { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; display: flex; align-items: flex-start; gap: 20px; }
@@ -129,6 +128,21 @@
         .fab:hover { transform: scale(1.1); }
         .fab.ig { display:none; background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
         .fab.wa { background: #25D366; }
+
+        /* ===== TERMOS E RODAPÉ ===== */
+        .terms-section { max-width: 800px; margin: 0 auto; padding: 40px 20px 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .terms-toggle { text-align: center; color: var(--text-muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; font-weight: 600; }
+        .terms-toggle:hover { color: #fff; }
+        .terms-toggle i { transition: transform 0.3s; }
+        .terms-content.open + .terms-toggle i { transform: rotate(180deg); }
+        .terms-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, margin-top 0.4s ease; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
+        .terms-content.open { max-height: 2000px; margin-top: 30px; }
+        .terms-content h4 { color: #fff; margin: 20px 0 10px 0; font-size: 14px; letter-spacing: 1px; }
+        .terms-content p { margin-bottom: 15px; text-align: justify; }
+
+        .main-footer { text-align: center; padding: 60px 20px 100px; background: #0a0a0a; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 20px; }
+        .main-footer .brand { justify-content: center; margin-bottom: 15px; }
+        .main-footer p { color: var(--text-muted); font-size: 13px; margin: 5px 0; }
     </style>
 </head>
 <body>
@@ -207,29 +221,7 @@
         </div>
     </section>
 
-    <!-- NOVA SEÇÃO: LOCALIZAÇÃO IDENTICA AO PRINT -->
-    <section>
-        <div class="section-header">
-            <span class="eyebrow">Localização</span>
-            <h2 class="section-title">ONDE TREINAMOS</h2>
-        </div>
-        <div class="location-card">
-            <!-- Como você não faz upload dessa imagem pelo painel ainda, coloquei um link de uma escola parecida provisoriamente. 
-                 Para alterar, é só trocar esse link (background-image) abaixo. -->
-            <div class="location-img" style="background-image: url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1000&auto=format&fit=crop');"></div>
-            
-            <div class="location-content">
-                <span class="loc-eyebrow">GINÁSIO ESCOLA SANTA MARIA</span>
-                <h3 class="loc-title" id="vt-endereco-linha1">Rua José Ferreira Dantas, 143</h3>
-                <p class="loc-subtitle" id="vt-endereco-linha2">Queimadas, PB - CEP 58475-000</p>
-                <p class="loc-schedule">Segunda, Quarta e Sexta · 19h20 às 20h20</p>
-                
-                <a href="#" id="vt-btn-maps" target="_blank" class="btn-primary" style="width: 100%; margin-top: 20px; font-size: 16px; padding: 16px;">Abrir no Google Maps</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- SEÇÃO EQUIPE DINÂMICA -->
+    <!-- SEÇÃO EQUIPE -->
     <section>
         <div class="section-header"><span class="eyebrow">Nossa equipe</span><h2 class="section-title">CONHEÇA NOSSA EQUIPE DE PROFISSIONAIS</h2></div>
         <div class="team-container">
@@ -246,6 +238,27 @@
         </div>
     </section>
 
+    <!-- SEÇÃO LOCALIZAÇÃO -->
+    <section>
+        <div class="section-header">
+            <span class="eyebrow">Localização</span>
+            <h2 class="section-title">ONDE TREINAMOS</h2>
+        </div>
+        <div class="location-card">
+            <!-- Imagem da Escola -->
+            <div class="location-img" style="background-image: url('fotoescola.jpg');"></div>
+            
+            <div class="location-content">
+                <span class="loc-eyebrow">GINÁSIO ESCOLA SANTA MARIA</span>
+                <h3 class="loc-title" id="vt-endereco-linha1">Rua José Ferreira Dantas, 143</h3>
+                <p class="loc-subtitle" id="vt-endereco-linha2">Queimadas, PB - CEP 58475-000</p>
+                <p class="loc-schedule">Segunda, Quarta e Sexta · 19h20 às 20h20</p>
+                
+                <a href="#" id="vt-btn-maps" target="_blank" class="btn-primary" style="width: 100%; margin-top: 20px; font-size: 16px; padding: 16px;">Abrir no Google Maps</a>
+            </div>
+        </div>
+    </section>
+
     <section>
         <div class="section-header"><span class="eyebrow">É Simples</span><h2 class="section-title">DA DECISÃO AO PRIMEIRO TREINO EM 3 PASSOS</h2></div>
         <div class="steps-list">
@@ -255,6 +268,7 @@
         </div>
     </section>
 
+    <!-- SEÇÃO DÚVIDAS FREQUENTES -->
     <section>
         <div class="section-header"><h2 class="section-title">DÚVIDAS FREQUENTES</h2></div>
         <div class="faq-list">
@@ -269,14 +283,34 @@
         </div>
     </section>
 
-    <footer style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; border-top: 1px solid rgba(255,255,255,0.05);">
-        Funcional do Ari &copy; 2026 • Termos e Condições
+    <!-- TERMOS E CONDIÇÕES -->
+    <div class="terms-section">
+        <div class="terms-toggle" onclick="document.getElementById('terms-content').classList.toggle('open'); this.classList.toggle('open');">
+            Termos e Condições <i data-lucide="chevron-down" style="width:16px; height:16px;"></i>
+        </div>
+        <div id="terms-content" class="terms-content">
+            <h4>TERMOS E CONDIÇÕES</h4>
+            <p>As informações disponíveis neste site têm caráter exclusivamente informativo e não substituem o parecer médico profissional. Recomenda-se consultar um profissional de saúde antes de iniciar qualquer atividade física, especialmente em caso de condições preexistentes. <strong style="color:#ccc;">O aluno é responsável por informar ao professor eventuais limitações físicas, lesões ou condições de saúde antes do início das atividades.</strong> Ao participar das aulas, o aluno assume corresponsabilidade pelos riscos inerentes à prática de atividade física, sem prejuízo das responsabilidades legais do profissional nos termos do Código de Defesa do Consumidor (Lei 8.078/90).</p>
+            
+            <h4>USO DE IMAGEM</h4>
+            <p>Ao participar das aulas, o aluno autoriza o uso de sua imagem e voz, captadas durante as atividades, para fins de divulgação do Funcional do Ari em redes sociais, site, material publicitário e demais meios de comunicação, sem limitação de prazo ou território, a título gratuito. O aluno poderá revogar essa autorização a qualquer momento mediante comunicação expressa ao responsável.</p>
+            
+            <h4>AVISO LEGAL</h4>
+            <p>O Funcional do Ari oferece aulas de atividade física com acompanhamento profissional presencial. Os resultados individuais podem variar conforme dedicação, alimentação e condições físicas de cada aluno, não constituindo garantia de resultados específicos. Em caso de planos pagos, cancelamentos devem ser comunicados com antecedência mínima de 48 horas. Os dados pessoais fornecidos são utilizados exclusivamente para comunicação sobre as aulas, em conformidade com a Lei Geral de Proteção de Dados (Lei 13.709/2018).</p>
+        </div>
+    </div>
+
+    <!-- RODAPÉ COMPLETO -->
+    <footer class="main-footer">
+        <div class="brand"><i data-lucide="triangle" class="brand-icon"></i> <span id="vt-footer-titulo">FUNCIONALDOARI</span></div>
+        <p><span id="vt-footer-insta">@funcionaldoari</span> • <span id="vt-footer-telefone">(83) 9 9123-3073</span></p>
+        <p style="opacity:0.6; margin-top:15px;">&copy; <span id="ano-atual"></span> Funcional do Ari</p>
     </footer>
 
     <!-- FABS FLUTUANTES (ÍCONE DO INSTAGRAM CORRIGIDO COM SVG NATIVO) -->
     <div class="fabs">
         <a href="#" id="vt-fab-ig" class="fab ig" target="_blank" style="display:none; align-items:center; justify-content:center;">
-            <!-- SVG Nativo para garantir exibição independentemente da biblioteca de ícones -->
+            <!-- SVG Nativo para garantir exibição -->
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16.11 7.5v-.01"/><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
         </a>
         <a href="#" id="vt-fab-wa" class="fab wa" target="_blank" style="display:flex; align-items:center; justify-content:center;">
@@ -284,11 +318,12 @@
         </a>
     </div>
 
-    <!-- FIREBASE (Seu projeto) -->
+    <!-- FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script>
         lucide.createIcons();
+        document.getElementById('ano-atual').innerText = new Date().getFullYear();
 
         function toggleFaq(element) {
             const item = element.parentElement;
@@ -314,6 +349,7 @@
             if (cfg.titulo) {
                 document.getElementById("vt-titulo").innerHTML = cfg.titulo;
                 document.getElementById("vt-header-titulo").innerText = cfg.titulo;
+                document.getElementById("vt-footer-titulo").innerText = cfg.titulo;
                 document.title = cfg.titulo;
             }
             if (cfg.subtitulo) document.getElementById("vt-subtitulo").innerText = cfg.subtitulo;
@@ -324,22 +360,33 @@
                 document.getElementById("vt-hero").style.backgroundPosition = 'center';
             }
 
-            // Whatsapp Config
             const whatsapp = cfg.whatsapp || "";
             if (whatsapp) {
                 const waUrl = `https://wa.me/55${whatsapp}?text=Olá! Vim pelo site e gostaria de agendar um horário 🔥`;
                 document.getElementById("vt-btn-whatsapp").href = waUrl;
                 document.getElementById("vt-fab-wa").href = waUrl;
+                
+                // Formata número para o rodapé
+                let celFormatado = whatsapp;
+                if(whatsapp.length === 11) {
+                    celFormatado = `(${whatsapp.substring(0,2)}) ${whatsapp.substring(2,3)} ${whatsapp.substring(3,7)}-${whatsapp.substring(7)}`;
+                }
+                document.getElementById("vt-footer-telefone").innerText = celFormatado;
             }
 
-            // Instagram Config (Exibe o ícone se o link existir)
             if (cfg.instagram) {
                 const fabIg = document.getElementById("vt-fab-ig");
                 fabIg.href = cfg.instagram;
                 fabIg.style.display = "flex";
+                
+                // Extrai o @ do link para colocar no rodapé
+                let arroba = cfg.instagram.split('instagram.com/')[1];
+                if(arroba) {
+                    arroba = arroba.replace('/', '');
+                    document.getElementById("vt-footer-insta").innerText = `@${arroba}`;
+                }
             }
 
-            // Configuração do Google Maps no Card de Localização
             if (cfg.endereco) {
                 document.getElementById("vt-endereco-linha1").innerText = cfg.endereco;
             }
@@ -347,14 +394,12 @@
                 document.getElementById("vt-btn-maps").href = cfg.googleMapsUrl;
             }
 
-            // Equipe Foto Config
             if (cfg.equipeFoto) {
                 document.getElementById("vt-equipe-foto").style.backgroundImage = `url('${cfg.equipeFoto}')`;
             } else {
                 document.getElementById("vt-equipe-foto").style.backgroundImage = `url('image_5b327d.jpg')`;
             }
 
-            // Evoluções Antes e Depois
             let baHTML = "";
             if (cfg.ba1Antes && cfg.ba1Depois) {
                 baHTML += `
