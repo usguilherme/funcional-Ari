@@ -491,34 +491,6 @@
         reader.readAsDataURL(file);
     });
 
-    // ==========================================
-    // VITRINE / LANDING PAGE PÚBLICA
-    // ==========================================
-    
-    // Helper para COMPRIMIR a imagem antes de salvar (Evita o erro de tamanho no Firebase)
-    const otimizarImagem = (file) => new Promise((resolve) => {
-        if (!file) return resolve(null);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800; // Tamanho ideal para web (leve e com boa qualidade)
-                const scaleSize = MAX_WIDTH / img.width;
-                canvas.width = MAX_WIDTH;
-                canvas.height = img.height * scaleSize;
-                
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                
-                // Converte para JPEG com 70% de qualidade para ficar bem leve
-                resolve(canvas.toDataURL('image/jpeg', 0.7));
-            };
-        };
-        reader.readAsDataURL(file);
-    });
-
     function preencherFormularioLanding() {
         if(!document.getElementById("landing-titulo")) return; // Aborta se a página não estiver montada
 
