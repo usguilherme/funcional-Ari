@@ -1129,9 +1129,10 @@
             const telefoneClean = cli.telefone ? cli.telefone.replace(/\D/g, '') : '';
             const zapLink = telefoneClean ? `https://wa.me/55${telefoneClean}?text=Olá ${cli.nome.split(' ')[0]}, passando para lembrar do vencimento da sua mensalidade dia ${cli.vencimento} no Funcional do Ari!` : '#';
 
+            // AQUI FOI CORRIGIDO: Adicionadas aspas simples ao redor de '${cli.id}'
             return `<tr data-cliente-id="${cli.id}">
                 <td><div class="avatar" style="background-image:url('${cli.foto || ''}'); background-size:cover;">${cli.foto ? '' : cli.nome.charAt(0).toUpperCase()}</div></td>
-                <td><strong style="cursor:pointer; color:var(--primary)" onclick="abrirModalAnamnese(${cli.id})" title="Ver Histórico Completo">${cli.nome}</strong></td>
+                <td><strong style="cursor:pointer; color:var(--primary)" onclick="abrirModalAnamnese('${cli.id}')" title="Ver Histórico Completo">${cli.nome}</strong></td>
                 <td>${sexo}</td>
                 <td>${idade}</td>
                 <td>${telefone}</td>
@@ -1142,14 +1143,14 @@
                 <td>${inicio}</td>
                 <td><span class="badge bg-purple">${vencimento}</span></td>
                 <td style="white-space: nowrap; display: flex; gap: 6px;">
-                    <button class="btn-small bg-yellow" onclick="editarCliente(${cli.id})" title="Editar">
+                    <button class="btn-small bg-yellow" onclick="editarCliente('${cli.id}')" title="Editar">
                         <i data-lucide="pencil" style="width:16px; height:16px;"></i>
                     </button>
-                    <button class="btn-small bg-purple" onclick="abrirModalAnamnese(${cli.id})" title="Ficha do Aluno">
+                    <button class="btn-small bg-purple" onclick="abrirModalAnamnese('${cli.id}')" title="Ficha do Aluno">
                         <i data-lucide="clipboard-list" style="width:16px; height:16px;"></i>
                     </button>
                     ${telefoneClean ? `<a href="${zapLink}" target="_blank" class="btn-small bg-green" style="display:flex; align-items:center; text-decoration:none;" title="Cobrar no WhatsApp"><i data-lucide="message-circle" style="width:16px; height:16px;"></i></a>` : ''}
-                    <button class="btn-small" style="background: rgba(248,113,113,0.1); color: var(--danger); border: 1px solid rgba(248,113,113,0.2);" onclick="excluirCliente(${cli.id})" title="Excluir">
+                    <button class="btn-small" style="background: rgba(248,113,113,0.1); color: var(--danger); border: 1px solid rgba(248,113,113,0.2);" onclick="excluirCliente('${cli.id}')" title="Excluir">
                         <i data-lucide="trash-2" style="width:16px; height:16px;"></i>
                     </button>
                 </td>
