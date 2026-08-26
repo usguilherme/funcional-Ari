@@ -1873,7 +1873,6 @@
         });
     }
 
-    // Substitua a função atualizarKPIs() atual por esta versão completa:
     function atualizarKPIs() {
         try {
             const hojeIso = new Date().toISOString().split('T')[0];
@@ -1889,8 +1888,6 @@
             const dataFim = inputFim?.value || hojeIso;
 
             let faturamentoPeriodo = 0;
-            let faturamentoMesFin = 0;
-            let saidasMesFin = 0;
             let agendamentosHoje = 0;
             let retornosPendentes = 0;
             let pontosDistribuidos = 0;
@@ -1914,14 +1911,12 @@
                     let valorPlano = 0;
                     
                     // === EDITAR PREÇOS AQUI ===
-                    // Como a planilha não tinha os preços de todos, coloquei uma lógica base.
-                    // Você pode alterar os valores aqui embaixo livremente!
                     if (c.frequencia.includes("1x")) valorPlano = 35;
                     else if (c.frequencia.includes("2x")) valorPlano = 45;
-                    else if (c.frequencia.includes("3x")) valorPlano = 55; // Estimado
-                    else if (c.frequencia.includes("4x")) valorPlano = 65; // Estimado
-                    else if (c.frequencia.includes("5x")) valorPlano = 75; // Estimado
-                    else if (c.frequencia.includes("6x")) valorPlano = 85; // Estimado
+                    else if (c.frequencia.includes("3x")) valorPlano = 55;
+                    else if (c.frequencia.includes("4x")) valorPlano = 65;
+                    else if (c.frequencia.includes("5x")) valorPlano = 75;
+                    else if (c.frequencia.includes("6x")) valorPlano = 85;
 
                     receitaPlanosTotal += valorPlano;
                     
@@ -1933,7 +1928,7 @@
             });
 
             // ====================================================
-            // 2. PROCESSA ATENDIMENTOS (Vendas Avulsas no Caixa)
+            // 2. PROCESSA ATENDIMENTOS (Para Dashboard)
             // ====================================================
             const atendimentos = store.atendimentos || [];
             atendimentos.forEach(a => {
@@ -1945,12 +1940,6 @@
                     }
                 }
 
-                if (a.data.startsWith(mesAtualIso)) {
-                    if (!profFiltroFin || a.profissionalId == profFiltroFin) {
-                        faturamentoMesFin += (Number(a.total) || 0);
-                    }
-                }
-
                 if (a.data === hojeIso) {
                     if (!profFiltroDash || a.profissionalId == profFiltroDash) {
                         agendamentosHoje++;
@@ -1959,105 +1948,59 @@
             });
 
             // ====================================================
-            // 3. PROCESSA DESPESAS
-            // ====================================================
-            const despesas = store.despesas || [];
-            despesas.forEach(d => {
-                if (d.data && d.data.startsWith(mesAtualIso)) {
-                    if (!profFiltroFin || !d.profissionalId || d.profissionalId == profFiltroFin) {
-                        saidasMesFin += (Number(d.valor) || 0);
-                    }
-                }
-            });
-
-            // ====================================================
-            // 4. ATUALIZA OS TEXTOS NO DASHBOARD E FINANCEIRO
+            // 3. ATUALIZA OS TEXTOS NO DASHBOARD
             // ====================================================
             const elFaturamento = document.getElementById('dash-faturamento');
             const elAtendimentos = document.getElementById('dash-atendimentos');
             const elRetornos = document.getElementById('dash-retornos');
             const elPontos = document.getElementById('dash-pontos');
 
-            // Faturamento do Dashboard = Mensalidades Pagas + Vendas Avulsas
             if (elFaturamento) elFaturamento.innerText = `R$ ${(faturamentoPeriodo + receitaPlanosPagos).toFixed(2)}`;
             if (elAtendimentos) elAtendimentos.innerText = agendamentosHoje;
             if (elRetornos) elRetornos.innerText = retornosPendentes;
             if (elPontos) elPontos.innerText = pontosDistribuidos;
 
-            // Financeiro
+            // ====================================================
+            // 4. SUBSTITUI OS CARDS COLORIDOS PELOS DADOS REAIS
+            // ====================================================
             const elEntradasFin = document.getElementById('fin-entradas') || document.getElementById('fin-entradas-mes');
             const elSaidasFin = document.getElementById('fin-saidas') || document.getElementById('fin-saidas-mes');
             const elLucroFin = document.getElementById('fin-lucro') || document.getElementById('fin-lucro-mes');
 
-            const totalEntradasReais = faturamentoMesFin + receitaPlanosPagos;
+            const pendente = receitaPlanosTotal - receitaPlanosPagos;
 
-            if (elEntradasFin) elEntradasFin.innerText = `R$ ${totalEntradasReais.toFixed(2)}`;
-            if (elSaidasFin) elSaidasFin.innerText = `R$ ${saidasMesFin.toFixed(2)}`;
-            if (elLucroFin) {
-                const lucro = totalEntradasReais - saidasMesFin;
-                elLucroFin.innerText = `R$ ${lucro.toFixed(2)}`;
-            }
-
-            // ====================================================
-            // 5. CRIA O CARD RESUMO DE MENSALIDADES (AUTOMÁTICO)
-            // ====================================================
-            const financeiroContainer = document.querySelector('#financeiro');
-            if (financeiroContainer && financeiroContainer.innerHTML.trim() !== "") {
-                let cardMensalidades = document.getElementById('card-resumo-mensalidades');
-                
-                if (!cardMensalidades) {
-                    cardMensalidades = document.createElement('div');
-                    cardMensalidades.id = 'card-resumo-mensalidades';
-                    cardMensalidades.className = 'glass-panel';
-                    cardMensalidades.style.padding = '20px';
-                    cardMensalidades.style.marginBottom = '20px';
-                    cardMensalidades.style.background = 'rgba(139, 92, 246, 0.1)';
-                    cardMensalidades.style.border = '1px solid rgba(139, 92, 246, 0.3)';
-                    
-                    // Modificação: posicionando logo acima do Extrato
-                    const tabelaExtrato = document.getElementById('tabela-financeiro');
-                    if (tabelaExtrato) {
-                        const painelExtrato = tabelaExtrato.closest('.glass-panel') || tabelaExtrato.parentElement;
-                        financeiroContainer.insertBefore(cardMensalidades, painelExtrato);
-                    } else {
-                        financeiroContainer.appendChild(cardMensalidades);
-                    }
+            // Card Verde -> Receita Paga
+            if (elEntradasFin) {
+                elEntradasFin.innerText = `R$ ${receitaPlanosPagos.toFixed(2)}`;
+                if (elEntradasFin.previousElementSibling) {
+                    elEntradasFin.previousElementSibling.innerText = "RECEITA PAGA (GARANTIDA)";
                 }
-
-                const pendente = receitaPlanosTotal - receitaPlanosPagos;
-
-                cardMensalidades.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
-                        <div>
-                            <h3 style="margin:0; color:var(--primary); display:flex; align-items:center; gap:8px;">
-                                <i data-lucide="wallet" style="width:20px;"></i> Resumo de Mensalidades (Alunos Ativos)
-                            </h3>
-                            <p style="margin:5px 0 0 0; font-size:13px; color:var(--text-muted);">Calculado pela frequência dos alunos. Marque como 'Pago' na aba de Atualização.</p>
-                        </div>
-                        <div style="display:flex; gap:20px; text-align:right; flex-wrap:wrap;">
-                            <div>
-                                <small style="color:var(--text-muted)">Previsão Total (Se todos pagarem)</small>
-                                <h2 style="margin:0; color:#fff;">R$ ${receitaPlanosTotal.toFixed(2)}</h2>
-                            </div>
-                            <div>
-                                <small style="color:var(--success)">Receita Paga (Garantida)</small>
-                                <h2 style="margin:0; color:var(--success);">R$ ${receitaPlanosPagos.toFixed(2)}</h2>
-                            </div>
-                            <div>
-                                <small style="color:var(--danger)">Pendente (Em aberto)</small>
-                                <h2 style="margin:0; color:var(--danger);">R$ ${pendente.toFixed(2)}</h2>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                if(window.lucide) lucide.createIcons();
             }
+
+            // Card Vermelho -> Pendente
+            if (elSaidasFin) {
+                elSaidasFin.innerText = `R$ ${pendente.toFixed(2)}`;
+                if (elSaidasFin.previousElementSibling) {
+                    elSaidasFin.previousElementSibling.innerText = "PENDENTE (EM ABERTO)";
+                }
+            }
+
+            // Card Azul -> Previsão Total
+            if (elLucroFin) {
+                elLucroFin.innerText = `R$ ${receitaPlanosTotal.toFixed(2)}`;
+                if (elLucroFin.previousElementSibling) {
+                    elLucroFin.previousElementSibling.innerText = "PREVISÃO TOTAL";
+                }
+            }
+
+            // Apaga aquela barra estreita que tínhamos criado antes
+            const cardAntigo = document.getElementById('card-resumo-mensalidades');
+            if (cardAntigo) cardAntigo.remove();
 
         } catch (erro) {
             console.error("Erro no Dashboard/Financeiro:", erro);
         }
     }
-    
 
     function renderTabelaFinanceiro() {
         const tbody = document.getElementById("tabela-financeiro");
