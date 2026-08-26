@@ -103,6 +103,9 @@
                 <a onclick="abrirAba('clientes')" class="nav-item">
                     <i data-lucide="users"></i> Alunos
                 </a>
+                <a onclick="abrirAba('avaliacoes')" class="nav-item">
+                    <i data-lucide="clipboard-check"></i> Avaliações
+                </a>
                 <a onclick="abrirAba('estoque')" class="nav-item">
                     <i data-lucide="package"></i> Estoque
                 </a>
@@ -182,6 +185,7 @@
                 <section id="novo_atendimento" class="aba fade-in" style="display:none"></section>
                 <section id="profissionais" class="aba fade-in" style="display:none"></section>
                 <section id="clientes" class="aba fade-in" style="display:none"></section>
+                <section id="avaliacoes" class="aba fade-in" style="display:none"></section>
                 <section id="estoque" class="aba fade-in" style="display:none"></section>
                 <section id="financeiro" class="aba fade-in" style="display:none"></section>
                 <section id="servicos" class="aba fade-in" style="display:none"></section>
@@ -437,6 +441,11 @@
                     </div>
                 </div>
 
+                <div class="form-group mt-10" style="margin-bottom: 20px;">
+                    <label class="label-small" style="color: var(--primary);"><i data-lucide="link"></i> Link da Pasta (Google Drive) - Avaliação</label>
+                    <input type="url" id="novo-cli-drive" class="modern-input" placeholder="https://drive.google.com/drive/folders/...">
+                </div>
+
                 <button onclick="salvarNovoClienteModal()" class="btn-glow full-width mt-15">SALVAR ALUNO</button>
             </div>
         </div>
@@ -497,7 +506,7 @@
         async function carregarComponentes() {
             const paginas = [
                 'dashboard', 'agenda', 'novo_atendimento', 'profissionais', 'clientes', 
-                'estoque', 'financeiro', 'servicos', 'despesas', 'landing'
+                'estoque', 'financeiro', 'servicos', 'despesas', 'landing', 'avaliacoes'
             ];
 
             const loads = paginas.map(async (pagina) => {

@@ -1,0 +1,37 @@
+<div class="view-section">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <h2 style="color: var(--primary); margin: 0;">Avaliações Físicas</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Acompanhe o progresso dos alunos através de pastas no Google Drive.</p>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="padding: 15px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 250px;">
+            <input type="text" id="busca-avaliacao" class="modern-input" placeholder="Buscar aluno por nome..." onkeyup="filtrarAvaliacoes()">
+        </div>
+        <div style="flex: 1; min-width: 200px;">
+            <select id="filtro-status-avaliacao" class="modern-input" onchange="filtrarAvaliacoes()">
+                <option value="todos">Todos os Alunos</option>
+                <option value="avaliados">Com Link no Drive (Avaliados)</option>
+                <option value="pendentes">Sem Link (Pendentes)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="glass-panel" style="overflow-x: auto;">
+        <table class="modern-table" style="width: 100%; min-width: 800px;">
+            <thead>
+                <tr>
+                    <th>Nome do Aluno</th>
+                    <th>Objetivo</th>
+                    <th>Status da Avaliação</th>
+                    <th>Ações (Google Drive)</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-avaliacoes">
+                <!-- Povoado pelo JS -->
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1295,7 +1295,8 @@
         const campos = [
             'id-cliente-edicao', 'novo-cli-nome', 'novo-cli-sexo', 'novo-cli-idade',
             'novo-cli-tel', 'novo-cli-email', 'novo-cli-objetivo', 'novo-cli-frequencia',
-            'novo-cli-tempo', 'novo-cli-inicio', 'novo-cli-vencimento', 'novo-cli-nasc', 'novo-cli-foto'
+            'novo-cli-tempo', 'novo-cli-inicio', 'novo-cli-vencimento', 'novo-cli-nasc', 'novo-cli-foto',
+            'novo-cli-drive'
         ];
 
         // 3. Limpa os campos de forma SEGURA (se o campo não existir, ele ignora e não trava)
@@ -1352,6 +1353,7 @@
         preencherCampo("novo-cli-tempo", c.tempoTreino);
         preencherCampo("novo-cli-inicio", c.inicio);
         preencherCampo("novo-cli-vencimento", c.vencimento);
+        preencherCampo("novo-cli-drive", c.linkDrive);
 
         // Exibe o modal na tela
         const modal = document.getElementById("modal-novo-cliente");
@@ -1433,6 +1435,9 @@
         const tempoTreino = document.getElementById("novo-cli-tempo")?.value.trim() || "";
         const inicio = document.getElementById("novo-cli-inicio")?.value || new Date().toISOString().split('T')[0];
         
+        // Captura o link do Google Drive para avaliações
+        const linkDrive = document.getElementById("novo-cli-drive")?.value.trim() || "";
+        
         // AUTOMATIZAÇÃO DO VENCIMENTO: Pega o dia exato da data de início escolhida
         let vencimento = document.getElementById("novo-cli-vencimento")?.value;
         if (!vencimento && inicio) {
@@ -1449,7 +1454,7 @@
             if (typeof idClienteEdicao !== 'undefined' && idClienteEdicao) {
                 const updates = { 
                     nome, sexo, idade, telefone: tel, email, 
-                    objetivo, frequencia, tempoTreino, inicio, vencimento 
+                    objetivo, frequencia, tempoTreino, inicio, vencimento, linkDrive 
                 };
                 if(fotoBase64) updates.foto = fotoBase64;
                 db.ref(`clientes/${idClienteEdicao}`).update(updates);
@@ -1458,7 +1463,7 @@
                 const id = Date.now();
                 db.ref(`clientes/${id}`).set({ 
                     id, nome, sexo, idade, telefone: tel, email, 
-                    objetivo, frequencia, tempoTreino, inicio, vencimento,
+                    objetivo, frequencia, tempoTreino, inicio, vencimento, linkDrive,
                     dataCadastro: new Date().toISOString(),
                     pontos: 0,
                     foto: fotoBase64 || null
@@ -1477,6 +1482,9 @@
             document.getElementById("novo-cli-frequencia").value = "";
             document.getElementById("novo-cli-tempo").value = "";
             document.getElementById("novo-cli-inicio").value = "";
+            if(document.getElementById("novo-cli-drive")) {
+                document.getElementById("novo-cli-drive").value = "";
+            }
             if(document.getElementById("novo-cli-vencimento")) {
                 document.getElementById("novo-cli-vencimento").value = "";
             }
@@ -3138,6 +3146,82 @@ function renderSelectPlanosAluno() {
     sel.innerHTML = html;
     if (valorAtual) sel.value = valorAtual;
 }
+
+// ==========================================
+// MÓDULO DE AVALIAÇÕES (GOOGLE DRIVE)
+// ==========================================
+document.addEventListener('sistemaPronto', () => {
+    // Garante que a tabela carrega ao abrir a aba
+    const _abrirAbaParaAvaliacoes = window.abrirAba;
+    window.abrirAba = function(idAba) {
+        if (typeof _abrirAbaParaAvaliacoes === 'function') _abrirAbaParaAvaliacoes(idAba);
+        if (idAba === 'avaliacoes') {
+            renderTabelaAvaliacoes();
+        }
+    };
+});
+
+// Listener do Firebase - Coloque 'renderTabelaAvaliacoes()' dentro do db.ref('clientes').on('value'...) se quiser que atualize em tempo real também.
+
+function renderTabelaAvaliacoes() {
+    const tbody = document.getElementById("tabela-avaliacoes");
+    if (!tbody) return;
+
+    if (!store.clientes || store.clientes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; opacity:0.5;">Nenhum aluno cadastrado.</td></tr>`;
+        return;
+    }
+
+    const clientesOrdenados = [...store.clientes].sort((a, b) => a.nome.localeCompare(b.nome));
+
+    tbody.innerHTML = clientesOrdenados.map(c => {
+        const temLink = c.linkDrive && c.linkDrive.length > 5;
+        const statusBadge = temLink 
+            ? `<span class="badge" style="background:#10b98120; color:#10b981; border: 1px solid #10b98140;"><i data-lucide="check-circle" style="width:12px; margin-right:4px;"></i> Avaliado</span>`
+            : `<span class="badge" style="background:#f59e0b20; color:#f59e0b; border: 1px solid #f59e0b40;">Pendente</span>`;
+
+        const acaoBtn = temLink
+            ? `<a href="${c.linkDrive}" target="_blank" class="btn-small bg-green" style="display:inline-flex; align-items:center; text-decoration:none;"><i data-lucide="external-link" style="width:16px; margin-right:6px;"></i> Acessar Pasta</a>`
+            : `<button class="btn-small" style="background:rgba(255,255,255,0.1); color:#fff;" onclick="editarCliente('${c.id}')"><i data-lucide="plus" style="width:16px; margin-right:6px;"></i> Add Link</button>`;
+
+        return `
+        <tr data-status-link="${temLink ? 'avaliados' : 'pendentes'}">
+            <td><strong>${c.nome}</strong></td>
+            <td>${c.objetivo || '-'}</td>
+            <td>${statusBadge}</td>
+            <td style="display:flex; gap:10px;">
+                ${acaoBtn}
+                <button class="btn-small bg-yellow" onclick="editarCliente('${c.id}')" title="Editar Link"><i data-lucide="pencil" style="width:16px;"></i></button>
+            </td>
+        </tr>
+        `;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+    filtrarAvaliacoes(); // Aplica os filtros se já tiver algo digitado
+}
+
+function filtrarAvaliacoes() {
+    const inputBusca = document.getElementById("busca-avaliacao");
+    const selectStatus = document.getElementById("filtro-status-avaliacao");
+    if (!inputBusca || !selectStatus) return;
+
+    const termo = inputBusca.value.toLowerCase();
+    const filtroStatus = selectStatus.value;
+    const linhas = document.querySelectorAll("#tabela-avaliacoes tr");
+    
+    linhas.forEach(linha => {
+        const txt = linha.innerText.toLowerCase();
+        const statusLink = linha.getAttribute("data-status-link"); // 'avaliados' ou 'pendentes'
+        
+        const bateTexto = txt.includes(termo);
+        const bateStatus = (filtroStatus === 'todos') || (filtroStatus === statusLink);
+
+        linha.style.display = (bateTexto && bateStatus) ? "" : "none";
+    });
+}
+
+
 
 
 
