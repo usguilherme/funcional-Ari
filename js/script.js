@@ -1374,7 +1374,6 @@
         
         if(!nome) return dispararToast("Nome é obrigatório", "error");
         if(!sexo) return dispararToast("Selecione o sexo", "error");
-        if(!tel) return dispararToast("Contato (WhatsApp) é obrigatório", "error");
         
         const salvarNoBanco = (fotoBase64) => {
             if (typeof idClienteEdicao !== 'undefined' && idClienteEdicao) {
