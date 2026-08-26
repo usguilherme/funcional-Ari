@@ -1874,7 +1874,7 @@
     }
 
     // Substitua a função atualizarKPIs() atual por esta versão completa:
-function atualizarKPIs() {
+    function atualizarKPIs() {
         try {
             const hojeIso = new Date().toISOString().split('T')[0];
             const mesAtualIso = hojeIso.slice(0, 7); // Ex: "2026-08"
@@ -2014,7 +2014,14 @@ function atualizarKPIs() {
                     cardMensalidades.style.background = 'rgba(139, 92, 246, 0.1)';
                     cardMensalidades.style.border = '1px solid rgba(139, 92, 246, 0.3)';
                     
-                    financeiroContainer.insertBefore(cardMensalidades, financeiroContainer.firstChild);
+                    // Modificação: posicionando logo acima do Extrato
+                    const tabelaExtrato = document.getElementById('tabela-financeiro');
+                    if (tabelaExtrato) {
+                        const painelExtrato = tabelaExtrato.closest('.glass-panel') || tabelaExtrato.parentElement;
+                        financeiroContainer.insertBefore(cardMensalidades, painelExtrato);
+                    } else {
+                        financeiroContainer.appendChild(cardMensalidades);
+                    }
                 }
 
                 const pendente = receitaPlanosTotal - receitaPlanosPagos;
@@ -2050,6 +2057,7 @@ function atualizarKPIs() {
             console.error("Erro no Dashboard/Financeiro:", erro);
         }
     }
+    
 
     function renderTabelaFinanceiro() {
         const tbody = document.getElementById("tabela-financeiro");
