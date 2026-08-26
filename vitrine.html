@@ -89,6 +89,15 @@
         .author-info strong { display: block; font-size: 14px; }
         .author-info span { font-size: 12px; color: var(--text-muted); }
 
+        /* ===== NOVA SEÇÃO: LOCALIZAÇÃO (CARD) ===== */
+        .location-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; max-width: 800px; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .location-img { width: 100%; height: 350px; background-color: #222; background-size: cover; background-position: center; }
+        .location-content { padding: 30px; text-align: left; }
+        .loc-eyebrow { color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 8px; }
+        .loc-title { font-size: 24px; font-family: var(--font-display); color: #fff; margin-bottom: 5px; }
+        .loc-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 5px; }
+        .loc-schedule { color: var(--text-muted); font-size: 13px; opacity: 0.8; }
+
         .team-container { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
         @media(min-width: 800px) { .team-container { flex-direction: row; align-items: center; } }
         .team-img { flex: 1; min-height: 300px; background-size: cover; background-position: center; background-color: #333; }
@@ -140,6 +149,7 @@
         </div>
     </section>
 
+    <!-- VÍDEO PRINCIPAL ATUALIZADO -->
     <section>
         <div class="section-header">
             <span class="eyebrow">Veja na prática</span>
@@ -147,7 +157,9 @@
             <p class="section-subtitle">Cada aula é diferente, dinâmica e feita para você evoluir.</p>
         </div>
         <div class="video-container">
-            <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/kStbv10TS40" allowfullscreen></iframe></div>
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/6CWDJ9MxVIA" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
         </div>
     </section>
 
@@ -195,10 +207,25 @@
         </div>
     </section>
 
+    <!-- NOVA SEÇÃO: LOCALIZAÇÃO IDENTICA AO PRINT -->
     <section>
-        <div class="video-container">
-            <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/kStbv10TS40" allowfullscreen></iframe></div>
-            <div class="video-wrapper"><iframe src="https://www.youtube.com/embed/4JhrbBkTjHk" allowfullscreen></iframe></div>
+        <div class="section-header">
+            <span class="eyebrow">Localização</span>
+            <h2 class="section-title">ONDE TREINAMOS</h2>
+        </div>
+        <div class="location-card">
+            <!-- Como você não faz upload dessa imagem pelo painel ainda, coloquei um link de uma escola parecida provisoriamente. 
+                 Para alterar, é só trocar esse link (background-image) abaixo. -->
+            <div class="location-img" style="background-image: url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1000&auto=format&fit=crop');"></div>
+            
+            <div class="location-content">
+                <span class="loc-eyebrow">GINÁSIO ESCOLA SANTA MARIA</span>
+                <h3 class="loc-title" id="vt-endereco-linha1">Rua José Ferreira Dantas, 143</h3>
+                <p class="loc-subtitle" id="vt-endereco-linha2">Queimadas, PB - CEP 58475-000</p>
+                <p class="loc-schedule">Segunda, Quarta e Sexta · 19h20 às 20h20</p>
+                
+                <a href="#" id="vt-btn-maps" target="_blank" class="btn-primary" style="width: 100%; margin-top: 20px; font-size: 16px; padding: 16px;">Abrir no Google Maps</a>
+            </div>
         </div>
     </section>
 
@@ -246,10 +273,15 @@
         Funcional do Ari &copy; 2026 • Termos e Condições
     </footer>
 
-    <!-- FABS FLUTUANTES -->
+    <!-- FABS FLUTUANTES (ÍCONE DO INSTAGRAM CORRIGIDO COM SVG NATIVO) -->
     <div class="fabs">
-        <a href="#" id="vt-fab-ig" class="fab ig" target="_blank"><i data-lucide="instagram"></i></a>
-        <a href="#" id="vt-fab-wa" class="fab wa" target="_blank"><i data-lucide="phone"></i></a>
+        <a href="#" id="vt-fab-ig" class="fab ig" target="_blank" style="display:none; align-items:center; justify-content:center;">
+            <!-- SVG Nativo para garantir exibição independentemente da biblioteca de ícones -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16.11 7.5v-.01"/><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
+        </a>
+        <a href="#" id="vt-fab-wa" class="fab wa" target="_blank" style="display:flex; align-items:center; justify-content:center;">
+            <i data-lucide="phone"></i>
+        </a>
     </div>
 
     <!-- FIREBASE (Seu projeto) -->
@@ -300,18 +332,25 @@
                 document.getElementById("vt-fab-wa").href = waUrl;
             }
 
-            // Instagram Config
+            // Instagram Config (Exibe o ícone se o link existir)
             if (cfg.instagram) {
                 const fabIg = document.getElementById("vt-fab-ig");
                 fabIg.href = cfg.instagram;
                 fabIg.style.display = "flex";
             }
 
+            // Configuração do Google Maps no Card de Localização
+            if (cfg.endereco) {
+                document.getElementById("vt-endereco-linha1").innerText = cfg.endereco;
+            }
+            if (cfg.googleMapsUrl) {
+                document.getElementById("vt-btn-maps").href = cfg.googleMapsUrl;
+            }
+
             // Equipe Foto Config
             if (cfg.equipeFoto) {
                 document.getElementById("vt-equipe-foto").style.backgroundImage = `url('${cfg.equipeFoto}')`;
             } else {
-                // Foto padrão caso não envie nada no painel
                 document.getElementById("vt-equipe-foto").style.backgroundImage = `url('image_5b327d.jpg')`;
             }
 
@@ -344,7 +383,7 @@
 
             if (baHTML !== "") {
                 document.getElementById("vt-ba-grid").innerHTML = baHTML;
-                document.getElementById("section-evolucao").style.display = "block"; // Exibe a seção se tiver fotos cadastradas
+                document.getElementById("section-evolucao").style.display = "block"; 
             }
         });
     </script>
