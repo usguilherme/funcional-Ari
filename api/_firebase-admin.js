@@ -134,12 +134,15 @@ function urlBancoPadrao(projectId) {
   return projectId ? `https://${projectId}-default-rtdb.firebaseio.com` : '';
 }
 
-// Limpa a FIREBASE_DATABASE_URL: aspas, espaços/\n/invisíveis colados, esquema
-// repetido, barra final e qualquer path/query. O Admin SDK quer só
-// protocolo + host, senão dá "Invalid Firebase Database URL ...".
+// Extrai uma URL utilizável da FIREBASE_DATABASE_URL, por mais suja que venha:
+// aspas, invisíveis, esquema repetido, barra/path, ou até um link markdown
+// "[texto](url)" colado por engano. O Admin SDK quer só protocolo + host.
 function normalizarUrlBanco(u) {
-  let s = limparEnv(u).replace(/\\[rn]/g, '').replace(/\s+/g, '');
+  let s = limparEnv(u).replace(/\\[rn]/g, ' ');
   if (!s) return '';
+  // 1ª URL http(s) que aparecer (resolve markdown, aspas, texto em volta).
+  const m = s.match(/https?:\/\/[^\s()[\]"'<>]+/i);
+  s = m ? m[0] : s.replace(/\s+/g, '').replace(/^[[(]+/, '');
   s = 'https://' + s.replace(/^(https?:\/\/)+/i, '');
   try {
     return new URL(s).origin;
@@ -163,9 +166,6 @@ export function getAdminDb() {
   const clientEmail = limparEnv(process.env.FIREBASE_CLIENT_EMAIL) || cred.clientEmail || '';
   const privateKey = cred.privateKey || '';
   const databaseURL = normalizarUrlBanco(process.env.FIREBASE_DATABASE_URL) || urlBancoPadrao(projectId);
-  const _hex = (x) => Buffer.from(String(x), 'utf8').toString('hex');
-  console.log('[firebase-admin] DBURL raw  len=' + String(process.env.FIREBASE_DATABASE_URL || '').length + ' hex=' + _hex(process.env.FIREBASE_DATABASE_URL || ''));
-  console.log('[firebase-admin] DBURL norm len=' + databaseURL.length + ' hex=' + _hex(databaseURL));
 
   const faltando = [];
   if (!projectId) faltando.push('FIREBASE_PROJECT_ID');
@@ -184,7 +184,7 @@ export function getAdminDb() {
         credential: cert({ projectId, clientEmail, privateKey }),
         databaseURL
       });
-      console.log('[firebase-admin] inicializado (projeto: ' + projectId + ', credencial via ' + cred.origem + ').');
+      console.log('[firebase-admin] inicializado (projeto: ' + projectId + ', db: ' + databaseURL + ', credencial via ' + cred.origem + ').');
     } catch (err) {
       // Stack completo (inclui erros do OpenSSL / node-forge).
       console.error('[firebase-admin] Falha em initializeApp/cert:', err && err.stack ? err.stack : err);
