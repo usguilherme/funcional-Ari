@@ -3,192 +3,485 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d0d0e">
+    <meta name="description" content="Funcional do Ari — treinos adaptados para você evoluir no seu ritmo, com acompanhamento de verdade. Queimadas, PB. Primeira aula grátis.">
     <title>Funcional do Ari</title>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-dark: #121212;
-            --bg-card: #1a1a1a;
-            --bg-card-hover: #222222;
-            --primary: #c93b3b;
-            --primary-hover: #e04444;
+            --bg-dark: #0d0d0e;
+            --bg-deep: #080808;
+            --bg-card: #161617;
+            --bg-card-hover: #1d1d1f;
+            --bg-elev: #202022;
+            --primary: #d13b3b;
+            --primary-hover: #e64a4a;
+            --primary-soft: rgba(209, 59, 59, 0.12);
+            --primary-glow: rgba(209, 59, 59, 0.4);
+            --ember: linear-gradient(135deg, #f0623d 0%, #d13b3b 45%, #8f2323 100%);
             --text-main: #ffffff;
-            --text-muted: #a0a0a0;
+            --text-muted: #a2a2a8;
+            --text-dim: #6b6b72;
+            --ring: rgba(255, 255, 255, 0.07);
+            --ring-strong: rgba(255, 255, 255, 0.14);
             --font-display: 'Anton', sans-serif;
             --font-body: 'Plus Jakarta Sans', sans-serif;
+            --shadow-card: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
+            --shadow-glow: 0 24px 60px -18px var(--primary-glow);
         }
 
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-        h1, h2, h3, .font-display { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 1px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 400;
+        }
+
+        img { max-width: 100%; display: block; }
+
+        ::selection { background: var(--primary); color: #fff; }
+
+        ::-webkit-scrollbar { width: 9px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: #2c2c2e; border-radius: 10px; border: 2px solid var(--bg-deep); }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        .topbar { position: fixed; top:0; left:0; width:100%; z-index: 100; display:flex; align-items:center; justify-content:space-between; padding: 15px 5%; background: rgba(18,18,18,0.95); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .brand { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:20px; letter-spacing:1px; }
-        .brand-icon { color: var(--primary); font-size:24px; }
-        
-        .btn-primary { background-color: var(--primary); color: white; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 14px; text-decoration: none; border: none; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; }
-        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
-        
-        .btn-outline { background-color: transparent; color: var(--primary); padding: 12px 20px; border-radius: 6px; font-weight: 600; font-size: 14px; text-decoration: none; border: 1px solid var(--primary); cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; }
-        .btn-outline:hover { background-color: rgba(201, 59, 59, 0.1); }
-        
-        @media(max-width: 600px) {
-            .btn-outline span { display: none; }
+        /* ===== TEXTURA / GRÃO GLOBAL ===== */
+        .grain {
+            position: fixed; inset: 0; z-index: 9998; pointer-events: none;
+            opacity: 0.035; mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
 
-        section { padding: 80px 5%; max-width: 1200px; margin: 0 auto; }
-        .section-header { text-align: center; margin-bottom: 50px; }
-        .eyebrow { color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; display: block; }
-        .section-title { font-size: 40px; color: #fff; line-height: 1.1; }
-        .section-subtitle { color: var(--text-muted); font-size: 15px; margin-top: 15px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        /* ===== BARRA DE PROGRESSO DE SCROLL ===== */
+        .scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+            background: var(--ember); z-index: 200;
+            box-shadow: 0 0 14px var(--primary-glow);
+            transition: width 0.1s linear;
+        }
 
-        .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-top: 80px; position: relative; background: radial-gradient(circle at center, #2a1515 0%, var(--bg-dark) 60%); }
-        .hero-pin { display: inline-flex; align-items: center; gap: 6px; background: rgba(201, 59, 59, 0.1); border: 1px solid rgba(201, 59, 59, 0.3); color: var(--primary); padding: 6px 16px; border-radius: 30px; font-size: 12px; font-weight: 700; letter-spacing: 1px; margin-bottom: 20px; text-transform: uppercase; }
-        .hero h1 { font-size: clamp(50px, 8vw, 90px); line-height: 0.95; margin-bottom: 20px; }
-        .hero h1 .highlight { color: var(--primary); }
-        .hero p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin-bottom: 40px; }
-        .hero-btn { width: 100%; max-width: 600px; padding: 20px; font-size: 18px; border-radius: 8px; margin-bottom: 20px; }
-        
-        .hero-trust { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; max-width: 600px; width: 100%; }
-        .trust-badge { flex: 1; min-width: 250px; display: flex; align-items: center; gap: 15px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 8px; text-align: left; }
-        .trust-badge i { color: #4ade80; }
+        /* ===== TOPBAR ===== */
+        .topbar {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 150;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 5%;
+            background: transparent;
+            border-bottom: 1px solid transparent;
+            transition: padding 0.35s ease, background 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease;
+        }
+        .topbar.scrolled {
+            padding: 12px 5%;
+            background: rgba(13, 13, 14, 0.72);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border-bottom-color: var(--ring);
+        }
+        .brand { display: flex; align-items: center; gap: 11px; font-family: var(--font-display); font-size: 21px; letter-spacing: 1.5px; }
+        .brand-icon {
+            color: var(--primary); width: 26px; height: 26px;
+            filter: drop-shadow(0 0 10px var(--primary-glow));
+            animation: brandPulse 4s ease-in-out infinite;
+        }
+        @keyframes brandPulse { 0%, 100% { filter: drop-shadow(0 0 8px var(--primary-glow)); } 50% { filter: drop-shadow(0 0 18px var(--primary-glow)); } }
+
+        .topbar-actions { display: flex; gap: 12px; align-items: center; }
+
+        .btn-primary {
+            position: relative; overflow: hidden;
+            background: var(--ember); background-size: 160% 160%;
+            color: #fff; padding: 13px 26px; border-radius: 8px;
+            font-weight: 700; font-size: 14px; text-decoration: none;
+            border: none; cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 10px 30px -10px var(--primary-glow);
+            letter-spacing: 0.4px;
+        }
+        .btn-primary::after {
+            content: ""; position: absolute; top: 0; left: -80%; width: 60%; height: 100%;
+            background: linear-gradient(100deg, transparent, rgba(255,255,255,0.35), transparent);
+            transform: skewX(-20deg); transition: left 0.6s ease;
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -12px var(--primary-glow); }
+        .btn-primary:hover::after { left: 130%; }
+        .btn-primary:active { transform: translateY(-1px); }
+
+        .btn-outline {
+            background: rgba(255,255,255,0.02); color: var(--text-main);
+            padding: 13px 20px; border-radius: 8px; font-weight: 600; font-size: 14px;
+            text-decoration: none; border: 1px solid var(--ring-strong); cursor: pointer;
+            transition: 0.3s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-outline:hover { background: var(--primary-soft); border-color: var(--primary); color: #fff; }
+        .btn-outline i { width: 16px; height: 16px; }
+
+        @media(max-width: 620px) {
+            .btn-outline span { display: none; }
+            .btn-outline { padding: 13px; }
+            .brand { font-size: 17px; }
+        }
+
+        section { padding: 100px 5%; max-width: 1180px; margin: 0 auto; }
+        @media(max-width: 700px) { section { padding: 70px 6%; } }
+
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .eyebrow {
+            color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: 3px;
+            text-transform: uppercase; margin-bottom: 16px; display: inline-flex; align-items: center; gap: 10px;
+        }
+        .eyebrow::before, .eyebrow::after { content: ""; width: 24px; height: 1px; background: linear-gradient(90deg, transparent, var(--primary)); }
+        .eyebrow::after { background: linear-gradient(90deg, var(--primary), transparent); }
+        .section-title { font-size: clamp(30px, 5vw, 44px); color: #fff; line-height: 1.05; }
+        .section-title .accent { color: var(--primary); }
+        .section-subtitle { color: var(--text-muted); font-size: 16px; margin: 18px auto 0; max-width: 620px; }
+
+        /* ===== REVEAL ===== */
+        .reveal { opacity: 0; transform: translateY(34px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.in { opacity: 1; transform: none; }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 140px 5% 90px; position: relative; overflow: hidden;
+            background-color: var(--bg-dark);
+        }
+        .hero::before {
+            content: ""; position: absolute; inset: -30%; z-index: 0;
+            background:
+                radial-gradient(closest-side at 30% 30%, rgba(209,59,59,0.28), transparent 70%),
+                radial-gradient(closest-side at 72% 40%, rgba(240,98,61,0.16), transparent 70%),
+                radial-gradient(closest-side at 50% 78%, rgba(209,59,59,0.14), transparent 70%);
+            filter: blur(20px);
+            animation: heroDrift 22s ease-in-out infinite alternate;
+        }
+        @keyframes heroDrift {
+            0% { transform: translate3d(-3%, -2%, 0) rotate(0deg) scale(1); }
+            100% { transform: translate3d(4%, 3%, 0) rotate(8deg) scale(1.12); }
+        }
+        .hero::after {
+            content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 40%, var(--bg-dark) 92%);
+        }
+        .hero > * { position: relative; z-index: 2; }
+
+        .hero-pin {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(209, 59, 59, 0.1); border: 1px solid rgba(209, 59, 59, 0.35);
+            color: var(--primary); padding: 8px 18px; border-radius: 40px;
+            font-size: 12px; font-weight: 800; letter-spacing: 1.5px; margin-bottom: 28px;
+            text-transform: uppercase; backdrop-filter: blur(4px);
+        }
+        .hero-pin i { width: 14px; height: 14px; }
+        .hero h1 {
+            font-size: clamp(46px, 9vw, 100px); line-height: 0.92; margin-bottom: 26px;
+            text-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .hero h1 .highlight {
+            background: var(--ember); -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; color: var(--primary);
+        }
+        .hero p { color: var(--text-muted); font-size: clamp(16px, 2.2vw, 19px); max-width: 620px; margin: 0 auto 44px; }
+
+        .hero-btn {
+            width: 100%; max-width: 560px; padding: 22px; font-size: 18px; border-radius: 12px;
+            margin-bottom: 44px; letter-spacing: 0.6px;
+        }
+        .hero-btn i { width: 20px; height: 20px; }
+
+        .hero-trust { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; max-width: 620px; width: 100%; }
+        .trust-badge {
+            flex: 1; min-width: 240px; display: flex; align-items: center; gap: 14px;
+            background: linear-gradient(180deg, var(--bg-card), rgba(22,22,23,0.6));
+            border: 1px solid var(--ring); padding: 16px 20px; border-radius: 12px; text-align: left;
+            transition: 0.3s; backdrop-filter: blur(6px);
+        }
+        .trust-badge:hover { border-color: var(--ring-strong); transform: translateY(-3px); }
+        .trust-badge i { width: 26px; height: 26px; flex-shrink: 0; color: #4ade80; }
         .trust-badge.alert i { color: #fbbf24; }
         .trust-badge strong { display: block; font-size: 14px; }
         .trust-badge span { font-size: 12px; color: var(--text-muted); }
 
-        .video-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 20px; }
-        .video-wrapper { width: 100%; max-width: 350px; aspect-ratio: 9/16; background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .scroll-cue {
+            margin-top: 8px; display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
+            color: var(--text-dim); font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+        }
+        .scroll-cue i { width: 18px; height: 18px; animation: bob 1.8s ease-in-out infinite; }
+        @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+        /* ===== VÍDEOS ===== */
+        .video-container { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; }
+        .video-wrapper {
+            width: 100%; max-width: 340px; aspect-ratio: 9/16;
+            background: var(--bg-card); border-radius: 20px; overflow: hidden;
+            border: 1px solid var(--ring); box-shadow: var(--shadow-card);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+        }
+        .video-wrapper:hover { transform: translateY(-8px) scale(1.015); box-shadow: var(--shadow-glow); }
         .video-wrapper iframe { width: 100%; height: 100%; border: none; }
 
-        .target-list { display: flex; flex-direction: column; gap: 15px; max-width: 800px; margin: 0 auto; }
-        .target-item { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 20px 25px; border-radius: 8px; display: flex; align-items: center; gap: 15px; font-size: 15px; color: #ddd; transition: 0.3s; }
-        .target-item:hover { background: var(--bg-card-hover); border-color: rgba(255,255,255,0.1); }
-        .target-item i { color: var(--primary); }
+        /* ===== TARGET LIST ===== */
+        .target-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; max-width: 900px; margin: 0 auto; }
+        .target-item {
+            background: var(--bg-card); border: 1px solid var(--ring); padding: 20px 24px;
+            border-radius: 12px; display: flex; align-items: center; gap: 16px;
+            font-size: 15px; color: #dcdcdc; transition: 0.3s;
+        }
+        .target-item:hover { background: var(--bg-card-hover); border-color: var(--primary); transform: translateX(6px); }
+        .target-item i { width: 20px; height: 20px; color: var(--primary); flex-shrink: 0; }
 
-        .method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .method-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 30px; border-radius: 12px; text-align: center; transition: 0.3s; }
-        .method-card:hover { border-color: var(--primary); transform: translateY(-5px); }
-        .method-card .icon-box { width: 60px; height: 60px; margin: 0 auto 20px; border-radius: 50%; background: rgba(201, 59, 59, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .method-card h3 { font-size: 20px; margin-bottom: 10px; }
-        .method-card p { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+        /* ===== MÉTODO ===== */
+        .method-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+        .method-card {
+            position: relative; background: var(--bg-card); border: 1px solid var(--ring);
+            padding: 40px 30px 34px; border-radius: 18px; text-align: center;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+            overflow: hidden;
+        }
+        .method-card::before {
+            content: ""; position: absolute; inset: 0; opacity: 0;
+            background: radial-gradient(circle at 50% 0%, var(--primary-soft), transparent 70%);
+            transition: opacity 0.4s ease;
+        }
+        .method-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: var(--shadow-glow); }
+        .method-card:hover::before { opacity: 1; }
+        .method-num {
+            position: absolute; top: 16px; right: 22px; font-family: var(--font-display);
+            font-size: 46px; color: rgba(255,255,255,0.04); line-height: 1;
+        }
+        .method-card .icon-box {
+            width: 64px; height: 64px; margin: 0 auto 22px; border-radius: 18px;
+            background: var(--primary-soft); border: 1px solid rgba(209,59,59,0.25);
+            color: var(--primary); display: flex; align-items: center; justify-content: center;
+            position: relative; z-index: 1;
+        }
+        .method-card .icon-box i { width: 26px; height: 26px; }
+        .method-card h3 { font-size: 21px; margin-bottom: 12px; position: relative; z-index: 1; }
+        .method-card p { color: var(--text-muted); font-size: 14.5px; line-height: 1.6; position: relative; z-index: 1; }
 
-        .ba-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
-        .ba-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; width: 100%; max-width: 450px; }
+        /* ===== ANTES/DEPOIS ===== */
+        .ba-grid { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; }
+        .ba-card { background: var(--bg-card); border: 1px solid var(--ring); border-radius: 18px; overflow: hidden; width: 100%; max-width: 440px; transition: 0.4s; }
+        .ba-card:hover { border-color: var(--ring-strong); transform: translateY(-6px); box-shadow: var(--shadow-card); }
         .ba-images { display: flex; position: relative; }
         .ba-images img { width: 50%; height: 300px; object-fit: cover; }
-        .ba-images .tag { position: absolute; top: 15px; padding: 4px 10px; font-size: 10px; font-weight: 800; border-radius: 4px; color: white; letter-spacing: 1px; }
+        .ba-images .tag { position: absolute; top: 15px; padding: 5px 12px; font-size: 10px; font-weight: 800; border-radius: 6px; color: #fff; letter-spacing: 1px; }
         .ba-images .tag.antes { left: 15px; background: var(--primary); }
         .ba-images .tag.depois { right: 15px; background: #22c55e; }
-        .ba-footer { padding: 20px; text-align: center; font-family: var(--font-display); font-size: 24px; color: var(--primary); }
+        .ba-footer { padding: 22px; text-align: center; font-family: var(--font-display); font-size: 24px; color: var(--primary); }
 
-        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .test-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 30px; border-radius: 12px; }
-        .stars { color: #fbbf24; margin-bottom: 15px; letter-spacing: 2px; }
-        .test-card p { font-size: 15px; line-height: 1.6; font-style: italic; color: #ccc; margin-bottom: 20px; }
-        .author { display: flex; align-items: center; gap: 15px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        /* ===== DEPOIMENTOS ===== */
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+        .test-card {
+            position: relative; background: var(--bg-card); border: 1px solid var(--ring);
+            padding: 36px 30px 30px; border-radius: 18px; transition: 0.4s; overflow: hidden;
+        }
+        .test-card:hover { border-color: var(--ring-strong); transform: translateY(-6px); box-shadow: var(--shadow-card); }
+        .test-card .quote-mark {
+            position: absolute; top: -18px; left: 18px; font-family: var(--font-display);
+            font-size: 120px; color: rgba(209,59,59,0.1); line-height: 1;
+        }
+        .stars { color: #fbbf24; margin-bottom: 16px; letter-spacing: 3px; font-size: 15px; position: relative; }
+        .test-card p { font-size: 15px; line-height: 1.7; color: #d0d0d0; margin-bottom: 24px; position: relative; }
+        .author { display: flex; align-items: center; gap: 14px; }
+        .avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--ember); display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 16px; border: 2px solid rgba(255,255,255,0.1);
+        }
         .author-info strong { display: block; font-size: 14px; }
         .author-info span { font-size: 12px; color: var(--text-muted); }
 
-        .team-container { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
-        @media(min-width: 800px) { .team-container { flex-direction: row; align-items: center; } }
-        .team-img { flex: 1; min-height: 300px; background-size: cover; background-position: center; background-color: #333; }
-        .team-content { flex: 1; padding: 40px; }
-        .team-content p { color: #ccc; line-height: 1.6; margin-bottom: 20px; font-size: 15px; }
-        .specialties { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 30px; }
-        .spec-badge { background: rgba(201, 59, 59, 0.05); border: 1px solid rgba(201, 59, 59, 0.2); color: var(--primary); padding: 8px 16px; border-radius: 30px; font-size: 12px; font-weight: 600; }
+        /* ===== EQUIPE ===== */
+        .team-container { background: var(--bg-card); border: 1px solid var(--ring); border-radius: 22px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow-card); }
+        @media(min-width: 820px) { .team-container { flex-direction: row; align-items: stretch; } }
+        .team-img {
+            flex: 1; min-height: 340px; background-size: cover; background-position: center;
+            background-color: #2a2a2a; position: relative;
+        }
+        .team-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 40%, rgba(22,22,23,0.9)); }
+        @media(max-width: 819px) { .team-img::after { background: linear-gradient(180deg, transparent 55%, rgba(22,22,23,0.95)); } }
+        .team-content { flex: 1; padding: 48px 42px; display: flex; flex-direction: column; justify-content: center; }
+        .team-content p { color: #d0d0d0; line-height: 1.7; margin-bottom: 18px; font-size: 15px; }
+        .specialties { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+        .spec-badge {
+            background: var(--primary-soft); border: 1px solid rgba(209, 59, 59, 0.25);
+            color: var(--primary); padding: 9px 18px; border-radius: 40px; font-size: 12px; font-weight: 700;
+        }
 
-        .location-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; max-width: 800px; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .location-img { width: 100%; height: 350px; background-color: #222; background-size: cover; background-position: center; }
-        .location-content { padding: 30px; text-align: left; }
-        .loc-eyebrow { color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 8px; }
-        .loc-title { font-size: 24px; font-family: var(--font-display); color: #fff; margin-bottom: 5px; }
-        .loc-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 5px; }
-        .loc-schedule { color: var(--text-muted); font-size: 13px; opacity: 0.8; }
+        /* ===== LOCALIZAÇÃO ===== */
+        .location-card {
+            background: var(--bg-card); border: 1px solid var(--ring); border-radius: 22px;
+            overflow: hidden; max-width: 820px; margin: 0 auto; box-shadow: var(--shadow-card);
+        }
+        .location-img { width: 100%; height: 360px; background-color: #1c1c1c; background-size: cover; background-position: center; position: relative; }
+        .location-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, rgba(22,22,23,0.95)); }
+        .location-pin {
+            position: absolute; z-index: 1; bottom: 20px; left: 24px;
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(13,13,14,0.7); border: 1px solid var(--ring-strong); backdrop-filter: blur(8px);
+            padding: 8px 16px; border-radius: 40px; font-size: 12px; font-weight: 700; letter-spacing: 1px;
+        }
+        .location-pin i { width: 14px; height: 14px; color: var(--primary); }
+        .location-content { padding: 34px; text-align: left; }
+        .loc-eyebrow { color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 10px; }
+        .loc-title { font-size: 26px; font-family: var(--font-display); color: #fff; margin-bottom: 6px; }
+        .loc-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 6px; }
+        .loc-schedule { color: var(--text-muted); font-size: 13px; opacity: 0.85; display: flex; align-items: center; gap: 8px; }
+        .loc-schedule i { width: 14px; height: 14px; color: var(--primary); }
 
-        .steps-list { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
-        .step-item { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; display: flex; align-items: flex-start; gap: 20px; }
-        .step-num { width: 40px; height: 40px; min-width: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 20px; color: #fff; }
-        .step-content h4 { font-size: 18px; margin-bottom: 5px; color: #fff; }
-        .step-content p { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+        /* ===== PASSOS ===== */
+        .steps-list { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 0; position: relative; }
+        .step-item {
+            background: var(--bg-card); border: 1px solid var(--ring); padding: 28px;
+            border-radius: 16px; display: flex; align-items: flex-start; gap: 22px;
+            transition: 0.35s; margin-bottom: 16px;
+        }
+        .step-item:hover { border-color: var(--primary); transform: translateX(6px); }
+        .step-num {
+            width: 46px; height: 46px; min-width: 46px; border-radius: 14px;
+            background: var(--primary-soft); border: 1px solid rgba(209,59,59,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-display); font-size: 22px; color: var(--primary);
+            box-shadow: 0 0 24px -6px var(--primary-glow);
+        }
+        .step-content h4 { font-size: 19px; margin-bottom: 6px; color: #fff; }
+        .step-content p { color: var(--text-muted); font-size: 14.5px; line-height: 1.6; }
 
-        .faq-list { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
-        .faq-item { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; }
-        .faq-q { padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 600; font-size: 15px; }
-        .faq-q i { color: var(--primary); transition: 0.3s; }
-        .faq-item.open .faq-q i { transform: rotate(45deg); }
-        .faq-a { max-height: 0; padding: 0 20px; color: var(--text-muted); font-size: 14px; line-height: 1.6; transition: 0.3s; }
-        .faq-item.open .faq-a { padding-bottom: 20px; max-height: 200px; }
-        .faq-footer { background: #152218; border: 1px solid #1a3a22; padding: 30px; text-align: center; border-radius: 12px; margin-top: 30px; }
-        
-        .btn-whatsapp { background: #25D366; color: #000; font-weight: 700; }
-        .btn-whatsapp:hover { background: #20bd5a; }
+        /* ===== FAQ ===== */
+        .faq-list { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+        .faq-item { background: var(--bg-card); border: 1px solid var(--ring); border-radius: 14px; overflow: hidden; transition: border-color 0.3s ease; }
+        .faq-item.open { border-color: rgba(209,59,59,0.4); }
+        .faq-q { padding: 22px 24px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 600; font-size: 15.5px; gap: 16px; }
+        .faq-q i { width: 20px; height: 20px; color: var(--primary); transition: transform 0.35s ease; flex-shrink: 0; }
+        .faq-item.open .faq-q i { transform: rotate(135deg); }
+        .faq-a { max-height: 0; padding: 0 24px; color: var(--text-muted); font-size: 14.5px; line-height: 1.7; transition: max-height 0.4s ease, padding-bottom 0.4s ease; }
+        .faq-item.open .faq-a { padding-bottom: 22px; max-height: 260px; }
+        .faq-footer {
+            background: linear-gradient(180deg, rgba(21, 34, 24, 0.8), rgba(21, 34, 24, 0.4));
+            border: 1px solid #1f4a2a; padding: 38px 30px; text-align: center; border-radius: 18px; margin-top: 34px;
+        }
+        .faq-footer h3 { color: #fff; margin-bottom: 6px; font-size: 27px; }
 
-        .fabs { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        .fab { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; text-decoration: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.3s; }
-        .fab:hover { transform: scale(1.1); }
-        .fab.ig { display:none; background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
-        .fab.wa { background: #25D366; }
+        .btn-whatsapp { background: linear-gradient(135deg, #25D366, #1eb355); color: #04240f; font-weight: 800; box-shadow: 0 10px 30px -10px rgba(37, 211, 102, 0.5); }
+        .btn-whatsapp::after { background: linear-gradient(100deg, transparent, rgba(255,255,255,0.5), transparent); }
+        .btn-whatsapp i { width: 18px; height: 18px; }
+
+        /* ===== FABS ===== */
+        .fabs { position: fixed; bottom: 28px; right: 28px; display: flex; flex-direction: column; gap: 14px; z-index: 140; }
+        .fab { width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; box-shadow: 0 12px 28px rgba(0,0,0,0.5); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .fab i { width: 24px; height: 24px; }
+        .fab:hover { transform: scale(1.12) translateY(-2px); }
+        .fab.ig { display: none; background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+        .fab.wa { background: linear-gradient(135deg, #25D366, #1eb355); position: relative; }
+        .fab.wa::before, .fab.wa::after {
+            content: ""; position: absolute; inset: 0; border-radius: 50%;
+            border: 2px solid #25D366; animation: fabRing 2.4s ease-out infinite;
+        }
+        .fab.wa::after { animation-delay: 1.2s; }
+        @keyframes fabRing { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.9); opacity: 0; } }
 
         /* ===== TERMOS E RODAPÉ ===== */
-        .terms-section { max-width: 800px; margin: 0 auto; padding: 40px 20px 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .terms-section { max-width: 820px; margin: 0 auto; padding: 44px 20px 20px; border-top: 1px solid var(--ring); }
         .terms-toggle { text-align: center; color: var(--text-muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; font-weight: 600; }
         .terms-toggle:hover { color: #fff; }
-        .terms-toggle i { transition: transform 0.3s; }
+        .terms-toggle i { width: 16px; height: 16px; transition: transform 0.3s; }
         .terms-content.open + .terms-toggle i { transform: rotate(180deg); }
-        .terms-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, margin-top 0.4s ease; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
-        .terms-content.open { max-height: 2000px; margin-top: 30px; }
+        .terms-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, margin-top 0.4s ease; color: var(--text-muted); font-size: 13px; line-height: 1.7; }
+        .terms-content.open { max-height: 2200px; margin-top: 30px; }
         .terms-content h4 { color: #fff; margin: 20px 0 10px 0; font-size: 14px; letter-spacing: 1px; }
         .terms-content p { margin-bottom: 15px; text-align: justify; }
 
-        .main-footer { text-align: center; padding: 60px 20px 100px; background: #0a0a0a; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 20px; }
-        .main-footer .brand { justify-content: center; margin-bottom: 15px; }
-        .main-footer p { color: var(--text-muted); font-size: 13px; margin: 5px 0; }
+        .main-footer { text-align: center; padding: 70px 20px 120px; background: var(--bg-deep); border-top: 1px solid var(--ring); margin-top: 20px; }
+        .main-footer .brand { justify-content: center; margin-bottom: 16px; }
+        .main-footer p { color: var(--text-muted); font-size: 13px; margin: 6px 0; }
+        .footer-socials { display: flex; gap: 14px; justify-content: center; margin: 18px 0 10px; }
+        .footer-socials a {
+            width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--ring);
+            display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: 0.3s;
+        }
+        .footer-socials a:hover { color: #fff; border-color: var(--primary); background: var(--primary-soft); transform: translateY(-3px); }
+        .footer-socials i { width: 18px; height: 18px; }
 
-        /* ===== MODAL ÁREA DO ALUNO (MERCADO PAGO) ===== */
-        .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .glass-modal { background: var(--bg-card); padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1); position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-        .close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; opacity: 0.7; }
-        .close-btn:hover { opacity: 1; }
-        .modern-input { width: 100%; padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; font-family: var(--font-body); font-size: 15px; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        .modern-input:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); }
-        
+        /* ===== MODAL ÁREA DO ALUNO ===== */
+        .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(8px); padding: 20px; }
+        .modal-backdrop.show { display: flex; animation: modalFade 0.3s ease; }
+        @keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
+        .glass-modal {
+            background: linear-gradient(180deg, var(--bg-elev), var(--bg-card));
+            padding: 34px; border-radius: 22px; width: 100%; max-width: 410px;
+            border: 1px solid var(--ring-strong); position: relative;
+            box-shadow: 0 30px 70px -20px rgba(0,0,0,0.8);
+            animation: modalRise 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes modalRise { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: none; } }
+        .close-btn { position: absolute; top: 16px; right: 18px; background: none; border: none; color: #fff; font-size: 26px; cursor: pointer; opacity: 0.6; line-height: 1; transition: 0.2s; }
+        .close-btn:hover { opacity: 1; transform: rotate(90deg); }
+        .modal-title { font-family: var(--font-display); font-size: 25px; color: var(--primary); margin-bottom: 10px; }
+        .modal-sub { color: var(--text-muted); font-size: 14px; margin-bottom: 22px; }
+        .modern-input {
+            width: 100%; padding: 15px 16px; border-radius: 10px; border: 1px solid var(--ring-strong);
+            background: rgba(0,0,0,0.35); color: #fff; font-family: var(--font-body); font-size: 15px;
+            margin-bottom: 14px; outline: none; transition: 0.3s;
+        }
+        .modern-input:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); box-shadow: 0 0 0 4px var(--primary-soft); }
+        .modal-btn { width: 100%; padding: 15px; font-size: 16px; border-radius: 10px; }
+
         .spinner { border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+            .reveal { opacity: 1; transform: none; }
+        }
     </style>
 </head>
 <body>
 
-    <header class="topbar">
+    <div class="grain"></div>
+    <div class="scroll-progress" id="scroll-progress"></div>
+
+    <header class="topbar" id="topbar">
         <div class="brand"><i data-lucide="triangle" class="brand-icon"></i> <span id="vt-header-titulo">FUNCIONALDOARI</span></div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-outline" onclick="abrirAreaAluno()"><i data-lucide="user" style="width:16px; margin-right:5px;"></i> <span>Área do Aluno</span></button>
+        <div class="topbar-actions">
+            <button class="btn-outline" onclick="abrirAreaAluno()"><i data-lucide="user"></i> <span>Área do Aluno</span></button>
             <a href="agendar.html" class="btn-primary">Agendar aula</a>
         </div>
     </header>
 
     <section class="hero" id="vt-hero">
-        <div class="hero-pin"><i data-lucide="map-pin" style="width: 14px;"></i> QUEIMADAS, PB</div>
+        <div class="hero-pin"><i data-lucide="map-pin"></i> QUEIMADAS, PB</div>
         <h1 id="vt-titulo">NÃO É SOBRE SER PERFEITO.<br><span class="highlight">É SOBRE COMEÇAR!</span></h1>
         <p id="vt-subtitulo">Treinos adaptados para você evoluir no seu ritmo, com acompanhamento de verdade.</p>
-        <a href="agendar.html" class="btn-primary hero-btn">Quero minha aula GRÁTIS</a>
+        <a href="agendar.html" class="btn-primary hero-btn"><i data-lucide="flame"></i> Quero minha aula GRÁTIS</a>
         <div class="hero-trust">
             <div class="trust-badge"><i data-lucide="check-circle-2"></i><div><strong>1ª aula 100% grátis</strong><span>Sem compromisso</span></div></div>
             <div class="trust-badge alert"><i data-lucide="alert-triangle"></i><div><strong>Vagas limitadas</strong><span>Reserve a sua hoje</span></div></div>
         </div>
+        <div class="scroll-cue">Role para ver<i data-lucide="chevron-down"></i></div>
     </section>
 
-    <!-- O resto do seu HTML (vídeos, depoimentos, localização, faq) continua igual até o Modal -->
-    <section>
+    <section class="reveal">
         <div class="section-header">
             <span class="eyebrow">Veja na prática</span>
-            <h2 class="section-title">COMO É TREINAR COM A GENTE</h2>
+            <h2 class="section-title">COMO É TREINAR <span class="accent">COM A GENTE</span></h2>
             <p class="section-subtitle">Cada aula é diferente, dinâmica e feita para você evoluir.</p>
         </div>
         <div class="video-container">
@@ -198,8 +491,8 @@
         </div>
     </section>
 
-    <section>
-        <div class="section-header"><h2 class="section-title">ESSE TREINO É PARA VOCÊ QUE...</h2></div>
+    <section class="reveal">
+        <div class="section-header"><span class="eyebrow">Identificou-se?</span><h2 class="section-title">ESSE TREINO É PARA <span class="accent">VOCÊ QUE...</span></h2></div>
         <div class="target-list">
             <div class="target-item"><i data-lucide="arrow-right"></i> Já tentou treinar e desistiu</div>
             <div class="target-item"><i data-lucide="arrow-right"></i> Não gosta de academia</div>
@@ -210,38 +503,38 @@
         </div>
     </section>
 
-    <section>
+    <section class="reveal">
         <div class="section-header">
             <span class="eyebrow">O Método</span>
-            <h2 class="section-title">TREINE DO SEU JEITO,<br>EVOLUA DE VERDADE!</h2>
+            <h2 class="section-title">TREINE DO SEU JEITO,<br><span class="accent">EVOLUA DE VERDADE!</span></h2>
         </div>
         <div class="method-grid">
-            <div class="method-card"><div class="icon-box"><i data-lucide="target"></i></div><h3 class="font-display">Feito para você</h3><p>No seu nível, sem comparação com ninguém.</p></div>
-            <div class="method-card"><div class="icon-box"><i data-lucide="handshake"></i></div><h3 class="font-display">Acompanhamento</h3><p>O Ari está do seu lado em cada movimento.</p></div>
-            <div class="method-card"><div class="icon-box"><i data-lucide="trending-up"></i></div><h3 class="font-display">Progressão segura</h3><p>Cada semana um passo a mais na sua evolução.</p></div>
+            <div class="method-card"><span class="method-num">01</span><div class="icon-box"><i data-lucide="target"></i></div><h3 class="font-display">Feito para você</h3><p>No seu nível, sem comparação com ninguém.</p></div>
+            <div class="method-card"><span class="method-num">02</span><div class="icon-box"><i data-lucide="handshake"></i></div><h3 class="font-display">Acompanhamento</h3><p>O Ari está do seu lado em cada movimento.</p></div>
+            <div class="method-card"><span class="method-num">03</span><div class="icon-box"><i data-lucide="trending-up"></i></div><h3 class="font-display">Progressão segura</h3><p>Cada semana um passo a mais na sua evolução.</p></div>
         </div>
     </section>
 
     <section id="section-evolucao" style="display:none;">
         <div class="section-header">
             <span class="eyebrow">Transformações reais</span>
-            <h2 class="section-title">Resultados de quem começou</h2>
+            <h2 class="section-title">RESULTADOS DE <span class="accent">QUEM COMEÇOU</span></h2>
         </div>
         <div class="ba-grid" id="vt-ba-grid">
             <!-- Povoado pelo Firebase -->
         </div>
     </section>
 
-    <section>
-        <div class="section-header"><span class="eyebrow">Quem vive, recomenda</span><h2 class="section-title">O QUE DIZEM OS ALUNOS</h2></div>
+    <section class="reveal">
+        <div class="section-header"><span class="eyebrow">Quem vive, recomenda</span><h2 class="section-title">O QUE DIZEM <span class="accent">OS ALUNOS</span></h2></div>
         <div class="test-grid">
-            <div class="test-card"><div class="stars">★★★★★</div><p>"O Funcional é a prática que acho melhor de fazer! Sempre muda, é descontraído e isso faz com que eu me encaixe nessas atividades."</p><div class="author"><div class="avatar">L</div><div class="author-info"><strong>Laís</strong><span>Aluna do Funcional do Ari</span></div></div></div>
-            <div class="test-card"><div class="stars">★★★★★</div><p>"Gostei bastante! A atenção dos professores é muito boa. Tenho problema de cansaço mas vou acompanhando o ritmo aos poucos."</p><div class="author"><div class="avatar">E</div><div class="author-info"><strong>Maria Eloiza</strong><span>Aluna do Funcional do Ari</span></div></div></div>
-            <div class="test-card"><div class="stars">★★★★★</div><p>"Funcional top, equipe top e super atenciosos!"</p><div class="author"><div class="avatar">N</div><div class="author-info"><strong>Naiara Pereira</strong><span>Aluna do Funcional do Ari</span></div></div></div>
+            <div class="test-card"><span class="quote-mark">&ldquo;</span><div class="stars">★★★★★</div><p>"O Funcional é a prática que acho melhor de fazer! Sempre muda, é descontraído e isso faz com que eu me encaixe nessas atividades."</p><div class="author"><div class="avatar">L</div><div class="author-info"><strong>Laís</strong><span>Aluna do Funcional do Ari</span></div></div></div>
+            <div class="test-card"><span class="quote-mark">&ldquo;</span><div class="stars">★★★★★</div><p>"Gostei bastante! A atenção dos professores é muito boa. Tenho problema de cansaço mas vou acompanhando o ritmo aos poucos."</p><div class="author"><div class="avatar">E</div><div class="author-info"><strong>Maria Eloiza</strong><span>Aluna do Funcional do Ari</span></div></div></div>
+            <div class="test-card"><span class="quote-mark">&ldquo;</span><div class="stars">★★★★★</div><p>"Funcional top, equipe top e super atenciosos!"</p><div class="author"><div class="avatar">N</div><div class="author-info"><strong>Naiara Pereira</strong><span>Aluna do Funcional do Ari</span></div></div></div>
         </div>
     </section>
 
-    <section style="padding-top: 0;">
+    <section class="reveal" style="padding-top: 0;">
         <div class="video-container">
             <div class="video-wrapper">
                 <iframe src="https://www.youtube.com/embed/kStbv10TS40" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -252,8 +545,8 @@
         </div>
     </section>
 
-    <section>
-        <div class="section-header"><span class="eyebrow">Nossa equipe</span><h2 class="section-title">CONHEÇA NOSSA EQUIPE DE PROFISSIONAIS</h2></div>
+    <section class="reveal">
+        <div class="section-header"><span class="eyebrow">Nossa equipe</span><h2 class="section-title">CONHEÇA NOSSA <span class="accent">EQUIPE</span></h2></div>
         <div class="team-container">
             <div class="team-img" id="vt-equipe-foto"></div>
             <div class="team-content">
@@ -268,25 +561,27 @@
         </div>
     </section>
 
-    <section>
+    <section class="reveal">
         <div class="section-header">
             <span class="eyebrow">Localização</span>
-            <h2 class="section-title">ONDE TREINAMOS</h2>
+            <h2 class="section-title">ONDE <span class="accent">TREINAMOS</span></h2>
         </div>
         <div class="location-card">
-            <div class="location-img" style="background-image: url('fotoescola.jpg');"></div>
+            <div class="location-img" style="background-image: url('fotoescola.jpg');">
+                <span class="location-pin"><i data-lucide="map-pin"></i> Queimadas, PB</span>
+            </div>
             <div class="location-content">
                 <span class="loc-eyebrow">GINÁSIO ESCOLA SANTA MARIA</span>
                 <h3 class="loc-title" id="vt-endereco-linha1">Rua José Ferreira Dantas, 143</h3>
                 <p class="loc-subtitle" id="vt-endereco-linha2">Queimadas, PB - CEP 58475-000</p>
-                <p class="loc-schedule">Segunda, Quarta e Sexta · 19h20 às 20h20</p>
-                <a href="#" id="vt-btn-maps" target="_blank" class="btn-primary" style="width: 100%; margin-top: 20px; font-size: 16px; padding: 16px;">Abrir no Google Maps</a>
+                <p class="loc-schedule"><i data-lucide="clock"></i> Segunda, Quarta e Sexta · 19h20 às 20h20</p>
+                <a href="#" id="vt-btn-maps" target="_blank" class="btn-primary" style="width: 100%; margin-top: 22px; font-size: 16px; padding: 16px;"><i data-lucide="navigation"></i> Abrir no Google Maps</a>
             </div>
         </div>
     </section>
 
-    <section>
-        <div class="section-header"><span class="eyebrow">É Simples</span><h2 class="section-title">DA DECISÃO AO PRIMEIRO TREINO EM 3 PASSOS</h2></div>
+    <section class="reveal">
+        <div class="section-header"><span class="eyebrow">É Simples</span><h2 class="section-title">DA DECISÃO AO PRIMEIRO TREINO EM <span class="accent">3 PASSOS</span></h2></div>
         <div class="steps-list">
             <div class="step-item"><div class="step-num">1</div><div class="step-content"><h4>Agende sua aula grátis</h4><p>Manda uma mensagem. A gente marca o melhor dia. Sem compromisso.</p></div></div>
             <div class="step-item"><div class="step-num">2</div><div class="step-content"><h4>Treine no seu ritmo</h4><p>Sem pressão, sem julgamento. Venha como você é.</p></div></div>
@@ -294,8 +589,8 @@
         </div>
     </section>
 
-    <section>
-        <div class="section-header"><h2 class="section-title">DÚVIDAS FREQUENTES</h2></div>
+    <section class="reveal">
+        <div class="section-header"><span class="eyebrow">Tira-dúvidas</span><h2 class="section-title">DÚVIDAS <span class="accent">FREQUENTES</span></h2></div>
         <div class="faq-list">
             <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Nunca treinei, vou conseguir acompanhar? <i data-lucide="plus"></i></div><div class="faq-a">Sim. O treino é adaptado ao seu nível. Você começa do seu jeito e evolui com segurança.</div></div>
             <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Tenho limitação ou dor, posso treinar? <i data-lucide="plus"></i></div><div class="faq-a">Sim. Os exercícios são adaptados conforme sua necessidade, priorizando sempre sua segurança. </div></div>
@@ -305,24 +600,24 @@
             <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Vocês acompanham a evolução dos alunos? <i data-lucide="plus"></i></div><div class="faq-a">Sim! Fazemos avaliações periódicas para ajustar o treino e garantir que você continue evoluindo.</div></div>
         </div>
         <div class="faq-footer">
-            <h3 class="font-display" style="color: #fff; margin-bottom: 5px; font-size: 26px;">AINDA FICOU COM DÚVIDA?</h3>
-            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Me chama no WhatsApp!</p>
-            <a href="#" id="vt-btn-whatsapp" target="_blank" class="btn-primary btn-whatsapp"><i data-lucide="message-circle" style="margin-right: 8px;"></i> Falar no WhatsApp agora</a>
+            <h3 class="font-display">AINDA FICOU COM DÚVIDA?</h3>
+            <p style="color: var(--text-muted); margin-bottom: 22px; font-size: 14px;">Me chama no WhatsApp!</p>
+            <a href="#" id="vt-btn-whatsapp" target="_blank" class="btn-primary btn-whatsapp"><i data-lucide="message-circle"></i> Falar no WhatsApp agora</a>
         </div>
     </section>
 
     <!-- TERMOS E CONDIÇÕES -->
     <div class="terms-section">
         <div class="terms-toggle" onclick="document.getElementById('terms-content').classList.toggle('open'); this.classList.toggle('open');">
-            Termos e Condições <i data-lucide="chevron-down" style="width:16px; height:16px;"></i>
+            Termos e Condições <i data-lucide="chevron-down"></i>
         </div>
         <div id="terms-content" class="terms-content">
             <h4>TERMOS E CONDIÇÕES</h4>
             <p>As informações disponíveis neste site têm caráter exclusivamente informativo e não substituem o parecer médico profissional. Recomenda-se consultar um profissional de saúde antes de iniciar qualquer atividade física, especialmente em caso de condições preexistentes. <strong style="color:#ccc;">O aluno é responsável por informar ao professor eventuais limitações físicas, lesões ou condições de saúde antes do início das atividades.</strong> Ao participar das aulas, o aluno assume corresponsabilidade pelos riscos inerentes à prática de atividade física, sem prejuízo das responsabilidades legais do profissional nos termos do Código de Defesa do Consumidor (Lei 8.078/90).</p>
-            
+
             <h4>USO DE IMAGEM</h4>
             <p>Ao participar das aulas, o aluno autoriza o uso de sua imagem e voz, captadas durante as atividades, para fins de divulgação do Funcional do Ari em redes sociais, site, material publicitário e demais meios de comunicação, sem limitação de prazo ou território, a título gratuito. O aluno poderá revogar essa autorização a qualquer momento mediante comunicação expressa ao responsável.</p>
-            
+
             <h4>AVISO LEGAL</h4>
             <p>O Funcional do Ari oferece aulas de atividade física com acompanhamento profissional presencial. Os resultados individuais podem variar conforme dedicação, alimentação e condições físicas de cada aluno, não constituindo garantia de resultados específicos. Em caso de planos pagos, cancelamentos devem ser comunicados com antecedência mínima de 48 horas. Os dados pessoais fornecidos são utilizados exclusivamente para comunicação sobre as aulas, em conformidade com a Lei Geral de Proteção de Dados (Lei 13.709/2018).</p>
         </div>
@@ -331,16 +626,20 @@
     <!-- RODAPÉ COMPLETO -->
     <footer class="main-footer">
         <div class="brand"><i data-lucide="triangle" class="brand-icon"></i> <span id="vt-footer-titulo">FUNCIONALDOARI</span></div>
+        <div class="footer-socials">
+            <a href="#" id="vt-footer-ig-link" target="_blank" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+            <a href="#" id="vt-footer-wa-link" target="_blank" aria-label="WhatsApp"><i data-lucide="phone"></i></a>
+        </div>
         <p><span id="vt-footer-insta">@funcionaldoari</span> • <span id="vt-footer-telefone">(83) 9 9123-3073</span></p>
         <p style="opacity:0.6; margin-top:15px;">&copy; <span id="ano-atual"></span> Funcional do Ari</p>
     </footer>
 
     <!-- FABS FLUTUANTES -->
     <div class="fabs">
-        <a href="#" id="vt-fab-ig" class="fab ig" target="_blank" style="display:none; align-items:center; justify-content:center;">
+        <a href="#" id="vt-fab-ig" class="fab ig" target="_blank">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16.11 7.5v-.01"/><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
         </a>
-        <a href="#" id="vt-fab-wa" class="fab wa" target="_blank" style="display:flex; align-items:center; justify-content:center;">
+        <a href="#" id="vt-fab-wa" class="fab wa" target="_blank">
             <i data-lucide="phone"></i>
         </a>
     </div>
@@ -348,43 +647,39 @@
     <!-- MODAL ÁREA DO ALUNO (MERCADO PAGO) -->
     <div id="modal-aluno" class="modal-backdrop">
         <div class="glass-modal">
-            <button onclick="fecharAreaAluno()" class="close-btn">×</button>
-            
+            <button onclick="fecharAreaAluno()" class="close-btn">&times;</button>
+
             <div id="etapa-busca">
-                <h3 style="font-family:var(--font-display); font-size:24px; color:var(--primary); margin-bottom:10px;">ÁREA DO ALUNO</h3>
-                <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Digite seu WhatsApp cadastrado para consultar sua mensalidade.</p>
+                <h3 class="modal-title">ÁREA DO ALUNO</h3>
+                <p class="modal-sub">Digite seu WhatsApp cadastrado para consultar sua mensalidade.</p>
                 <input type="tel" id="aluno-tel-busca" class="modern-input" placeholder="(83) 99999-9999" oninput="this.value = this.value.replace(/[^0-9() -]/g, '')">
-                <button onclick="buscarAluno()" class="btn-primary" style="width:100%; padding:15px; font-size:16px;">Consultar</button>
-                <p id="erro-busca" style="color:#f87171; font-size:13px; margin-top:10px; display:none; text-align:center;">Aluno não encontrado. Verifique o número.</p>
+                <button onclick="buscarAluno()" class="btn-primary modal-btn">Consultar</button>
+                <p id="erro-busca" style="color:#f87171; font-size:13px; margin-top:12px; display:none; text-align:center;">Aluno não encontrado. Verifique o número.</p>
             </div>
 
             <div id="etapa-resultado" style="display:none; text-align:center;">
-                <h3 id="res-nome" style="font-family:var(--font-display); font-size:22px; color:white; margin-bottom:5px;">Olá, Aluno</h3>
-                <div id="res-status" style="display:inline-block; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:bold; margin-bottom:15px;">Status</div>
-                
-                <div id="area-pagamento" style="display:none; background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); text-align:center;">
-                    <p style="color:var(--text-muted); font-size:13px; margin-bottom:5px;">Vencimento: <strong id="res-vencimento" style="color:white;"></strong></p>
-                    <p style="font-size:24px; font-weight:bold; color:var(--primary); margin-bottom:15px;" id="res-valor">R$ 0,00</p>
-                    
-                    <!-- NOVO: BOTÃO QUE CHAMA A API DO MERCADO PAGO -->
-                    <button id="btn-gerar-mp" class="btn-primary" style="width:100%; padding:15px; font-size:16px; background:#009ee3; color:white; margin-bottom: 10px;">Gerar Pix Oficial</button>
-                    
-                    <!-- AQUI VAI APARECER O QR CODE DEPOIS DE CLICAR -->
+                <h3 id="res-nome" class="modal-title" style="color:#fff; font-size:22px;">Olá, Aluno</h3>
+                <div id="res-status" style="display:inline-block; padding:6px 14px; border-radius:24px; font-size:12px; font-weight:800; margin-bottom:16px;">Status</div>
+
+                <div id="area-pagamento" style="display:none; background:rgba(0,0,0,0.25); padding:18px; border-radius:14px; border:1px solid var(--ring); text-align:center;">
+                    <p style="color:var(--text-muted); font-size:13px; margin-bottom:6px;">Vencimento: <strong id="res-vencimento" style="color:#fff;"></strong></p>
+                    <p style="font-size:26px; font-weight:800; color:var(--primary); margin-bottom:16px;" id="res-valor">R$ 0,00</p>
+
+                    <button id="btn-gerar-mp" class="btn-primary" style="width:100%; padding:15px; font-size:16px; background:linear-gradient(135deg,#00b3f0,#009ee3); box-shadow:0 10px 30px -10px rgba(0,158,227,0.5); margin-bottom: 10px;">Gerar Pix Oficial</button>
+
                     <div id="caixa-qr-code" style="display: none;">
-                        <img id="qr-pix-mp" src="" style="width: 100%; max-width: 200px; border-radius:8px; margin-bottom: 15px; background: white; padding: 5px;">
-                        <input type="text" id="pix-copia-cola-mp" readonly style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.3); color:var(--text-muted); font-size:12px; margin-bottom:10px; text-align:center;">
+                        <img id="qr-pix-mp" src="" alt="QR Code Pix" style="width: 100%; max-width: 200px; border-radius:12px; margin: 0 auto 15px; background: #fff; padding: 8px;">
+                        <input type="text" id="pix-copia-cola-mp" readonly style="width:100%; padding:11px; border-radius:10px; border:1px solid var(--ring-strong); background:rgba(0,0,0,0.35); color:var(--text-muted); font-size:12px; margin-bottom:10px; text-align:center;">
                         <button onclick="copiarPixMP()" class="btn-outline" style="width:100%; padding:12px; font-size:14px; margin-bottom:15px;">Copiar Código Pix</button>
-                        
-                        <!-- ANIMAÇÃO DE CARREGAMENTO -->
-                        <div style="display:flex; align-items:center; justify-content:center; gap:10px; color:#a0a0a0; font-size:13px;">
+
+                        <div style="display:flex; align-items:center; justify-content:center; gap:10px; color:var(--text-muted); font-size:13px;">
                             <div class="spinner" style="width:20px; height:20px; margin:0; border-width:2px;"></div> Aguardando confirmação...
                         </div>
                     </div>
                 </div>
 
-                <!-- TELA DE SUCESSO VERDE (Aparece automaticamente) -->
                 <div id="tela-sucesso-pagamento" style="display:none; padding: 30px 15px; text-align:center;">
-                    <i data-lucide="check-circle-2" style="width:60px; height:60px; color:#22c55e; margin-bottom:15px;"></i>
+                    <i data-lucide="check-circle-2" style="width:64px; height:64px; color:#22c55e; margin-bottom:15px;"></i>
                     <h2 style="color:#22c55e; margin-bottom:10px;">PAGAMENTO CONFIRMADO!</h2>
                     <p style="color:var(--text-muted); font-size:14px;">O sistema já atualizou sua mensalidade automaticamente. Bom treino!</p>
                 </div>
@@ -402,6 +697,31 @@
     <script>
         lucide.createIcons();
         document.getElementById('ano-atual').innerText = new Date().getFullYear();
+
+        // ===== TOPBAR + BARRA DE PROGRESSO =====
+        const topbar = document.getElementById('topbar');
+        const progressBar = document.getElementById('scroll-progress');
+        function onScroll() {
+            const y = window.scrollY || document.documentElement.scrollTop;
+            topbar.classList.toggle('scrolled', y > 30);
+            const h = document.documentElement.scrollHeight - window.innerHeight;
+            progressBar.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        // ===== REVEAL ON SCROLL =====
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) { entry.target.classList.add('in'); io.unobserve(entry.target); }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+        // Stagger em grids de cards
+        document.querySelectorAll('.method-grid, .test-grid, .target-list, .steps-list').forEach(grid => {
+            Array.from(grid.children).forEach((child, i) => { child.style.transitionDelay = (i * 70) + 'ms'; });
+        });
 
         function toggleFaq(element) {
             const item = element.parentElement;
@@ -421,29 +741,34 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let mapServicos = {};
         let listenerStatusPix = null;
-
-        db.ref('servicos').once('value').then(snap => {
-            const srvs = snap.val() || {};
-            Object.values(srvs).forEach(s => { 
-                mapServicos[s.nome] = parseFloat(s.preco) || 0; 
-            });
-        });
 
         db.ref('landingConfig').once('value').then(snap => {
             const cfg = snap.val() || {};
-            // (Código de preenchimento da landing original mantido igual...)
-            if (cfg.titulo) document.getElementById("vt-titulo").innerHTML = cfg.titulo;
-            if (cfg.capa) document.getElementById("vt-hero").style.backgroundImage = `radial-gradient(circle at center, rgba(42,21,21,0.8) 0%, var(--bg-dark) 100%), url('${cfg.capa}')`;
-            //...
+            if (cfg.titulo) document.getElementById("vt-titulo").textContent = cfg.titulo;
+            if (cfg.subtitulo) document.getElementById("vt-subtitulo").textContent = cfg.subtitulo;
+            if (cfg.capa) document.getElementById("vt-hero").style.backgroundImage = `radial-gradient(circle at center, rgba(13,13,14,0.55) 0%, var(--bg-dark) 92%), url('${encodeURI(cfg.capa)}')`;
+            if (cfg.capa) { document.getElementById("vt-hero").style.backgroundSize = 'cover'; document.getElementById("vt-hero").style.backgroundPosition = 'center'; }
+            if (cfg.equipeFoto) document.getElementById("vt-equipe-foto").style.backgroundImage = `url('${encodeURI(cfg.equipeFoto)}')`;
+            if (cfg.whatsapp) {
+                const zap = 'https://wa.me/55' + String(cfg.whatsapp).replace(/\D/g, '');
+                ['vt-btn-whatsapp', 'vt-fab-wa', 'vt-footer-wa-link'].forEach(id => { const el = document.getElementById(id); if (el) el.href = zap; });
+            }
+            if (cfg.instagram) {
+                ['vt-fab-ig'].forEach(id => { const el = document.getElementById(id); if (el) { el.href = cfg.instagram; el.style.display = 'flex'; } });
+                const igFooter = document.getElementById('vt-footer-ig-link');
+                if (igFooter) igFooter.href = cfg.instagram;
+            }
+            if (cfg.googleMapsUrl) document.getElementById('vt-btn-maps').href = cfg.googleMapsUrl;
         });
 
         // ==========================================
         // LÓGICA DA ÁREA DO ALUNO (MERCADO PAGO API)
         // ==========================================
         function abrirAreaAluno() {
-            document.getElementById('modal-aluno').style.display = 'flex';
+            const m = document.getElementById('modal-aluno');
+            m.style.display = 'flex';
+            m.classList.add('show');
             document.getElementById('etapa-busca').style.display = 'block';
             document.getElementById('etapa-resultado').style.display = 'none';
             document.getElementById('tela-sucesso-pagamento').style.display = 'none';
@@ -451,14 +776,15 @@
             document.getElementById('btn-gerar-mp').style.display = 'block';
             document.getElementById('aluno-tel-busca').value = '';
             document.getElementById('erro-busca').style.display = 'none';
-            
-            // Para de ouvir o Firebase caso o usuário feche e abra de novo
+
             if(listenerStatusPix) listenerStatusPix.off();
         }
 
         function fecharAreaAluno() {
-            document.getElementById('modal-aluno').style.display = 'none';
-            if(listenerStatusPix) listenerStatusPix.off(); // Segurança
+            const m = document.getElementById('modal-aluno');
+            m.style.display = 'none';
+            m.classList.remove('show');
+            if(listenerStatusPix) listenerStatusPix.off();
         }
 
         function buscarAluno() {
@@ -477,23 +803,22 @@
             btn.innerText = "Buscando...";
             btn.disabled = true;
 
-            db.ref('clientes').once('value').then(snap => {
-                const clientes = snap.val() ? Object.values(snap.val()) : [];
-                
-                const alunoEncontrado = clientes.find(c => {
-                    const cTelLimpo = (c.telefone || "").replace(/\D/g, '');
-                    return cTelLimpo.length >= 8 && cTelLimpo === telLimpo;
-                });
-
-                if (alunoEncontrado) {
-                    mostrarResultadoAluno(alunoEncontrado);
-                } else {
+            fetch('/api/consulta-aluno', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telefone: telLimpo })
+            }).then(async (resp) => {
+                if (resp.status === 404) {
                     erroMsg.innerText = "Aluno não encontrado. Verifique o número.";
                     erroMsg.style.display = 'block';
+                    return;
                 }
+                if (!resp.ok) throw new Error('Falha na consulta');
+                const aluno = await resp.json();
+                mostrarResultadoAluno(aluno);
             }).catch(err => {
                 console.error(err);
-                erroMsg.innerText = "Erro de conexão.";
+                erroMsg.innerText = "Erro de conexão. Tente novamente.";
                 erroMsg.style.display = 'block';
             }).finally(() => {
                 btn.innerText = txtOriginal;
@@ -505,12 +830,13 @@
             document.getElementById('etapa-busca').style.display = 'none';
             document.getElementById('etapa-resultado').style.display = 'block';
 
-            const primeiroNome = aluno.nome.split(' ')[0];
-            document.getElementById('res-nome').innerText = `Olá, ${primeiroNome}!`;
+            document.getElementById('res-nome').innerText = `Olá, ${aluno.primeiroNome || 'Aluno'}!`;
 
             const statusEl = document.getElementById('res-status');
             const areaPagamento = document.getElementById('area-pagamento');
-            const statusBanco = aluno.statusMensalidade || 'atrasado'; 
+            const statusBanco = aluno.statusMensalidade || 'atrasado';
+
+            statusEl.style.display = 'inline-block';
 
             if (statusBanco === 'pago') {
                 statusEl.innerText = "✓ MENSALIDADE EM DIA";
@@ -523,38 +849,32 @@
                 statusEl.style.background = "rgba(248, 113, 113, 0.2)";
                 statusEl.style.color = "#f87171";
                 statusEl.style.border = "1px solid rgba(248, 113, 113, 0.3)";
-                
+
                 document.getElementById('res-vencimento').innerText = `Dia ${aluno.vencimento || '10'}`;
-                
-                const precoPlano = mapServicos[aluno.frequencia] || 0;
-                
+
+                const precoPlano = Number(aluno.valorPlano) || 0;
+                areaPagamento.style.display = 'block';
+
                 if (precoPlano > 0) {
                     document.getElementById('res-valor').innerText = `R$ ${precoPlano.toFixed(2)}`;
-                    areaPagamento.style.display = 'block';
-                    
-                    // Configura o botão do Mercado Pago
                     const btnMP = document.getElementById('btn-gerar-mp');
+                    btnMP.style.display = 'block';
                     btnMP.onclick = () => solicitarPixServidor(aluno, precoPlano);
                 } else {
                     document.getElementById('res-valor').innerText = `Valor sob consulta`;
-                    areaPagamento.style.display = 'block';
                     document.getElementById('btn-gerar-mp').style.display = 'none';
                 }
             }
         }
 
-        // ========================================================
-        // COMUNICAÇÃO COM O SERVIDOR (VERCEL API) E ESCUTA REAL-TIME
-        // ========================================================
         async function solicitarPixServidor(aluno, valor) {
             const btnMP = document.getElementById('btn-gerar-mp');
             const caixaQR = document.getElementById('caixa-qr-code');
-            
+
             btnMP.innerText = "Conectando ao banco...";
             btnMP.disabled = true;
 
             try {
-                // Chama a API que vamos criar na Vercel (Passo 2)
                 const resposta = await fetch('/api/gerar-pix', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -571,15 +891,12 @@
                     throw new Error(dados.erro || 'Falha ao gerar Pix');
                 }
 
-                // Esconde o botão e mostra a caixa com o QR Code oficial
                 btnMP.style.display = 'none';
                 caixaQR.style.display = 'block';
-                
-                // Exibe as informações que vieram do Mercado Pago
+
                 document.getElementById('qr-pix-mp').src = `data:image/png;base64,${dados.qr_code_base64}`;
                 document.getElementById('pix-copia-cola-mp').value = dados.qr_code;
 
-                // INICIA O OUVINTE EM TEMPO REAL DO FIREBASE
                 iniciarEscutaPagamento(aluno.id);
 
             } catch (erro) {
@@ -591,25 +908,19 @@
         }
 
         function iniciarEscutaPagamento(clienteId) {
-            // O sistema fica "escutando" a ficha desse aluno 24h por dia
             listenerStatusPix = db.ref(`clientes/${clienteId}/statusMensalidade`);
-            
+
             listenerStatusPix.on('value', snap => {
                 const status = snap.val();
                 if (status === 'pago') {
-                    // O WEBHOOK DO MERCADO PAGO ATUALIZOU O BANCO! A TELA REAGE NA HORA:
-                    
-                    // Toca o som de vitória (caixa registradora / sucesso)
                     const audio = document.getElementById('audio-sucesso');
                     if(audio) audio.play().catch(e => console.log(e));
 
-                    // Esconde a área de cobrança e mostra a tela verde gigante
                     document.getElementById('area-pagamento').style.display = 'none';
                     document.getElementById('res-status').style.display = 'none';
                     document.getElementById('tela-sucesso-pagamento').style.display = 'block';
                     lucide.createIcons();
 
-                    // Para de ouvir o Firebase para não consumir internet
                     listenerStatusPix.off();
                 }
             });
@@ -619,12 +930,18 @@
             const input = document.getElementById("pix-copia-cola-mp");
             input.select();
             document.execCommand("copy");
-            
+
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = "Copiado! ✅";
             setTimeout(() => { btn.innerText = originalText; }, 2000);
         }
+
+        // Fecha modal ao clicar no fundo / ESC
+        document.getElementById('modal-aluno').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-aluno') fecharAreaAluno();
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharAreaAluno(); });
     </script>
 </body>
 </html>

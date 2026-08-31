@@ -1,0 +1,96 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "config": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "clientes": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$clienteId": {
+        "statusMensalidade": {
+          ".read": true
+        }
+      }
+    },
+
+    "atendimentos": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["timestamp"]
+    },
+
+    "despesas": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "estoque": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "vales": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["timestamp"]
+    },
+
+    "painel_tv": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "servicos": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "landingConfig": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "profissionais": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "profissionais_publicos": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "disponibilidade": {
+      ".read": true,
+      ".write": "auth != null",
+      "$data": {
+        "$profissionalId": {
+          "$hora": {
+            ".write": "auth != null || (!data.exists() && newData.val() === true)",
+            ".validate": "newData.isBoolean() || newData.val() == null"
+          }
+        }
+      }
+    },
+
+    "agendamentos_publicos": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$id": {
+        ".write": "auth != null || (!data.exists() && newData.exists())",
+        ".validate": "newData.hasChildren(['nomeCliente','telefoneCliente','data','hora','servicoNome']) && newData.child('nomeCliente').isString() && newData.child('nomeCliente').val().length > 0 && newData.child('nomeCliente').val().length <= 120 && newData.child('telefoneCliente').isString() && newData.child('telefoneCliente').val().length <= 30 && newData.child('data').isString() && newData.child('data').val().length == 10 && newData.child('hora').isString() && newData.child('hora').val().length <= 5 && newData.child('servicoNome').isString() && newData.child('servicoNome').val().length <= 120",
+        "obs": { ".validate": "newData.isString() && newData.val().length <= 400" },
+        "profissionalNome": { ".validate": "newData.isString() && newData.val().length <= 120" },
+        "profissionalId": { ".validate": "newData.isString() || newData.isNumber() || newData.val() == null" },
+        "valor": { ".validate": "newData.isNumber()" },
+        "criadoEm": { ".validate": "newData.isNumber()" },
+        "$outro": { ".validate": "newData.isString() || newData.isNumber() || newData.isBoolean()" }
+      }
+    }
+  }
+}

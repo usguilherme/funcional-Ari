@@ -3,18 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0605">
     <title>Agendar Aula | Funcional do Ari</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* ===== VARIÁVEIS DE ALTO PADRÃO ===== */
         :root {
             --bg-dark: #0a0605;
-            --bg-surface: rgba(30, 20, 18, 0.7);
+            --bg-surface: rgba(24, 17, 16, 0.72);
             --primary: #e6432f;
+            --primary-hover: #ff5a44;
             --gold: #ff8a4c;
+            --ember: linear-gradient(135deg, #ff8a4c 0%, #e6432f 55%, #a12417 100%);
             --text-main: #ffffff;
             --text-muted: #9ca3af;
+            --text-dim: #6b6b72;
+            --ring: rgba(255, 255, 255, 0.09);
+            --ring-strong: rgba(255, 255, 255, 0.16);
             --font-display: 'Anton', sans-serif;
             --font-body: 'Plus Jakarta Sans', sans-serif;
         }
@@ -23,7 +30,6 @@
 
         body {
             background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at top, #2d1b3d 0%, var(--bg-dark) 80%);
             color: var(--text-main);
             font-family: var(--font-body);
             -webkit-font-smoothing: antialiased;
@@ -31,229 +37,251 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 24px;
+            position: relative;
+            overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        /* ===== ANIMAÇÃO ===== */
+        /* ===== FUNDO ANIMADO ===== */
+        .bg-mesh {
+            position: fixed; inset: -25%; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(closest-side at 25% 25%, rgba(230, 67, 47, 0.30), transparent 70%),
+                radial-gradient(closest-side at 78% 30%, rgba(255, 138, 76, 0.18), transparent 70%),
+                radial-gradient(closest-side at 55% 82%, rgba(230, 67, 47, 0.16), transparent 70%);
+            filter: blur(30px);
+            animation: meshDrift 24s ease-in-out infinite alternate;
+        }
+        @keyframes meshDrift {
+            0% { transform: translate3d(-2%, -3%, 0) scale(1) rotate(0deg); }
+            100% { transform: translate3d(3%, 4%, 0) scale(1.14) rotate(9deg); }
+        }
+        .bg-grain {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            opacity: 0.04; mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        .bg-vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at center, transparent 45%, var(--bg-dark) 95%); }
+
+        ::selection { background: var(--primary); color: #fff; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #2c2020; border-radius: 10px; }
+
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(34px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-up {
-            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        .animate-up { animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        /* ===== CONTAINER DO FORMULÁRIO ===== */
-        .agendar-container {
+        /* ===== SHELL DE 2 COLUNAS ===== */
+        .agendar-shell {
+            position: relative; z-index: 2;
+            display: grid; grid-template-columns: 1fr;
+            width: 100%; max-width: 940px;
             background: var(--bg-surface);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            padding: 40px 30px;
-            width: 100%;
-            max-width: 480px;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            border: 1px solid var(--ring);
+            border-radius: 28px;
+            overflow: hidden;
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+            box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255,255,255,0.02) inset;
+        }
+        @media (min-width: 860px) {
+            .agendar-shell { grid-template-columns: 0.9fr 1.1fr; }
         }
 
-        /* ===== HEADER DO FORM ===== */
-        .form-header {
-            text-align: center;
-            margin-bottom: 30px;
+        /* ===== PAINEL LATERAL (BRANDING) ===== */
+        .aside-panel {
+            padding: 44px 38px;
+            background:
+                linear-gradient(180deg, rgba(230, 67, 47, 0.14), rgba(10, 6, 5, 0.2)),
+                radial-gradient(circle at 20% 10%, rgba(255, 138, 76, 0.2), transparent 55%);
+            border-bottom: 1px solid var(--ring);
+            display: flex; flex-direction: column; gap: 26px;
         }
-        .selo-marca {
+        @media (min-width: 860px) { .aside-panel { border-bottom: none; border-right: 1px solid var(--ring); } }
+
+        .aside-brand { display: flex; align-items: center; gap: 11px; font-family: var(--font-display); font-size: 20px; letter-spacing: 1.5px; }
+        .aside-brand i { width: 24px; height: 24px; color: var(--primary); filter: drop-shadow(0 0 10px rgba(230,67,47,0.5)); }
+
+        .aside-panel h1 {
             font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
-            font-size: 11px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--primary);
-            margin-bottom: 12px;
-            display: inline-block;
-            background: rgba(229, 169, 169, 0.1);
-            padding: 4px 12px;
-            border-radius: 30px;
-            border: 1px solid rgba(229, 169, 169, 0.2);
+            font-size: clamp(30px, 5vw, 40px); line-height: 1.02; font-weight: 400;
+        }
+        .aside-panel h1 .accent { background: var(--ember); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .aside-panel > p { color: var(--text-muted); font-size: 14.5px; }
+
+        .aside-benefits { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
+        .benefit { display: flex; align-items: center; gap: 13px; font-size: 14px; color: #e2e2e2; }
+        .benefit i { width: 18px; height: 18px; color: #4ade80; flex-shrink: 0; }
+
+        .aside-foot { margin-top: auto; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-dim); }
+        .aside-foot i { width: 14px; height: 14px; }
+
+        /* ===== FORM ===== */
+        .form-panel { padding: 44px 38px; }
+        @media (max-width: 480px) { .aside-panel, .form-panel { padding: 34px 24px; } }
+
+        .form-header { margin-bottom: 26px; }
+        .selo-marca {
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 3px;
+            font-size: 10px; color: var(--primary); margin-bottom: 12px; display: inline-block;
+            background: rgba(230, 67, 47, 0.12); padding: 5px 14px; border-radius: 30px;
+            border: 1px solid rgba(230, 67, 47, 0.3);
         }
         .form-header h2 {
             font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 26px; font-weight: 400;
             background: linear-gradient(to right, #fff, #e6432f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .form-header p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 6px;
-        }
+        .form-header p { color: var(--text-muted); font-size: 13.5px; margin-top: 6px; }
 
-        /* ===== INPUTS ===== */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 16px;
-        }
+        .form-group { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
         .label-small {
-            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-left: 4px;
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.8px;
+            font-size: 11px; font-weight: 400; color: var(--text-muted); margin-left: 4px;
+            display: flex; align-items: center; gap: 7px;
         }
+        .label-small i { width: 13px; height: 13px; color: var(--primary); }
+
+        .input-wrap { position: relative; }
         .modern-input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            font-family: var(--font-body);
-            font-size: 15px;
-            padding: 14px 16px;
-            border-radius: 14px;
-            transition: all 0.3s ease;
-            outline: none;
-            width: 100%;
+            background: rgba(0, 0, 0, 0.34);
+            border: 1px solid var(--ring-strong);
+            color: #fff; font-family: var(--font-body); font-size: 15px;
+            padding: 14px 16px; border-radius: 14px;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+            outline: none; width: 100%;
         }
         .modern-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(229, 169, 169, 0.15);
+            box-shadow: 0 0 0 4px rgba(230, 67, 47, 0.14);
             background: rgba(0, 0, 0, 0.5);
         }
-        .modern-input::placeholder { color: rgba(255,255,255,0.3); }
-        
-        select.modern-input option {
-            background-color: var(--bg-dark);
-            color: white;
-        }
+        .modern-input::placeholder { color: rgba(255,255,255,0.28); }
+        .modern-input:not([type]):hover, input.modern-input:hover, select.modern-input:hover { border-color: var(--ring-strong); }
+
+        select.modern-input option { background-color: #140d0c; color: #fff; }
         select.modern-input optgroup {
-            background-color: #1e1a2b;
-            color: var(--primary);
-            font-weight: bold;
+            background-color: #1c1413; color: var(--primary); font-weight: bold;
             font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
         }
+        input[type="date"].modern-input, input[type="time"].modern-input { color-scheme: dark; }
 
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        @media (max-width: 400px) { .grid-2 { grid-template-columns: 1fr; } }
 
-        /* ===== AVISOS ===== */
-        .aviso-caixa {
-            font-size: 13px;
-            border-radius: 12px;
-            padding: 12px 16px;
-            line-height: 1.5;
-            margin-bottom: 16px;
-            display: none;
-        }
-        #pub-horarios-ocupados {
-            color: var(--text-muted);
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        #pub-aviso-conflito {
-            color: #fca5a5;
-            background: rgba(248, 113, 113, 0.1);
-            border: 1px solid rgba(248, 113, 113, 0.2);
-        }
+        .aviso-caixa { font-size: 13px; border-radius: 12px; padding: 12px 16px; line-height: 1.55; margin-bottom: 16px; display: none; }
+        #pub-horarios-ocupados { color: var(--text-muted); background: rgba(255,255,255,0.03); border: 1px solid var(--ring); }
+        #pub-aviso-conflito { color: #fca5a5; background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.25); }
 
-        /* ===== BOTÃO ===== */
         .btn-glow {
-            display: inline-block;
-            background: linear-gradient(135deg, #ff8a4c, #e6432f);
-            color: white;
-            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
-            font-weight: 700;
-            font-size: 15px;
-            padding: 16px 32px;
-            border-radius: 50px;
-            text-align: center;
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 10px 20px rgba(230, 67, 47, 0.3);
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
+            position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            background: var(--ember); color: #fff;
+            font-family: var(--font-display); text-transform: uppercase; letter-spacing: 1px;
+            font-weight: 400; font-size: 15px;
+            padding: 17px 32px; border-radius: 50px; text-align: center; text-decoration: none;
+            box-shadow: 0 14px 34px -10px rgba(230, 67, 47, 0.5);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+            border: none; cursor: pointer; width: 100%; margin-top: 12px;
         }
-        .btn-glow:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 25px rgba(230, 67, 47, 0.5);
+        .btn-glow::after {
+            content: ""; position: absolute; top: 0; left: -80%; width: 55%; height: 100%;
+            background: linear-gradient(100deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-20deg); transition: left 0.6s ease;
         }
-        
-        /* Botão Voltar */
+        .btn-glow:hover { transform: translateY(-3px); box-shadow: 0 20px 44px -12px rgba(230, 67, 47, 0.65); }
+        .btn-glow:hover::after { left: 130%; }
+        .btn-glow i { width: 18px; height: 18px; }
+
         .btn-voltar {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 14px;
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+            margin-top: 18px; color: var(--text-muted); text-decoration: none; font-size: 13.5px;
             transition: color 0.2s;
         }
         .btn-voltar:hover { color: var(--primary); }
+        .btn-voltar i { width: 15px; height: 15px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+            .animate-up { opacity: 1; transform: none; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="agendar-container animate-up">
-        <div class="form-header">
-            <span class="selo-marca">Reserva Online</span>
-            <h2>Agendar Aula</h2>
-            <p>Preencha os dados e fale conosco pelo WhatsApp para agendar seu treino.</p>
-        </div>
-        
-        <div>
-            <div class="form-group">
-                <label class="label-small">Seu Nome Completo</label>
-                <input type="text" id="pub-nome" class="modern-input" placeholder="Ex: João Silva">
+    <div class="bg-mesh"></div>
+    <div class="bg-grain"></div>
+    <div class="bg-vignette"></div>
+
+    <div class="agendar-shell animate-up">
+        <aside class="aside-panel">
+            <div class="aside-brand"><i data-lucide="triangle"></i> FUNCIONALDOARI</div>
+            <h1>Sua primeira aula é <span class="accent">por nossa conta</span></h1>
+            <p>Reserve seu horário em menos de um minuto. A gente confirma tudo com você pelo WhatsApp.</p>
+            <div class="aside-benefits">
+                <div class="benefit"><i data-lucide="check-circle-2"></i> Aula experimental 100% gratuita</div>
+                <div class="benefit"><i data-lucide="check-circle-2"></i> Treino adaptado ao seu nível</div>
+                <div class="benefit"><i data-lucide="check-circle-2"></i> Acompanhamento real, sem julgamento</div>
+                <div class="benefit"><i data-lucide="check-circle-2"></i> Sem compromisso, sem fidelidade</div>
             </div>
-            
-            <div class="form-group">
-                <label class="label-small">Seu WhatsApp</label>
-                <input type="text" id="pub-tel" class="modern-input" placeholder="(83) 99999-9999">
+            <div class="aside-foot"><i data-lucide="map-pin"></i> Ginásio Escola Santa Maria · Queimadas, PB</div>
+        </aside>
+
+        <div class="form-panel">
+            <div class="form-header">
+                <span class="selo-marca">Reserva Online</span>
+                <h2>Agendar Aula</h2>
+                <p>Preencha os dados e fale conosco pelo WhatsApp para agendar seu treino.</p>
             </div>
 
-            <div class="form-group">
-                <label class="label-small">Instrutor Preferido</label>
-                <select id="pub-profissional" class="modern-input">
-                    <option value="">Qualquer instrutor disponível</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="label-small">Escolha o Plano/Treino</label>
-                <select id="pub-servico" class="modern-input">
-                    <option value="">Carregando planos...</option>
-                </select>
-            </div>
-
-            <div class="grid-2">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label class="label-small">Data Desejada</label>
-                    <input type="date" id="pub-data" class="modern-input">
+            <div>
+                <div class="form-group">
+                    <label class="label-small"><i data-lucide="user"></i> Seu Nome Completo</label>
+                    <input type="text" id="pub-nome" class="modern-input" placeholder="Ex: João Silva">
                 </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <label class="label-small">Horário</label>
-                    <input type="time" id="pub-hora" class="modern-input">
+
+                <div class="form-group">
+                    <label class="label-small"><i data-lucide="phone"></i> Seu WhatsApp</label>
+                    <input type="text" id="pub-tel" class="modern-input" placeholder="(83) 99999-9999">
                 </div>
-            </div>
 
-            <div id="pub-horarios-ocupados" class="aviso-caixa"></div>
-            <div id="pub-aviso-conflito" class="aviso-caixa">
-                ⚠️ Esse horário já está ocupado com esse instrutor. Escolha outro, por favor.
-            </div>
+                <div class="form-group">
+                    <label class="label-small"><i data-lucide="user-cog"></i> Instrutor Preferido</label>
+                    <select id="pub-profissional" class="modern-input">
+                        <option value="">Qualquer instrutor disponível</option>
+                    </select>
+                </div>
 
-            <button onclick="salvarAgendamentoPublico()" class="btn-glow">AGENDAR E IR PARA WHATSAPP</button>
-            
-            <!-- AQUI FOI CORRIGIDO O LINK PARA VOLTAR PARA A VITRINE -->
-            <a href="vitrine.html" class="btn-voltar">← Voltar para a vitrine</a>
+                <div class="form-group">
+                    <label class="label-small"><i data-lucide="dumbbell"></i> Escolha o Plano/Treino</label>
+                    <select id="pub-servico" class="modern-input">
+                        <option value="">Carregando planos...</option>
+                    </select>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="label-small"><i data-lucide="calendar"></i> Data Desejada</label>
+                        <input type="date" id="pub-data" class="modern-input">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="label-small"><i data-lucide="clock"></i> Horário</label>
+                        <input type="time" id="pub-hora" class="modern-input">
+                    </div>
+                </div>
+
+                <div id="pub-horarios-ocupados" class="aviso-caixa"></div>
+                <div id="pub-aviso-conflito" class="aviso-caixa">
+                    ⚠️ Esse horário já está ocupado com esse instrutor. Escolha outro, por favor.
+                </div>
+
+                <button onclick="salvarAgendamentoPublico()" class="btn-glow"><i data-lucide="message-circle"></i> AGENDAR E IR PARA WHATSAPP</button>
+
+                <a href="vitrine.html" class="btn-voltar"><i data-lucide="arrow-left"></i> Voltar para a vitrine</a>
+            </div>
         </div>
     </div>
 
@@ -262,6 +290,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <script>
+        lucide.createIcons();
+
         const firebaseConfig = {
             apiKey: "AIzaSyBY4nfykJETa-Vw6E5TLOVAkuPVXva0Bx4",
             authDomain: "funcional-ari.firebaseapp.com",
@@ -279,26 +309,33 @@
         db.ref('servicos').once('value').then(snap => {
             const servicosObj = snap.val() ? snap.val() : {};
             todosServicosGlobais = Object.values(servicosObj).sort((a, b) => a.nome.localeCompare(b.nome));
-            
+
             renderizarServicos();
         }).catch(err => console.error("Erro ao carregar serviços:", err));
 
-        // 2. Carrega os Instrutores do Banco de Dados
-        db.ref('profissionais').once('value').then(snap => {
-            const profsObj = snap.val() ? snap.val() : {};
-            let profissionais = Object.values(profsObj);
+        // 2. Carrega os Instrutores (lista pública { id: nome }, mantida pelo painel)
+        db.ref('profissionais_publicos').once('value').then(snap => {
+            const mapa = snap.val() || {};
+            const profissionais = Object.keys(mapa)
+                .map(id => ({ id, nome: mapa[id] }))
+                .filter(p => p.nome)
+                .sort((a, b) => a.nome.localeCompare(b.nome));
 
             const sel = document.getElementById("pub-profissional");
-            profissionais.sort((a, b) => a.nome.localeCompare(b.nome));
-            
-            sel.innerHTML = '<option value="">Qualquer instrutor disponível</option>' + 
-                profissionais.map(p => `<option value="${p.id}" data-nome="${p.nome}">${p.nome}</option>`).join('');
+            sel.innerHTML = '<option value="">Qualquer instrutor disponível</option>' +
+                profissionais.map(p => `<option value="${escAttr(p.id)}" data-nome="${escAttr(p.nome)}">${escHtml(p.nome)}</option>`).join('');
         }).catch(err => console.error("Erro ao carregar profissionais:", err));
+
+        // Helpers de escape para montar HTML com dados do banco.
+        function escHtml(v) {
+            return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function escAttr(v) { return escHtml(v); }
 
         // ===== FUNÇÃO QUE MONTA A CAIXA DE PLANOS =====
         function renderizarServicos() {
             const sel = document.getElementById("pub-servico");
-            
+
             if (todosServicosGlobais.length === 0) {
                 sel.innerHTML = '<option value="">Nenhum plano cadastrado</option>';
                 return;
@@ -306,10 +343,11 @@
 
             let htmlBase = '<option value="">Selecione o plano...</option>';
             let htmlPlanos = '<optgroup label="🏋️ Planos e Aulas">';
-            
+
             todosServicosGlobais.forEach(s => {
-                const precoFormatado = parseFloat(s.preco) > 0 ? `R$ ${parseFloat(s.preco).toFixed(2)}` : 'Valor sob avaliação';
-                htmlPlanos += `<option value="${s.nome}" data-preco="${s.preco}">${s.nome} - ${precoFormatado}</option>`;
+                const precoNum = parseFloat(s.preco) || 0;
+                const precoFormatado = precoNum > 0 ? `R$ ${precoNum.toFixed(2)}` : 'Valor sob avaliação';
+                htmlPlanos += `<option value="${escAttr(s.nome)}" data-preco="${escAttr(precoNum)}">${escHtml(s.nome)} - ${precoFormatado}</option>`;
             });
 
             htmlPlanos += '</optgroup>';
@@ -367,7 +405,7 @@
         document.getElementById("pub-profissional").addEventListener("change", () => {
             carregarHorariosOcupados();
         });
-        
+
         document.getElementById("pub-data").addEventListener("change", carregarHorariosOcupados);
         document.getElementById("pub-hora").addEventListener("change", verificarConflitoHorario);
 
@@ -375,10 +413,10 @@
         function salvarAgendamentoPublico() {
             const nome = document.getElementById("pub-nome").value.trim();
             const tel = document.getElementById("pub-tel").value.trim();
-            
+
             const servicoSelect = document.getElementById("pub-servico");
             const opcaoSelecionada = servicoSelect.options[servicoSelect.selectedIndex];
-            
+
             const servicoNome = servicoSelect.value;
             const precoServico = parseFloat(opcaoSelecionada?.getAttribute('data-preco')) || 0;
 
@@ -399,21 +437,17 @@
                 return;
             }
 
-            const id = Date.now();
-            const novoAtendimento = {
-                id: id,
+            const registro = {
                 data: data,
                 hora: hora,
-                timestamp: Date.now(),
-                nomeCliente: nome,
-                telefoneCliente: tel,
-                profissionalId: profId || null,
-                nomeProfissional: profNome,
-                status: "Aguardando Confirmação",
-                servicos: [{ id: Date.now(), nome: servicoNome, preco: precoServico, tipo: 'servico' }],
-                total: precoServico,
-                pagamento: "Pendente",
-                obs: "Agendado via Link Público - Aguardando validação via WhatsApp"
+                nomeCliente: nome.slice(0, 120),
+                telefoneCliente: tel.slice(0, 30),
+                servicoNome: (servicoNome || '').slice(0, 120),
+                profissionalId: profId ? String(profId) : null,
+                profissionalNome: (profNome || 'Qualquer Instrutor').slice(0, 120),
+                valor: precoServico,
+                obs: "Agendado pelo site — aguardando confirmação",
+                criadoEm: Date.now()
             };
 
             const btn = document.querySelector(".btn-glow");
@@ -421,25 +455,25 @@
             btn.style.opacity = "0.7";
             btn.style.pointerEvents = "none";
 
-            db.ref(`atendimentos/${id}`).set(novoAtendimento)
+            db.ref('agendamentos_publicos').push(registro)
                 .then(() => {
                     if(profId) {
                         db.ref(`disponibilidade/${data}/${profId}/${chaveHora(hora)}`).set(true)
                             .catch(err => console.error("Erro ao registrar disponibilidade:", err));
                     }
-                    
+
                     const dataFormatada = data.split('-').reverse().join('/');
 
                     db.ref('landingConfig/whatsapp').once('value').then(snap => {
                         let numeroWhats = snap.val() || "83999999999";
-                        numeroWhats = numeroWhats.replace(/\D/g, ''); 
+                        numeroWhats = numeroWhats.replace(/\D/g, '');
                         if(!numeroWhats.startsWith('55')) numeroWhats = '55' + numeroWhats;
 
                         const precoFormatado = precoServico > 0 ? `R$ ${precoServico.toFixed(2)}` : 'A combinar/Avaliação';
-                        const msg = `Olá! Meu nome é ${nome}.%0A%0AQuero confirmar o agendamento da minha aula:%0A🏋️ *Plano:* ${servicoNome}%0A🧑‍🏫 *Instrutor:* ${profNome}%0A📅 *Data:* ${dataFormatada}%0A⏰ *Horário:* ${hora}%0A💰 *Valor:* ${precoFormatado}`;
+                        const msg = `Olá! Meu nome é ${nome}.\n\nQuero confirmar o agendamento da minha aula:\n🏋️ *Plano:* ${servicoNome}\n🧑‍🏫 *Instrutor:* ${profNome}\n📅 *Data:* ${dataFormatada}\n⏰ *Horário:* ${hora}\n💰 *Valor:* ${precoFormatado}`;
 
                         alert("🎉 Horário reservado no sistema! Vamos te direcionar para o nosso WhatsApp para finalizar.");
-                        window.location.href = `https://wa.me/${numeroWhats}?text=${msg}`;
+                        window.location.href = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(msg)}`;
                     });
                 })
                 .catch(err => {
