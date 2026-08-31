@@ -727,7 +727,14 @@
                     $('erro-login').classList.add('show');
                     return;
                 }
-                if (!resp.ok) throw new Error('falha');
+                if (!resp.ok) {
+                    var msg = 'Erro de conexão. Tente de novo em instantes.';
+                    try { var j = await resp.json(); if (j && j.erro) msg = j.erro; } catch (e2) {}
+                    mostrarTela('form');
+                    $('erro-login').textContent = msg;
+                    $('erro-login').classList.add('show');
+                    return;
+                }
                 var dados = await resp.json();
                 dados._telefone = telefone;
                 ALUNO = dados;

@@ -48,11 +48,12 @@ export default async function handler(req, res) {
     ]);
 
     const clientes = snapClientes.val() || {};
-    const servicos = paraLista(snapServicos.val());
+    const servicos = paraLista(snapServicos.val()).filter(s => s && typeof s === 'object');
     const precoPorPlano = {};
-    servicos.forEach(s => { precoPorPlano[s.nome] = parseFloat(s.preco) || 0; });
+    servicos.forEach(s => { if (s.nome) precoPorPlano[s.nome] = parseFloat(s.preco) || 0; });
 
     const aluno = Object.values(clientes).find(c => {
+      if (!c || typeof c !== 'object') return false;
       const t = soDigitos(c.telefone);
       return t.length >= 8 && t === telefone;
     });
@@ -134,7 +135,12 @@ export default async function handler(req, res) {
       }
     });
   } catch (err) {
-    console.error('Erro na consulta de aluno:', err);
-    return res.status(500).json({ erro: 'Erro interno' });
+    console.error('Erro na consulta de aluno:', err && err.stack ? err.stack : err);
+    const ehConfig = /vari[aá]veis de ambiente|formato inv[aá]lido|inicializar|Firebase Admin/i.test((err && err.message) || '');
+    return res.status(500).json({
+      erro: ehConfig
+        ? 'Consulta indisponível no momento (configuração do servidor). Fale com o estúdio.'
+        : 'Erro interno'
+    });
   }
 }

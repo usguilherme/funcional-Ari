@@ -713,7 +713,43 @@
                 if (igFooter) igFooter.href = cfg.instagram;
             }
             if (cfg.googleMapsUrl) document.getElementById('vt-btn-maps').href = cfg.googleMapsUrl;
-        });
+
+            // ===== EVOLUÇÃO / ANTES E DEPOIS =====
+            // Chaves salvas pelo painel (aba Vitrine Online): ba1Antes, ba1Depois,
+            // ba1Texto, ba2Antes, ba2Depois, ba2Texto. As imagens podem ser URL
+            // (Storage antigo) ou string base64 (data URL) — ambas funcionam em <img src>.
+            const escHtml = (v) => String(v == null ? '' : v)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            const srcImg = (v) => {
+                const s = String(v || '').trim();
+                if (!s) return '';
+                // data URLs já são seguras; só encoda URLs http normais.
+                return s.startsWith('data:') ? s : encodeURI(s);
+            };
+
+            const transformacoes = [
+                { antes: cfg.ba1Antes, depois: cfg.ba1Depois, texto: cfg.ba1Texto },
+                { antes: cfg.ba2Antes, depois: cfg.ba2Depois, texto: cfg.ba2Texto }
+            ].filter(b => b.antes && b.depois);
+
+            const gridBA = document.getElementById('vt-ba-grid');
+            const secBA = document.getElementById('section-evolucao');
+            if (transformacoes.length && gridBA && secBA) {
+                gridBA.innerHTML = transformacoes.map(b => `
+                    <div class="ba-card">
+                        <div class="ba-images">
+                            <span class="tag antes">ANTES</span>
+                            <img src="${srcImg(b.antes)}" alt="Antes" loading="lazy">
+                            <img src="${srcImg(b.depois)}" alt="Depois" loading="lazy">
+                            <span class="tag depois">DEPOIS</span>
+                        </div>
+                        ${b.texto ? `<div class="ba-footer">${escHtml(b.texto)}</div>` : ''}
+                    </div>`).join('');
+                secBA.style.display = '';
+                secBA.classList.add('reveal', 'in');
+            }
+        }).catch(err => console.error('Erro ao carregar landingConfig:', err));
 
     </script>
 </body>
