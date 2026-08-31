@@ -3,7 +3,7 @@
 // nova e cai para o cache quando offline). Chamadas ao Firebase/APIs passam
 // direto pela rede, sem cache.
 
-const VERSAO = 'v7';
+const VERSAO = 'v8';
 const CACHE_NOME = `funcionaldoari-${VERSAO}`;
 
 const ASSETS = [
