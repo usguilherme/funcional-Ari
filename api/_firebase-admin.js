@@ -14,6 +14,21 @@ import { getDatabase } from 'firebase-admin/database';
 
 let dbInstance = null;
 
+// Caracteres de controle (C0/C1) e invisíveis (BOM, zero-width, NBSP,
+// ideographic space, marcas bidi, soft hyphen) que o copiar-e-colar às vezes
+// injeta e que .trim() / \s não removem. Montado por code point para não
+// depender de literais invisíveis no código-fonte.
+const RE_INVISIVEIS = new RegExp(
+  '[\\u0000-\\u001F\\u007F-\\u009F\\u00A0\\u00AD\\u200B-\\u200F\\u202A-\\u202E\\u2060\\u2066-\\u2069\\u3000\\uFEFF]',
+  'g'
+);
+function limparEnv(v) {
+  return String(v == null ? '' : v)
+    .replace(RE_INVISIVEIS, '')
+    .replace(/^["']+|["']+$/g, '')
+    .trim();
+}
+
 const PEM_RE = /-----BEGIN ([A-Z0-9 ]+?)-----([\s\S]*?)-----END \1-----/;
 
 // Reconstrói um PEM canônico a partir de QUALQUER texto que contenha um bloco
@@ -23,6 +38,7 @@ const PEM_RE = /-----BEGIN ([A-Z0-9 ]+?)-----([\s\S]*?)-----END \1-----/;
 function canonicalizarPem(texto) {
   if (!texto) return null;
   const desescapado = String(texto)
+    .replace(RE_INVISIVEIS, '')
     .replace(/\\r\\n/g, '\n')
     .replace(/\\n/g, '\n')
     .replace(/\\r/g, '\n');
@@ -103,10 +119,10 @@ function resolverCredencial() {
     let decodificado = bruto;
     const d = tentarBase64(bruto);
     if (d) decodificado = d.trim();
-    const impressao = (s) => s.length + ' chars; ini="' +
-      s.slice(0, 24).replace(/\s/g, '·') + '"; fim="' +
-      s.slice(-24).replace(/\s/g, '·') + '"; BEGIN=' + s.includes('BEGIN') +
-      '; ENDPK=' + s.includes('END PRIVATE KEY') + '; json=' + s.trimStart().startsWith('{');
+    const impressao = (x) => x.length + ' chars; ini="' +
+      x.slice(0, 24).replace(/\s/g, '·') + '"; fim="' +
+      x.slice(-24).replace(/\s/g, '·') + '"; BEGIN=' + x.includes('BEGIN') +
+      '; ENDPK=' + x.includes('END PRIVATE KEY') + '; json=' + x.trimStart().startsWith('{');
     console.error('[firebase-admin] ' + nome + ' não produziu um PEM utilizável.');
     console.error('[firebase-admin]   bruto      -> ' + impressao(bruto));
     if (decodificado !== bruto) console.error('[firebase-admin]   decodificado-> ' + impressao(decodificado));
@@ -118,17 +134,13 @@ function urlBancoPadrao(projectId) {
   return projectId ? `https://${projectId}-default-rtdb.firebaseio.com` : '';
 }
 
-// Limpa a FIREBASE_DATABASE_URL: aspas, espaços/\n colados, barra final e
-// qualquer path/query (o Admin SDK quer só protocolo + host, senão dá
-// "Invalid Firebase Database URL ... path can't contain ...").
+// Limpa a FIREBASE_DATABASE_URL: aspas, espaços/\n/invisíveis colados, esquema
+// repetido, barra final e qualquer path/query. O Admin SDK quer só
+// protocolo + host, senão dá "Invalid Firebase Database URL ...".
 function normalizarUrlBanco(u) {
-  if (!u) return '';
-  let s = String(u).trim()
-    .replace(/^["']|["']$/g, '')
-    .replace(/\\r|\\n/g, '')
-    .replace(/\s+/g, '')
-    .trim();
-  if (s && !/^https?:\/\//i.test(s)) s = 'https://' + s;
+  let s = limparEnv(u).replace(/\\[rn]/g, '').replace(/\s+/g, '');
+  if (!s) return '';
+  s = 'https://' + s.replace(/^(https?:\/\/)+/i, '');
   try {
     return new URL(s).origin;
   } catch {
@@ -147,11 +159,11 @@ export function getAdminDb() {
     throw new Error('Firebase Admin: ' + (err && err.message ? err.message : err), { cause: err });
   }
 
-  const projectId = process.env.FIREBASE_PROJECT_ID || cred.projectId || '';
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || cred.clientEmail || '';
+  const projectId = limparEnv(process.env.FIREBASE_PROJECT_ID) || cred.projectId || '';
+  const clientEmail = limparEnv(process.env.FIREBASE_CLIENT_EMAIL) || cred.clientEmail || '';
   const privateKey = cred.privateKey || '';
   const databaseURL = normalizarUrlBanco(process.env.FIREBASE_DATABASE_URL) || urlBancoPadrao(projectId);
-  console.log('[firebase-admin] databaseURL bruta="' + JSON.stringify(process.env.FIREBASE_DATABASE_URL || '') + '" -> "' + databaseURL + '"');
+  console.log('[firebase-admin] databaseURL -> "' + databaseURL + '" (projeto: ' + projectId + ')');
 
   const faltando = [];
   if (!projectId) faltando.push('FIREBASE_PROJECT_ID');
