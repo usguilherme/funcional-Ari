@@ -28,14 +28,31 @@ function aplicarCors(req, res) {
 const soDigitos = (v) => String(v || '').replace(/\D/g, '');
 const paraLista = (v) => (v && typeof v === 'object') ? Object.values(v) : (Array.isArray(v) ? v : []);
 
-// O corpo pode chegar já como objeto (Vercel parseia application/json) ou como
-// string (content-type ausente/errado, ou body cru). Cobrimos os dois.
-function lerCorpo(req) {
-  const b = req.body;
+// Lê o corpo da requisição de forma tolerante. Dependendo do runtime da Vercel
+// e do Content-Type, `req.body` pode vir:
+//   - já como objeto  (application/json parseado automaticamente)
+//   - como string      (JSON cru, ou form-urlencoded)
+//   - como Buffer
+//   - undefined         (o runtime não parseou nada -> lemos o stream cru)
+async function lerCorpo(req) {
+  let b = req.body;
+
+  if (b === undefined || b === null || b === '') {
+    b = await new Promise((resolve) => {
+      let dados = '';
+      req.on('data', (c) => { dados += c; });
+      req.on('end', () => resolve(dados));
+      req.on('error', () => resolve(''));
+    });
+  }
+
+  if (Buffer.isBuffer(b)) b = b.toString('utf8');
   if (b && typeof b === 'object') return b;
+
   if (typeof b === 'string' && b.trim()) {
-    try { return JSON.parse(b); } catch { /* tenta querystring abaixo */ }
-    try { return Object.fromEntries(new URLSearchParams(b)); } catch { /* ignora */ }
+    const s = b.trim();
+    try { return JSON.parse(s); } catch { /* tenta querystring abaixo */ }
+    try { return Object.fromEntries(new URLSearchParams(s)); } catch { /* ignora */ }
   }
   return {};
 }
@@ -45,20 +62,30 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   // O front-end (area-aluno.html) chama via POST com { telefone } no corpo.
-  // GET com ?telefone=... também é aceito — facilita testar a rota direto no
-  // navegador e evita 405 caso algum proxy/redirect troque o método.
-  let telefoneBruto;
-  if (req.method === 'POST') {
-    telefoneBruto = lerCorpo(req).telefone;
-  } else if (req.method === 'GET') {
-    telefoneBruto = req.query?.telefone;
-  } else {
+  // GET com ?telefone=... também é aceito (teste direto no navegador).
+  // Lemos das duas fontes independentemente do método, para não depender de
+  // qual delas o runtime/proxy preencheu.
+  if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({ erro: 'Método não permitido', metodoRecebido: req.method });
   }
 
+  const corpo = await lerCorpo(req);
+  const query = req.query || {};
+  const telefoneBruto = corpo.telefone ?? query.telefone ?? corpo.phone ?? query.phone;
+
   const telefone = soDigitos(telefoneBruto);
   if (telefone.length < 8) {
-    return res.status(400).json({ erro: 'Telefone inválido' });
+    const debug = String(process.env.EXPOR_ERRO_CONFIG || '').toLowerCase() === 'true';
+    return res.status(400).json({
+      erro: 'Telefone inválido',
+      ...(debug ? {
+        metodo: req.method,
+        recebidoDoCorpo: corpo.telefone ?? null,
+        recebidoDaQuery: query.telefone ?? null,
+        chavesCorpo: Object.keys(corpo),
+        contentType: req.headers['content-type'] || null
+      } : {})
+    });
   }
 
   try {
