@@ -21,19 +21,42 @@ function aplicarCors(req, res) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
   }
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
 const soDigitos = (v) => String(v || '').replace(/\D/g, '');
 const paraLista = (v) => (v && typeof v === 'object') ? Object.values(v) : (Array.isArray(v) ? v : []);
 
+// O corpo pode chegar já como objeto (Vercel parseia application/json) ou como
+// string (content-type ausente/errado, ou body cru). Cobrimos os dois.
+function lerCorpo(req) {
+  const b = req.body;
+  if (b && typeof b === 'object') return b;
+  if (typeof b === 'string' && b.trim()) {
+    try { return JSON.parse(b); } catch { /* tenta querystring abaixo */ }
+    try { return Object.fromEntries(new URLSearchParams(b)); } catch { /* ignora */ }
+  }
+  return {};
+}
+
 export default async function handler(req, res) {
   aplicarCors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ erro: 'Método não permitido' });
 
-  const telefone = soDigitos(req.body?.telefone);
+  // O front-end (area-aluno.html) chama via POST com { telefone } no corpo.
+  // GET com ?telefone=... também é aceito — facilita testar a rota direto no
+  // navegador e evita 405 caso algum proxy/redirect troque o método.
+  let telefoneBruto;
+  if (req.method === 'POST') {
+    telefoneBruto = lerCorpo(req).telefone;
+  } else if (req.method === 'GET') {
+    telefoneBruto = req.query?.telefone;
+  } else {
+    return res.status(405).json({ erro: 'Método não permitido', metodoRecebido: req.method });
+  }
+
+  const telefone = soDigitos(telefoneBruto);
   if (telefone.length < 8) {
     return res.status(400).json({ erro: 'Telefone inválido' });
   }
