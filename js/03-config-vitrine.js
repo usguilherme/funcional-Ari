@@ -44,6 +44,11 @@
         document.getElementById("landing-instagram").value = landingConfig.instagram || "";
         document.getElementById("landing-endereco").value = landingConfig.endereco || "";
         document.getElementById("landing-maps").value = landingConfig.googleMapsUrl || "";
+
+        const inHorariosAluno = document.getElementById("landing-horarios-aluno");
+        if (inHorariosAluno) inHorariosAluno.value = landingConfig.horariosAluno || "";
+        const inRecadoAluno = document.getElementById("landing-recado-aluno");
+        if (inRecadoAluno) inRecadoAluno.value = landingConfig.recadoAluno || "";
         
         if(document.getElementById("ba1-texto")) document.getElementById("ba1-texto").value = landingConfig.ba1Texto || "";
         if(document.getElementById("ba2-texto")) document.getElementById("ba2-texto").value = landingConfig.ba2Texto || "";
@@ -65,7 +70,10 @@
             const endereco = document.getElementById("landing-endereco").value.trim();
             const maps = document.getElementById("landing-maps").value.trim();
 
-            const updates = { titulo, subtitulo, whatsapp, instagram, endereco, googleMapsUrl: maps };
+            const horariosAluno = document.getElementById("landing-horarios-aluno")?.value.trim() || "";
+            const recadoAluno = document.getElementById("landing-recado-aluno")?.value.trim() || "";
+
+            const updates = { titulo, subtitulo, whatsapp, instagram, endereco, googleMapsUrl: maps, horariosAluno, recadoAluno };
 
             // CAPA PRINCIPAL
             const capaInput = document.getElementById("landing-capa");

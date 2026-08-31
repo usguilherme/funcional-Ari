@@ -1,0 +1,13 @@
+{
+  "name": "Área do Aluno — Funcional do Ari",
+  "short_name": "Meu Treino",
+  "start_url": "/area-aluno.html",
+  "display": "standalone",
+  "background_color": "#0d0d0e",
+  "theme_color": "#0d0d0e",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "assets/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "assets/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ]
+}

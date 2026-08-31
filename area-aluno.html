@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0d0d0e">
+    <meta name="description" content="Área do Aluno do Funcional do Ari — acompanhe sua mensalidade, evolução, treinos e conquistas.">
+    <meta name="robots" content="noindex">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest-aluno.json">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <title>Área do Aluno · Funcional do Ari</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #0d0d0e;
+            --bg-deep: #080808;
+            --bg-card: #161617;
+            --bg-card-hover: #1d1d1f;
+            --bg-elev: #202022;
+            --primary: #d13b3b;
+            --primary-hover: #e64a4a;
+            --primary-soft: rgba(209, 59, 59, 0.12);
+            --primary-glow: rgba(209, 59, 59, 0.4);
+            --ember: linear-gradient(135deg, #f0623d 0%, #d13b3b 45%, #8f2323 100%);
+            --green: #22c55e;
+            --green-soft: rgba(34, 197, 94, 0.14);
+            --amber: #fbbf24;
+            --blue: #38bdf8;
+            --text-main: #ffffff;
+            --text-muted: #a2a2a8;
+            --text-dim: #6b6b72;
+            --ring: rgba(255, 255, 255, 0.07);
+            --ring-strong: rgba(255, 255, 255, 0.14);
+            --font-display: 'Anton', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            --shadow-card: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
+            --shadow-glow: 0 24px 60px -18px var(--primary-glow);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.55;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        h1, h2, h3, h4, .font-display {
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 400;
+        }
+        img { max-width: 100%; display: block; }
+        button { font-family: inherit; cursor: pointer; }
+        a { color: inherit; }
+        ::selection { background: var(--primary); color: #fff; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: #2c2c2e; border-radius: 10px; }
+
+        .grain {
+            position: fixed; inset: 0; z-index: 9998; pointer-events: none;
+            opacity: 0.03; mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 13px 20px; border-radius: 10px; font-weight: 700; font-size: 14px;
+            border: none; text-decoration: none; transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+            letter-spacing: .3px; color: #fff;
+        }
+        .btn i { width: 17px; height: 17px; }
+        .btn-primary { background: var(--ember); box-shadow: 0 10px 30px -10px var(--primary-glow); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 38px -12px var(--primary-glow); }
+        .btn-outline { background: rgba(255,255,255,0.03); border: 1px solid var(--ring-strong); color: var(--text-main); }
+        .btn-outline:hover { background: var(--primary-soft); border-color: var(--primary); }
+        .btn-green { background: linear-gradient(135deg, #25D366, #1eb355); color: #04240f; box-shadow: 0 10px 30px -10px rgba(37,211,102,0.45); }
+        .btn-green:hover { transform: translateY(-2px); }
+        .btn-block { width: 100%; }
+        .btn:disabled { opacity: .6; pointer-events: none; }
+
+        /* ===== LOGIN ===== */
+        .login-wrap {
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 32px 22px; text-align: center; position: relative; overflow: hidden;
+        }
+        .login-wrap::before {
+            content: ""; position: absolute; inset: -30%; z-index: 0;
+            background: radial-gradient(closest-side at 40% 30%, rgba(209,59,59,0.22), transparent 70%),
+                        radial-gradient(closest-side at 70% 70%, rgba(240,98,61,0.14), transparent 70%);
+            filter: blur(24px);
+        }
+        .login-card {
+            position: relative; z-index: 1; width: 100%; max-width: 400px;
+            background: linear-gradient(180deg, var(--bg-elev), var(--bg-card));
+            border: 1px solid var(--ring-strong); border-radius: 22px; padding: 34px 26px;
+            box-shadow: 0 30px 70px -20px rgba(0,0,0,0.8);
+        }
+        .login-brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 20px; letter-spacing: 1.5px; margin-bottom: 22px; }
+        .login-brand i { color: var(--primary); width: 24px; height: 24px; filter: drop-shadow(0 0 10px var(--primary-glow)); }
+        .login-card h1 { font-size: 26px; color: var(--primary); margin-bottom: 8px; }
+        .login-card p.sub { color: var(--text-muted); font-size: 14px; margin-bottom: 22px; }
+        .field { position: relative; margin-bottom: 14px; }
+        .input {
+            width: 100%; padding: 15px 16px; border-radius: 12px; border: 1px solid var(--ring-strong);
+            background: rgba(0,0,0,0.35); color: #fff; font-size: 16px; outline: none; transition: .25s;
+        }
+        .input:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); box-shadow: 0 0 0 4px var(--primary-soft); }
+        .msg-erro { color: #f87171; font-size: 13px; margin-top: 10px; display: none; }
+        .msg-erro.show { display: block; }
+        .login-foot { margin-top: 18px; font-size: 12px; color: var(--text-dim); }
+        .login-foot a { color: var(--text-muted); text-decoration: underline; }
+        .welcome-back { position: relative; z-index: 1; width: 100%; max-width: 400px; }
+        .wb-avatar {
+            width: 76px; height: 76px; border-radius: 50%; margin: 0 auto 14px; background: var(--ember);
+            display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800;
+            background-size: cover; background-position: center; border: 2px solid var(--ring-strong);
+        }
+
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.12); border-left-color: var(--primary);
+            border-radius: 50%; width: 34px; height: 34px; animation: spin 1s linear infinite; margin: 18px auto;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* ===== APP SHELL ===== */
+        .app { display: none; padding-bottom: 92px; }
+        .app.show { display: block; }
+
+        .topbar {
+            position: sticky; top: 0; z-index: 50;
+            display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+            padding-top: max(14px, env(safe-area-inset-top));
+            background: rgba(13,13,14,0.82); backdrop-filter: blur(16px) saturate(160%);
+            border-bottom: 1px solid var(--ring);
+        }
+        .topbar .avatar {
+            width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; background: var(--ember);
+            display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px;
+            background-size: cover; background-position: center; border: 1px solid var(--ring-strong);
+        }
+        .topbar .who { flex: 1; min-width: 0; }
+        .topbar .who strong { display: block; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .topbar .who span { font-size: 12px; color: var(--text-muted); }
+        .icon-btn {
+            width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.04);
+            border: 1px solid var(--ring); color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+        }
+        .icon-btn i { width: 18px; height: 18px; }
+        .icon-btn:hover { color: #fff; border-color: var(--primary); }
+
+        .view { display: none; padding: 20px 16px 8px; max-width: 640px; margin: 0 auto; animation: viewIn .35s ease; }
+        .view.active { display: block; }
+        @keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+        .view-title { font-size: 13px; letter-spacing: 2px; color: var(--primary); font-weight: 800; margin-bottom: 4px; text-transform: uppercase; font-family: var(--font-body); }
+        .view-h { font-size: 26px; margin-bottom: 18px; }
+
+        .card {
+            background: var(--bg-card); border: 1px solid var(--ring); border-radius: 16px;
+            padding: 18px; margin-bottom: 14px;
+        }
+        .card-lg { padding: 22px; }
+        .card h3 { font-size: 17px; margin-bottom: 12px; display: flex; align-items: center; gap: 9px; }
+        .card h3 i { width: 18px; height: 18px; color: var(--primary); }
+        .muted { color: var(--text-muted); font-size: 13.5px; }
+        .dim { color: var(--text-dim); font-size: 12px; }
+
+        /* hero de boas-vindas */
+        .hero-card {
+            position: relative; overflow: hidden;
+            background: linear-gradient(150deg, rgba(209,59,59,0.18), var(--bg-card) 60%);
+            border: 1px solid var(--ring-strong); border-radius: 20px; padding: 22px; margin-bottom: 16px;
+        }
+        .hero-card .big-avatar {
+            width: 60px; height: 60px; border-radius: 50%; background: var(--ember);
+            display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 24px;
+            background-size: cover; background-position: center; border: 2px solid rgba(255,255,255,0.14); margin-bottom: 12px;
+        }
+        .hero-card h2 { font-size: 24px; line-height: 1.1; }
+        .hero-card .plano-badge {
+            display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+            background: var(--primary-soft); border: 1px solid rgba(209,59,59,0.3); color: #ffb4a8;
+            padding: 5px 12px; border-radius: 30px; font-size: 12px; font-weight: 700;
+        }
+        .hero-card .tempo { margin-top: 10px; font-size: 13px; color: var(--text-muted); }
+
+        /* grid de stats */
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+        .stat {
+            background: var(--bg-card); border: 1px solid var(--ring); border-radius: 15px; padding: 15px;
+            display: flex; flex-direction: column; gap: 3px; text-align: left; width: 100%;
+        }
+        .stat .lbl { font-size: 11px; letter-spacing: .5px; color: var(--text-dim); text-transform: uppercase; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .stat .lbl i { width: 13px; height: 13px; }
+        .stat .val { font-family: var(--font-display); font-size: 24px; line-height: 1.1; }
+        .stat .foot { font-size: 11.5px; color: var(--text-muted); }
+        .stat.tap:active { transform: scale(0.98); }
+        .stat.ok .val { color: var(--green); }
+        .stat.warn .val { color: var(--amber); }
+        .stat.bad .val { color: #f87171; }
+
+        .pill {
+            display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 30px;
+            font-size: 12px; font-weight: 800; letter-spacing: .4px;
+        }
+        .pill.ok { background: var(--green-soft); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+        .pill.bad { background: rgba(248,113,113,0.16); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+        .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .divider { height: 1px; background: var(--ring); margin: 14px 0; }
+
+        /* barra de progresso */
+        .bar { height: 9px; border-radius: 20px; background: rgba(255,255,255,0.07); overflow: hidden; }
+        .bar > span { display: block; height: 100%; border-radius: 20px; background: var(--ember); transition: width .6s cubic-bezier(0.16,1,0.3,1); }
+        .bar.green > span { background: linear-gradient(135deg, #34d399, #22c55e); }
+
+        /* frase do dia */
+        .quote {
+            background: linear-gradient(180deg, rgba(240,98,61,0.12), rgba(22,22,23,0.4));
+            border: 1px solid rgba(240,98,61,0.22); border-radius: 16px; padding: 20px; margin-bottom: 14px;
+        }
+        .quote i.mk { width: 22px; height: 22px; color: var(--primary); margin-bottom: 6px; }
+        .quote p { font-size: 15px; font-style: italic; color: #eee; }
+
+        /* ações rápidas */
+        .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .quick {
+            display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center;
+            background: var(--bg-card); border: 1px solid var(--ring); border-radius: 14px; padding: 16px 10px;
+            font-size: 12.5px; font-weight: 600; color: #e6e6e6; text-decoration: none;
+        }
+        .quick:active { transform: scale(0.97); }
+        .quick i { width: 20px; height: 20px; color: var(--primary); }
+
+        /* lista genérica */
+        .list-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--ring); }
+        .list-item:last-child { border-bottom: none; }
+        .list-item .ic { width: 34px; height: 34px; border-radius: 10px; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .list-item .ic i { width: 16px; height: 16px; }
+        .list-item .tx { flex: 1; min-width: 0; }
+        .list-item .tx strong { display: block; font-size: 14px; }
+        .list-item .tx span { font-size: 12px; color: var(--text-muted); }
+
+        /* galeria */
+        .galeria { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .galeria figure { border-radius: 14px; overflow: hidden; border: 1px solid var(--ring); background: var(--bg-deep); position: relative; }
+        .galeria img { width: 100%; height: 150px; object-fit: cover; }
+        .galeria figcaption { padding: 8px 10px; font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; gap: 6px; }
+
+        /* timeline */
+        .timeline { position: relative; padding-left: 22px; }
+        .timeline::before { content: ""; position: absolute; left: 5px; top: 4px; bottom: 4px; width: 2px; background: var(--ring-strong); }
+        .tl-item { position: relative; padding-bottom: 16px; }
+        .tl-item:last-child { padding-bottom: 0; }
+        .tl-item::before { content: ""; position: absolute; left: -21px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+        .tl-item strong { font-size: 14px; display: block; }
+        .tl-item time { font-size: 12px; color: var(--text-dim); }
+        .tl-item p { font-size: 13px; color: var(--text-muted); margin-top: 4px; white-space: pre-wrap; }
+
+        /* horários */
+        .grade { display: flex; flex-direction: column; gap: 8px; }
+        .grade .dia {
+            display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
+            border-radius: 12px; border: 1px solid var(--ring); background: var(--bg-card); font-size: 14px;
+        }
+        .grade .dia.hoje { border-color: var(--primary); background: var(--primary-soft); }
+        .grade .dia.hoje .tag { background: var(--primary); color: #fff; }
+        .grade .dia .tag { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 20px; background: rgba(255,255,255,0.06); color: var(--text-muted); letter-spacing: .5px; }
+
+        /* checklist */
+        .check-list { display: flex; flex-direction: column; gap: 2px; }
+        .check-list label { display: flex; align-items: center; gap: 11px; padding: 10px 4px; font-size: 14px; cursor: pointer; border-bottom: 1px solid var(--ring); }
+        .check-list label:last-child { border-bottom: none; }
+        .check-list input { width: 19px; height: 19px; accent-color: var(--primary); flex-shrink: 0; }
+        .check-list input:checked + span { color: var(--text-dim); text-decoration: line-through; }
+
+        /* conquistas */
+        .badges { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .badge-c {
+            background: var(--bg-card); border: 1px solid var(--ring); border-radius: 16px; padding: 16px 12px; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .badge-c .emoji { font-size: 30px; line-height: 1; margin-bottom: 8px; display: block; filter: grayscale(1) opacity(.35); }
+        .badge-c.on .emoji { filter: none; }
+        .badge-c.on { border-color: rgba(240,98,61,0.35); background: linear-gradient(180deg, rgba(240,98,61,0.1), var(--bg-card)); }
+        .badge-c strong { font-size: 13px; display: block; }
+        .badge-c span { font-size: 11px; color: var(--text-muted); display: block; margin-top: 3px; }
+        .badge-c .lock { position: absolute; top: 8px; right: 8px; width: 13px; height: 13px; color: var(--text-dim); }
+
+        /* nivel */
+        .nivel-card { text-align: center; }
+        .nivel-card .lv { font-family: var(--font-display); font-size: 15px; letter-spacing: 2px; color: var(--primary); }
+        .nivel-card .lv-nome { font-family: var(--font-display); font-size: 34px; margin: 2px 0 4px; }
+        .nivel-card .pts { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
+
+        /* mini registro (peso) */
+        .mini-form { display: flex; gap: 8px; margin-top: 10px; }
+        .mini-form .input { flex: 1; padding: 12px 14px; font-size: 15px; }
+        .peso-hist { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+        .peso-hist .l { display: flex; justify-content: space-between; font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--ring); }
+        .peso-hist .l small { color: var(--text-dim); }
+        .spark { width: 100%; height: 54px; margin-top: 10px; }
+        .spark polyline { fill: none; stroke: var(--primary); stroke-width: 2; }
+        .spark circle { fill: var(--primary); }
+
+        /* dicas */
+        .tip { display: flex; gap: 13px; padding: 14px 0; border-bottom: 1px solid var(--ring); }
+        .tip:last-child { border-bottom: none; }
+        .tip .te { font-size: 24px; line-height: 1; flex-shrink: 0; }
+        .tip strong { font-size: 14px; display: block; margin-bottom: 2px; }
+        .tip p { font-size: 13px; color: var(--text-muted); }
+
+        /* pix */
+        .pix-box { text-align: center; }
+        #qr-pix-mp { width: 100%; max-width: 210px; border-radius: 12px; margin: 4px auto 14px; background: #fff; padding: 8px; }
+        #pix-copia-cola-mp {
+            width: 100%; padding: 11px; border-radius: 10px; border: 1px solid var(--ring-strong);
+            background: rgba(0,0,0,0.35); color: var(--text-muted); font-size: 12px; margin-bottom: 10px; text-align: center;
+        }
+        .aguardando { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+        .tela-sucesso { text-align: center; padding: 24px 10px; }
+        .tela-sucesso i { width: 58px; height: 58px; color: var(--green); margin-bottom: 12px; }
+        .tela-sucesso h2 { color: var(--green); margin-bottom: 8px; }
+
+        .empty { text-align: center; padding: 26px 12px; color: var(--text-dim); font-size: 13px; }
+        .empty i { width: 26px; height: 26px; margin-bottom: 8px; opacity: .6; }
+
+        /* bottom nav */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+            display: flex; justify-content: space-around; align-items: stretch;
+            background: rgba(13,13,14,0.94); backdrop-filter: blur(16px);
+            border-top: 1px solid var(--ring);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .bottom-nav button {
+            flex: 1; background: none; border: none; color: var(--text-dim);
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            padding: 9px 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: .2px;
+        }
+        .bottom-nav button i { width: 21px; height: 21px; }
+        .bottom-nav button.active { color: var(--primary); }
+        .bottom-nav button.active i { filter: drop-shadow(0 0 8px var(--primary-glow)); }
+
+        .toast {
+            position: fixed; left: 50%; bottom: 108px; transform: translateX(-50%) translateY(20px);
+            background: var(--bg-elev); border: 1px solid var(--ring-strong); color: #fff;
+            padding: 12px 20px; border-radius: 12px; font-size: 13px; font-weight: 600;
+            opacity: 0; pointer-events: none; transition: .3s; z-index: 200; box-shadow: var(--shadow-card);
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @media (min-width: 560px) {
+            .stat-grid { grid-template-columns: repeat(4, 1fr); }
+            .quick-grid { grid-template-columns: repeat(4, 1fr); }
+            .badges { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="grain"></div>
+
+    <!-- ================= LOGIN ================= -->
+    <div id="tela-login" class="login-wrap">
+        <div id="login-form" class="login-card">
+            <div class="login-brand"><i data-lucide="triangle"></i> FUNCIONAL DO ARI</div>
+            <h1>Área do Aluno</h1>
+            <p class="sub">Digite o WhatsApp que você usou no cadastro para entrar.</p>
+            <div class="field">
+                <input id="inp-tel" class="input" type="tel" inputmode="numeric" placeholder="(83) 99999-9999" autocomplete="tel">
+            </div>
+            <button id="btn-entrar" class="btn btn-primary btn-block">Entrar</button>
+            <p id="erro-login" class="msg-erro">Não encontramos esse número. Confira com o professor.</p>
+            <div class="login-foot">
+                Não é aluno ainda? <a href="agendar.html">Agende sua aula grátis</a><br>
+                <a href="vitrine.html">Voltar ao site</a>
+            </div>
+        </div>
+
+        <div id="welcome-back" class="welcome-back login-card" style="display:none;">
+            <div id="wb-avatar" class="wb-avatar"></div>
+            <h1 id="wb-nome" style="font-size:22px; color:#fff;">Olá!</h1>
+            <p class="sub">Bom te ver de volta. Vamos treinar?</p>
+            <button id="btn-continuar" class="btn btn-primary btn-block" style="margin-bottom:10px;">Continuar</button>
+            <button id="btn-trocar" class="btn btn-outline btn-block">Entrar com outro número</button>
+        </div>
+
+        <div id="login-loading" style="display:none; position:relative; z-index:1;">
+            <div class="spinner"></div>
+            <p class="muted">Carregando seus dados...</p>
+        </div>
+    </div>
+
+    <!-- ================= APP ================= -->
+    <div id="app" class="app">
+        <header class="topbar">
+            <div id="tb-avatar" class="avatar"></div>
+            <div class="who">
+                <strong id="tb-nome">Aluno</strong>
+                <span id="tb-plano">—</span>
+            </div>
+            <button class="icon-btn" id="btn-atualizar" title="Atualizar"><i data-lucide="refresh-cw"></i></button>
+            <button class="icon-btn" id="btn-sair" title="Sair"><i data-lucide="log-out"></i></button>
+        </header>
+
+        <!-- ---------- INÍCIO ---------- -->
+        <section id="v-inicio" class="view active">
+            <div id="inicio-conteudo"></div>
+        </section>
+
+        <!-- ---------- MENSALIDADE ---------- -->
+        <section id="v-mensalidade" class="view">
+            <p class="view-title">Financeiro</p>
+            <h1 class="view-h">Minha mensalidade</h1>
+            <div id="mensalidade-conteudo"></div>
+        </section>
+
+        <!-- ---------- EVOLUÇÃO ---------- -->
+        <section id="v-evolucao" class="view">
+            <p class="view-title">Acompanhamento</p>
+            <h1 class="view-h">Minha evolução</h1>
+            <div id="evolucao-conteudo"></div>
+        </section>
+
+        <!-- ---------- TREINOS ---------- -->
+        <section id="v-treinos" class="view">
+            <p class="view-title">Rotina</p>
+            <h1 class="view-h">Meus treinos</h1>
+            <div id="treinos-conteudo"></div>
+        </section>
+
+        <!-- ---------- CONQUISTAS ---------- -->
+        <section id="v-conquistas" class="view">
+            <p class="view-title">Gamificação</p>
+            <h1 class="view-h">Conquistas</h1>
+            <div id="conquistas-conteudo"></div>
+        </section>
+    </div>
+
+    <nav id="bottom-nav" class="bottom-nav" style="display:none;">
+        <button data-view="inicio" class="active"><i data-lucide="home"></i>Início</button>
+        <button data-view="mensalidade"><i data-lucide="wallet"></i>Mensalidade</button>
+        <button data-view="evolucao"><i data-lucide="trending-up"></i>Evolução</button>
+        <button data-view="treinos"><i data-lucide="dumbbell"></i>Treinos</button>
+        <button data-view="conquistas"><i data-lucide="award"></i>Conquistas</button>
+    </nav>
+
+    <div id="toast" class="toast"></div>
+
+    <audio id="audio-sucesso" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3" preload="auto"></audio>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script>
+    (function () {
+        'use strict';
+
+        // ================= FIREBASE (config público, igual à vitrine) =================
+        var firebaseConfig = {
+            apiKey: "AIzaSyBY4nfykJETa-Vw6E5TLOVAkuPVXva0Bx4",
+            authDomain: "funcional-ari.firebaseapp.com",
+            projectId: "funcional-ari",
+            storageBucket: "funcional-ari.firebasestorage.app",
+            messagingSenderId: "790601708418",
+            appId: "1:790601708418:web:048f04d9d498096460159b"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var db = firebase.database();
+
+        // ================= ESTADO =================
+        var ALUNO = null;              // resposta da API
+        var listenerPix = null;
+        var LS = 'fda:aluno';          // último login salvo
+        var viewAtual = 'inicio';
+
+        var $ = function (id) { return document.getElementById(id); };
+        var soDigitos = function (v) { return String(v || '').replace(/\D/g, ''); };
+        var icons = function () { if (window.lucide) lucide.createIcons(); };
+
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function attr(s) { return esc(s); }
+
+        function toast(msg) {
+            var t = $('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(function () { t.classList.remove('show'); }, 2600);
+        }
+
+        // ================= HELPERS DE DATA =================
+        function hojeISO() { return new Date().toISOString().slice(0, 10); }
+        function mesRef() { return new Date().toISOString().slice(0, 7); }
+
+        function fmtData(iso) {
+            if (!iso || String(iso).length < 8) return '';
+            var p = String(iso).slice(0, 10).split('-');
+            if (p.length !== 3) return String(iso);
+            return p[2] + '/' + p[1] + '/' + p[0];
+        }
+        function fmtMesAno(ym) {
+            if (!ym || ym.length < 7) return '';
+            var meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+            var p = ym.split('-');
+            return meses[parseInt(p[1], 10) - 1] + '/' + p[0];
+        }
+        function moeda(v) {
+            return 'R$ ' + (Number(v) || 0).toFixed(2).replace('.', ',');
+        }
+        function diasEntre(isoA, isoB) {
+            var a = new Date(isoA + 'T00:00:00'), b = new Date(isoB + 'T00:00:00');
+            return Math.round((b - a) / 86400000);
+        }
+        function mesesTreinando(inicioISO) {
+            if (!inicioISO) return 0;
+            var d = diasEntre(String(inicioISO).slice(0, 10), hojeISO());
+            return Math.max(0, Math.floor(d / 30.44));
+        }
+        function textoTempo(inicioISO) {
+            if (!inicioISO) return '';
+            var d = diasEntre(String(inicioISO).slice(0, 10), hojeISO());
+            if (d < 0) return 'começa em breve';
+            if (d < 1) return 'começou hoje!';
+            if (d < 30) return 'há ' + d + (d === 1 ? ' dia' : ' dias');
+            var m = mesesTreinando(inicioISO);
+            if (m < 12) return 'há ' + m + (m === 1 ? ' mês' : ' meses');
+            var anos = Math.floor(m / 12), resto = m % 12;
+            return 'há ' + anos + (anos === 1 ? ' ano' : ' anos') + (resto ? ' e ' + resto + (resto === 1 ? ' mês' : ' meses') : '');
+        }
+
+        // Próximo vencimento a partir do dia do mês
+        function proximoVencimento(diaVenc) {
+            var dia = parseInt(diaVenc, 10);
+            if (isNaN(dia) || dia < 1) dia = 10;
+            var hoje = new Date();
+            var alvo = new Date(hoje.getFullYear(), hoje.getMonth(), Math.min(dia, 28));
+            if (alvo < new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())) {
+                alvo = new Date(hoje.getFullYear(), hoje.getMonth() + 1, Math.min(dia, 28));
+            }
+            return alvo;
+        }
+
+        var DIAS_MAP = { 'domingo': 0, 'segunda': 1, 'terca': 2, 'terça': 2, 'quarta': 3, 'quinta': 4, 'sexta': 5, 'sabado': 6, 'sábado': 6 };
+        var DIAS_NOME = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+
+        function parseHorarios(txt) {
+            txt = String(txt || '').toLowerCase();
+            var dias = [];
+            Object.keys(DIAS_MAP).forEach(function (k) {
+                if (txt.indexOf(k) !== -1 && dias.indexOf(DIAS_MAP[k]) === -1) dias.push(DIAS_MAP[k]);
+            });
+            var hora = (txt.match(/\d{1,2}[h:]\d{2}/) || txt.match(/\d{1,2}\s*h/) || [''])[0].replace('h', ':').replace(/:$/, 'h00').replace(':', 'h');
+            dias.sort(function (a, b) { return a - b; });
+            return { dias: dias, horaTxt: (txt.match(/\d{1,2}h\d{2}[^.,;]*\d{1,2}h\d{2}/) || txt.match(/\d{1,2}h\d{2}/) || [hora || ''])[0] };
+        }
+        function proximaAula(horariosTxt) {
+            var h = parseHorarios(horariosTxt);
+            if (!h.dias.length) return null;
+            var hoje = new Date().getDay();
+            for (var i = 0; i < 7; i++) {
+                var d = (hoje + i) % 7;
+                if (h.dias.indexOf(d) !== -1) {
+                    return { quando: i === 0 ? 'Hoje' : (i === 1 ? 'Amanhã' : DIAS_NOME[d]), dia: d, hora: h.horaTxt, hoje: i === 0 };
+                }
+            }
+            return null;
+        }
+
+        // ================= LOCALSTORAGE (por aluno) =================
+        function lsGet(chave, padrao) {
+            try {
+                var raw = localStorage.getItem('fda:' + chave + ':' + (ALUNO && ALUNO.id));
+                return raw ? JSON.parse(raw) : padrao;
+            } catch (e) { return padrao; }
+        }
+        function lsSet(chave, valor) {
+            try { localStorage.setItem('fda:' + chave + ':' + (ALUNO && ALUNO.id), JSON.stringify(valor)); } catch (e) {}
+        }
+
+        function getCheckins() { return lsGet('checkins', []); }
+        function semanaAtualISO() {
+            var d = new Date(); var dia = d.getDay();
+            var seg = new Date(d); seg.setDate(d.getDate() - ((dia + 6) % 7));
+            return seg.toISOString().slice(0, 10);
+        }
+        function checkinsNaSemana() {
+            var ini = semanaAtualISO();
+            return getCheckins().filter(function (x) { return x >= ini; }).length;
+        }
+        function sequenciaTreino() {
+            // dias consecutivos com pelo menos 1 check-in, contando a partir de hoje/ontem
+            var set = {};
+            getCheckins().forEach(function (x) { set[x] = true; });
+            var streak = 0;
+            var d = new Date();
+            if (!set[d.toISOString().slice(0, 10)]) d.setDate(d.getDate() - 1); // permite começar por ontem
+            while (set[d.toISOString().slice(0, 10)]) {
+                streak++;
+                d.setDate(d.getDate() - 1);
+            }
+            return streak;
+        }
+        function registrarTreinoHoje() {
+            var c = getCheckins();
+            var h = hojeISO();
+            if (c.indexOf(h) !== -1) { toast('Treino de hoje já registrado 💪'); return; }
+            c.push(h);
+            lsSet('checkins', c.slice(-400));
+            toast('Treino registrado! Sequência: ' + sequenciaTreino() + ' 🔥');
+            renderInicio();
+            if (viewAtual === 'treinos') renderTreinos();
+            if (viewAtual === 'conquistas') renderConquistas();
+        }
+
+        // ================= NÍVEL / PONTOS =================
+        var NIVEIS = [
+            { min: 0, nome: 'Iniciante' },
+            { min: 100, nome: 'Bronze' },
+            { min: 300, nome: 'Prata' },
+            { min: 600, nome: 'Ouro' },
+            { min: 1200, nome: 'Diamante' },
+            { min: 2500, nome: 'Lenda' }
+        ];
+        function nivelDe(pontos) {
+            pontos = Number(pontos) || 0;
+            var atual = NIVEIS[0], idx = 0;
+            for (var i = 0; i < NIVEIS.length; i++) {
+                if (pontos >= NIVEIS[i].min) { atual = NIVEIS[i]; idx = i; }
+            }
+            var prox = NIVEIS[idx + 1] || null;
+            var base = atual.min;
+            var teto = prox ? prox.min : atual.min;
+            var pct = prox ? Math.round(((pontos - base) / (teto - base)) * 100) : 100;
+            return { nome: atual.nome, numero: idx + 1, prox: prox, pct: Math.max(3, Math.min(100, pct)), faltam: prox ? (teto - pontos) : 0 };
+        }
+
+        // ================= CONTEÚDO ESTÁTICO =================
+        var FRASES = [
+            'Não é sobre ser perfeito. É sobre começar.',
+            'Cada treino conta. Inclusive o que você quase não veio.',
+            'Constância vence intensidade.',
+            'O corpo alcança o que a mente acredita.',
+            'Você não precisa estar pronto. Só precisa começar.',
+            'Um pouco todo dia vira muito com o tempo.',
+            'A dor de hoje é a força de amanhã.',
+            'Comparar-se com quem você era ontem já é evolução.',
+            'Disciplina é escolher o que você quer mais.',
+            'O treino difícil é o que mais te transforma.',
+            'Progresso, não perfeição.',
+            'Sua única concorrência é a pessoa no espelho.',
+            'Respira. Foca. Faz mais uma.',
+            'Movimento é remédio.',
+            'O melhor projeto que você pode trabalhar é você mesmo.'
+        ];
+        function fraseDoDia() {
+            var d = new Date();
+            var dayOfYear = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000);
+            return FRASES[dayOfYear % FRASES.length];
+        }
+
+        var DICAS = [
+            { e: '💧', t: 'Hidrate-se', p: 'Beba água ao longo do dia todo, não só no treino. Meta simples: 35 ml por kg de peso.' },
+            { e: '😴', t: 'Durma bem', p: 'O músculo cresce no descanso. 7 a 9 horas de sono fazem mais que qualquer suplemento.' },
+            { e: '🥗', t: 'Proteína em toda refeição', p: 'Ajuda na recuperação e na saciedade. Ovo, frango, carne, peixe, feijão, iogurte.' },
+            { e: '🔥', t: 'Aquecimento nunca é opcional', p: '5 minutos de mobilidade antes da aula reduzem muito o risco de lesão.' },
+            { e: '📆', t: 'Constância > perfeição', p: 'Treinar 3x por semana sempre vale mais que treinar 6x por uma semana só.' },
+            { e: '🧘', t: 'Respeite os dias de descanso', p: 'Descanso ativo (caminhada leve, alongamento) acelera a recuperação.' },
+            { e: '📸', t: 'Registre sua evolução', p: 'Fotos e medidas mostram progresso que a balança às vezes esconde.' },
+            { e: '🎧', t: 'Chegue 5 min antes', p: 'Dá tempo de organizar o material, conversar com o professor e começar sem correria.' }
+        ];
+
+        var CHECKLIST_AULA = ['Garrafa de água', 'Toalha de rosto', 'Roupa confortável', 'Tênis de treino', 'Chegar 5 min antes', 'Boa energia 💪'];
+
+        // ================= LOGIN =================
+        function mostrarTela(qual) {
+            $('login-form').style.display = qual === 'form' ? 'block' : 'none';
+            $('welcome-back').style.display = qual === 'welcome' ? 'block' : 'none';
+            $('login-loading').style.display = qual === 'loading' ? 'block' : 'none';
+        }
+
+        function salvarLoginLocal(aluno) {
+            try {
+                localStorage.setItem(LS, JSON.stringify({
+                    telefone: aluno._telefone || '',
+                    primeiroNome: aluno.primeiroNome || 'Aluno',
+                    foto: aluno.foto || ''
+                }));
+            } catch (e) {}
+        }
+        function lerLoginLocal() {
+            try { return JSON.parse(localStorage.getItem(LS) || 'null'); } catch (e) { return null; }
+        }
+
+        function iniciais(nome) {
+            return String(nome || 'A').trim().charAt(0).toUpperCase();
+        }
+
+        async function consultar(telefone) {
+            mostrarTela('loading');
+            try {
+                var resp = await fetch('/api/consulta-aluno', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telefone: telefone })
+                });
+                if (resp.status === 404) {
+                    mostrarTela('form');
+                    $('erro-login').textContent = 'Não encontramos esse número. Confira com o professor.';
+                    $('erro-login').classList.add('show');
+                    return;
+                }
+                if (!resp.ok) throw new Error('falha');
+                var dados = await resp.json();
+                dados._telefone = telefone;
+                ALUNO = dados;
+                salvarLoginLocal(dados);
+                abrirApp();
+            } catch (e) {
+                console.error(e);
+                mostrarTela('form');
+                $('erro-login').textContent = 'Erro de conexão. Tente de novo em instantes.';
+                $('erro-login').classList.add('show');
+            }
+        }
+
+        $('btn-entrar').addEventListener('click', function () {
+            var tel = soDigitos($('inp-tel').value);
+            $('erro-login').classList.remove('show');
+            if (tel.length < 8) {
+                $('erro-login').textContent = 'Digite um número de telefone válido.';
+                $('erro-login').classList.add('show');
+                return;
+            }
+            consultar(tel);
+        });
+        $('inp-tel').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btn-entrar').click(); });
+
+        $('btn-continuar').addEventListener('click', function () {
+            var salvo = lerLoginLocal();
+            if (salvo && salvo.telefone) consultar(salvo.telefone);
+            else mostrarTela('form');
+        });
+        $('btn-trocar').addEventListener('click', function () {
+            mostrarTela('form');
+            $('inp-tel').value = '';
+            $('inp-tel').focus();
+        });
+
+        $('btn-sair').addEventListener('click', function () {
+            if (!confirm('Sair da sua área?')) return;
+            try { localStorage.removeItem(LS); } catch (e) {}
+            if (listenerPix) { listenerPix.off(); listenerPix = null; }
+            ALUNO = null;
+            $('app').classList.remove('show');
+            $('bottom-nav').style.display = 'none';
+            document.getElementById('tela-login').style.display = 'flex';
+            mostrarTela('form');
+            $('inp-tel').value = '';
+        });
+
+        $('btn-atualizar').addEventListener('click', function () {
+            if (ALUNO && ALUNO._telefone) {
+                toast('Atualizando...');
+                fetch('/api/consulta-aluno', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telefone: ALUNO._telefone })
+                }).then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+                  .then(function (d) { d._telefone = ALUNO._telefone; ALUNO = d; renderTudo(); toast('Dados atualizados ✅'); })
+                  .catch(function () { toast('Não foi possível atualizar agora.'); });
+            }
+        });
+
+        // ================= APP =================
+        function abrirApp() {
+            document.getElementById('tela-login').style.display = 'none';
+            $('app').classList.add('show');
+            $('bottom-nav').style.display = 'flex';
+
+            var av = $('tb-avatar');
+            if (ALUNO.foto) { av.style.backgroundImage = "url('" + encodeURI(ALUNO.foto) + "')"; av.textContent = ''; }
+            else av.textContent = iniciais(ALUNO.primeiroNome);
+            $('tb-nome').textContent = ALUNO.primeiroNome || ALUNO.nome || 'Aluno';
+            $('tb-plano').textContent = ALUNO.plano || 'Aluno Funcional';
+
+            trocarView('inicio');
+            renderTudo();
+            iniciarListenerPix();
+        }
+
+        function renderTudo() {
+            renderInicio();
+            renderMensalidade();
+            renderEvolucao();
+            renderTreinos();
+            renderConquistas();
+            icons();
+        }
+
+        // navegação
+        Array.prototype.forEach.call(document.querySelectorAll('#bottom-nav button'), function (b) {
+            b.addEventListener('click', function () { trocarView(b.dataset.view); });
+        });
+        function trocarView(nome) {
+            viewAtual = nome;
+            Array.prototype.forEach.call(document.querySelectorAll('.view'), function (v) { v.classList.remove('active'); });
+            var alvo = $('v-' + nome);
+            if (alvo) alvo.classList.add('active');
+            Array.prototype.forEach.call(document.querySelectorAll('#bottom-nav button'), function (b) {
+                b.classList.toggle('active', b.dataset.view === nome);
+            });
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            if (nome === 'inicio') renderInicio();
+            if (nome === 'conquistas') renderConquistas();
+            if (nome === 'treinos') renderTreinos();
+            icons();
+        }
+        window.__trocarView = trocarView;
+
+        function wa(numero, texto) {
+            var n = soDigitos(numero);
+            if (!n) return '#';
+            return 'https://wa.me/55' + n + (texto ? '?text=' + encodeURIComponent(texto) : '');
+        }
+
+        // ---------- INÍCIO ----------
+        function renderInicio() {
+            if (!ALUNO) return;
+            var pago = ALUNO.statusMensalidade === 'pago';
+            var venc = proximoVencimento(ALUNO.vencimento);
+            var diasVenc = diasEntre(hojeISO(), venc.toISOString().slice(0, 10));
+            var nv = nivelDe(ALUNO.pontos);
+            var streak = sequenciaTreino();
+            var semana = checkinsNaSemana();
+            var aula = proximaAula(ALUNO.estudio && ALUNO.estudio.horarios);
+            var zap = ALUNO.estudio && ALUNO.estudio.whatsapp;
+            var jaHoje = getCheckins().indexOf(hojeISO()) !== -1;
+
+            var h = '';
+            var av = ALUNO.foto ? "style=\"background-image:url('" + encodeURI(ALUNO.foto) + "')\"" : '';
+            h += '<div class="hero-card">' +
+                    '<div class="big-avatar" ' + av + '>' + (ALUNO.foto ? '' : iniciais(ALUNO.primeiroNome)) + '</div>' +
+                    '<h2>Olá, ' + esc(ALUNO.primeiroNome) + '!</h2>' +
+                    (ALUNO.plano ? '<span class="plano-badge"><i data-lucide="badge-check" style="width:13px;height:13px"></i> ' + esc(ALUNO.plano) + '</span>' : '') +
+                    (ALUNO.inicio ? '<div class="tempo">Treinando com a gente ' + esc(textoTempo(ALUNO.inicio)) + ' 🎯</div>' : '') +
+                 '</div>';
+
+            h += '<div class="stat-grid">' +
+                    '<button class="stat tap ' + (pago ? 'ok' : 'bad') + '" onclick="__trocarView(\'mensalidade\')">' +
+                        '<span class="lbl"><i data-lucide="wallet"></i> Mensalidade</span>' +
+                        '<span class="val">' + (pago ? 'Em dia' : 'Pendente') + '</span>' +
+                        '<span class="foot">' + (pago ? 'tudo certo!' : 'toque para pagar') + '</span>' +
+                    '</button>' +
+                    '<button class="stat tap" onclick="__trocarView(\'conquistas\')">' +
+                        '<span class="lbl"><i data-lucide="star"></i> Pontos</span>' +
+                        '<span class="val">' + (Number(ALUNO.pontos) || 0) + '</span>' +
+                        '<span class="foot">nível ' + nv.numero + ' · ' + esc(nv.nome) + '</span>' +
+                    '</button>' +
+                    '<div class="stat ' + (streak > 0 ? 'warn' : '') + '">' +
+                        '<span class="lbl"><i data-lucide="flame"></i> Sequência</span>' +
+                        '<span class="val">' + streak + '</span>' +
+                        '<span class="foot">' + (streak === 1 ? 'dia seguido' : 'dias seguidos') + '</span>' +
+                    '</div>' +
+                    '<div class="stat ' + (diasVenc <= 3 && !pago ? 'warn' : '') + '">' +
+                        '<span class="lbl"><i data-lucide="calendar"></i> Vencimento</span>' +
+                        '<span class="val">dia ' + esc(ALUNO.vencimento || '10') + '</span>' +
+                        '<span class="foot">' + (pago ? 'já pago este mês' : (diasVenc === 0 ? 'é hoje!' : (diasVenc > 0 ? 'em ' + diasVenc + ' dias' : 'atrasado'))) + '</span>' +
+                    '</div>' +
+                 '</div>';
+
+            // treino de hoje
+            h += '<div class="card">' +
+                    '<div class="row">' +
+                        '<div><h3 style="margin-bottom:2px"><i data-lucide="dumbbell"></i> Treino de hoje</h3>' +
+                        '<p class="muted">' + (jaHoje ? 'Registrado! Bom trabalho hoje. 🎉' : (semana > 0 ? 'Você já treinou ' + semana + 'x nesta semana.' : 'Bora começar a semana?')) + '</p></div>' +
+                    '</div>' +
+                    (jaHoje ? '' : '<button class="btn btn-primary btn-block" style="margin-top:12px" onclick="__registrarTreino()"><i data-lucide="check-circle-2"></i> Registrar treino de hoje</button>') +
+                 '</div>';
+
+            // próxima aula
+            if (aula) {
+                h += '<div class="card">' +
+                        '<h3><i data-lucide="clock"></i> Próxima aula</h3>' +
+                        '<div class="row"><strong style="font-size:18px">' + esc(aula.quando) + '</strong>' +
+                        '<span class="muted">' + esc(aula.hora || (ALUNO.estudio && ALUNO.estudio.horarios) || '') + '</span></div>' +
+                        (aula.hoje ? '<p class="dim" style="margin-top:6px">É hoje! Confirma sua presença com o professor.</p>' : '') +
+                     '</div>';
+            }
+
+            // frase do dia
+            h += '<div class="quote"><i data-lucide="quote" class="mk"></i><p>"' + esc(fraseDoDia()) + '"</p></div>';
+
+            // recado do estúdio
+            if (ALUNO.estudio && ALUNO.estudio.recado) {
+                h += '<div class="card" style="border-color:rgba(56,189,248,0.3);background:rgba(56,189,248,0.06)">' +
+                        '<h3><i data-lucide="megaphone"></i> Recado do estúdio</h3>' +
+                        '<p class="muted" style="white-space:pre-wrap">' + esc(ALUNO.estudio.recado) + '</p>' +
+                     '</div>';
+            }
+
+            // ações rápidas
+            h += '<h3 style="margin:18px 0 12px;font-size:15px"><i data-lucide="zap" style="width:16px;height:16px;color:var(--primary)"></i> Ações rápidas</h3>';
+            h += '<div class="quick-grid">' +
+                    '<a class="quick" href="' + (zap ? wa(zap, 'Olá! Sou ' + ALUNO.nome + ', aluno(a) do Funcional do Ari.') : '#') + '" target="_blank"><i data-lucide="message-circle"></i>Falar com o professor</a>' +
+                    '<a class="quick" href="agendar.html" target="_blank"><i data-lucide="calendar-plus"></i>Agendar / repor aula</a>' +
+                    '<a class="quick" href="#" onclick="__trocarView(\'evolucao\');return false;"><i data-lucide="camera"></i>Minha evolução</a>' +
+                    '<a class="quick" href="' + (zap ? wa(zap, 'Oi! Quero indicar um amigo para o Funcional do Ari 🙌') : '#') + '" target="_blank"><i data-lucide="user-plus"></i>Indicar um amigo</a>' +
+                 '</div>';
+
+            // dicas
+            var dica = DICAS[(new Date().getDate()) % DICAS.length];
+            h += '<div class="card" style="margin-top:14px">' +
+                    '<h3><i data-lucide="lightbulb"></i> Dica de hoje</h3>' +
+                    '<div class="tip" style="border:none;padding:4px 0"><span class="te">' + dica.e + '</span><div><strong>' + esc(dica.t) + '</strong><p>' + esc(dica.p) + '</p></div></div>' +
+                 '</div>';
+
+            $('inicio-conteudo').innerHTML = h;
+            icons();
+        }
+        window.__registrarTreino = registrarTreinoHoje;
+
+        // ---------- MENSALIDADE ----------
+        function renderMensalidade() {
+            if (!ALUNO) return;
+            var pago = ALUNO.statusMensalidade === 'pago';
+            var valor = Number(ALUNO.valorPlano) || 0;
+            var c = $('mensalidade-conteudo');
+
+            var h = '';
+            h += '<div class="card card-lg" style="text-align:center">' +
+                    '<span class="pill ' + (pago ? 'ok' : 'bad') + '">' + (pago ? '✓ MENSALIDADE EM DIA' : '⚠️ PAGAMENTO PENDENTE') + '</span>' +
+                    '<p class="muted" style="margin-top:12px">' +
+                        (pago
+                            ? ('Você está em dia' + (ALUNO.mesPagamento ? ' — referência ' + fmtMesAno(ALUNO.mesPagamento) : '') + '. Bom treino! 💪')
+                            : ('Vencimento no dia <strong style="color:#fff">' + esc(ALUNO.vencimento || '10') + '</strong> de cada mês.')) +
+                    '</p>' +
+                 '</div>';
+
+            if (!pago) {
+                h += '<div class="card">' +
+                        '<div class="row"><span class="muted">Valor do plano</span>' +
+                        '<strong style="font-size:24px;color:var(--primary)">' + (valor > 0 ? moeda(valor) : 'sob consulta') + '</strong></div>' +
+                        '<div class="divider"></div>' +
+                        '<div id="area-pagamento">' +
+                            (valor > 0
+                                ? '<button id="btn-gerar-mp" class="btn btn-block" style="background:linear-gradient(135deg,#00b3f0,#009ee3);color:#fff"><i data-lucide="qr-code"></i> Gerar Pix oficial</button>'
+                                : '<p class="dim" style="text-align:center">Fale com o professor para confirmar o valor da sua mensalidade.</p>') +
+                            '<div id="caixa-qr-code" style="display:none;margin-top:14px" class="pix-box">' +
+                                '<img id="qr-pix-mp" src="" alt="QR Code Pix">' +
+                                '<input type="text" id="pix-copia-cola-mp" readonly>' +
+                                '<button id="btn-copiar-pix" class="btn btn-outline btn-block"><i data-lucide="copy"></i> Copiar código Pix</button>' +
+                                '<div class="aguardando" style="margin-top:12px"><div class="spinner" style="width:18px;height:18px;margin:0;border-width:2px"></div> Aguardando confirmação do pagamento...</div>' +
+                            '</div>' +
+                            '<div id="tela-sucesso-pagamento" style="display:none" class="tela-sucesso">' +
+                                '<i data-lucide="check-circle-2"></i>' +
+                                '<h2>Pagamento confirmado!</h2>' +
+                                '<p class="muted">Sua mensalidade já foi atualizada automaticamente. Bom treino!</p>' +
+                            '</div>' +
+                        '</div>' +
+                     '</div>';
+            }
+
+            // plano atual
+            h += '<div class="card">' +
+                    '<h3><i data-lucide="ticket"></i> Meu plano</h3>' +
+                    '<strong style="font-size:15px">' + esc(ALUNO.plano || 'Não definido') + '</strong>' +
+                    (ALUNO.planoDescricao ? '<p class="muted" style="margin-top:4px">' + esc(ALUNO.planoDescricao) + '</p>' : '') +
+                    (valor > 0 ? '<p class="dim" style="margin-top:6px">' + moeda(valor) + ' / mês</p>' : '') +
+                 '</div>';
+
+            // histórico de compras
+            if (ALUNO.atendimentos && ALUNO.atendimentos.length) {
+                h += '<div class="card"><h3><i data-lucide="receipt"></i> Histórico de compras</h3>';
+                ALUNO.atendimentos.slice(0, 12).forEach(function (a) {
+                    h += '<div class="list-item"><div class="ic"><i data-lucide="shopping-bag"></i></div>' +
+                        '<div class="tx"><strong>' + moeda(a.total) + '</strong>' +
+                        '<span>' + esc(fmtData(a.data)) + (a.itens && a.itens.length ? ' · ' + esc(a.itens.join(', ')) : '') + '</span></div></div>';
+                });
+                h += '</div>';
+            }
+
+            // outros planos
+            if (ALUNO.planos && ALUNO.planos.length > 1) {
+                h += '<div class="card"><h3><i data-lucide="list"></i> Outros planos</h3>';
+                ALUNO.planos.forEach(function (p) {
+                    if (p.nome === ALUNO.plano) return;
+                    h += '<div class="list-item"><div class="ic"><i data-lucide="tag"></i></div>' +
+                        '<div class="tx"><strong>' + esc(p.nome) + (p.destaque ? ' ⭐' : '') + '</strong>' +
+                        '<span>' + (p.preco > 0 ? moeda(p.preco) + ' / mês' : 'sob consulta') + (p.descricao ? ' · ' + esc(p.descricao) : '') + '</span></div></div>';
+                });
+                h += '<p class="dim" style="margin-top:10px">Quer trocar de plano? Fale com o professor.</p></div>';
+            }
+
+            var zap = ALUNO.estudio && ALUNO.estudio.whatsapp;
+            if (zap) {
+                h += '<a class="btn btn-green btn-block" style="margin-bottom:14px" target="_blank" href="' +
+                    wa(zap, 'Olá! Sou ' + ALUNO.nome + ' e tenho uma dúvida sobre minha mensalidade.') +
+                    '"><i data-lucide="message-circle"></i> Tirar dúvida no WhatsApp</a>';
+            }
+
+            c.innerHTML = h;
+            icons();
+
+            var btnGerar = $('btn-gerar-mp');
+            if (btnGerar) btnGerar.addEventListener('click', function () { solicitarPix(valor); });
+            var btnCopiar = $('btn-copiar-pix');
+            if (btnCopiar) btnCopiar.addEventListener('click', copiarPix);
+        }
+
+        async function solicitarPix(valor) {
+            var btn = $('btn-gerar-mp');
+            btn.disabled = true;
+            btn.innerHTML = 'Conectando ao banco...';
+            try {
+                var resp = await fetch('/api/gerar-pix', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ clienteId: ALUNO.id, nome: ALUNO.nome, valor: valor })
+                });
+                var dados = await resp.json();
+                if (!resp.ok) throw new Error(dados.erro || 'falha');
+
+                btn.style.display = 'none';
+                $('caixa-qr-code').style.display = 'block';
+                $('qr-pix-mp').src = 'data:image/png;base64,' + dados.qr_code_base64;
+                $('pix-copia-cola-mp').value = dados.qr_code;
+                icons();
+            } catch (e) {
+                console.error(e);
+                btn.disabled = false;
+                btn.innerHTML = 'Erro. Tentar novamente';
+                toast('Não foi possível gerar o Pix agora.');
+            }
+        }
+        function copiarPix() {
+            var inp = $('pix-copia-cola-mp');
+            inp.select();
+            try {
+                if (navigator.clipboard) navigator.clipboard.writeText(inp.value);
+                else document.execCommand('copy');
+                toast('Código Pix copiado ✅');
+            } catch (e) { document.execCommand('copy'); toast('Código Pix copiado ✅'); }
+        }
+
+        function iniciarListenerPix() {
+            if (!ALUNO || !ALUNO.id) return;
+            if (listenerPix) listenerPix.off();
+            listenerPix = db.ref('clientes/' + ALUNO.id + '/statusMensalidade');
+            listenerPix.on('value', function (snap) {
+                var status = snap.val();
+                if (!status) return;
+                var mudou = ALUNO.statusMensalidade !== status;
+                ALUNO.statusMensalidade = status;
+                if (status === 'pago' && mudou) {
+                    try { $('audio-sucesso').play().catch(function () {}); } catch (e) {}
+                    var suc = $('tela-sucesso-pagamento');
+                    var area = $('area-pagamento');
+                    if (suc && area) { area.style.display = 'none'; suc.style.display = 'block'; }
+                    toast('Pagamento confirmado! 🎉');
+                }
+                renderInicio();
+                renderMensalidade();
+                renderConquistas();
+                icons();
+            });
+        }
+
+        // ---------- EVOLUÇÃO ----------
+        function renderEvolucao() {
+            if (!ALUNO) return;
+            var c = $('evolucao-conteudo');
+            var zap = ALUNO.estudio && ALUNO.estudio.whatsapp;
+            var h = '';
+
+            // objetivo
+            h += '<div class="card">' +
+                    '<h3><i data-lucide="target"></i> Meu objetivo</h3>' +
+                    '<p style="font-size:15px">' + (ALUNO.objetivo ? esc(ALUNO.objetivo) : '<span class="dim">Ainda não definido. Combine com o professor na próxima aula.</span>') + '</p>' +
+                 '</div>';
+
+            // avaliação (Drive)
+            if (ALUNO.linkDrive && /^https?:\/\//i.test(ALUNO.linkDrive)) {
+                h += '<a class="btn btn-primary btn-block" style="margin-bottom:14px" target="_blank" rel="noopener" href="' + attr(ALUNO.linkDrive) + '">' +
+                    '<i data-lucide="folder-open"></i> Ver minha avaliação completa</a>';
+            } else if (zap) {
+                h += '<div class="card" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.06)">' +
+                        '<h3><i data-lucide="clipboard-list"></i> Avaliação física</h3>' +
+                        '<p class="muted">Você ainda não tem uma avaliação registrada. Que tal marcar a sua?</p>' +
+                        '<a class="btn btn-outline btn-block" style="margin-top:12px" target="_blank" href="' + wa(zap, 'Oi! Gostaria de agendar/atualizar minha avaliação física.') + '"><i data-lucide="message-circle"></i> Pedir avaliação</a>' +
+                     '</div>';
+            }
+
+            // galeria
+            h += '<div class="card"><h3><i data-lucide="images"></i> Fotos de evolução</h3>';
+            if (ALUNO.galeria && ALUNO.galeria.length) {
+                h += '<div class="galeria">';
+                ALUNO.galeria.slice().reverse().forEach(function (f) {
+                    h += '<figure onclick="window.open(\'' + attr(encodeURI(f.img)) + '\',\'_blank\')">' +
+                            '<img src="' + attr(encodeURI(f.img)) + '" alt="" loading="lazy">' +
+                            '<figcaption><span>' + esc(f.desc || 'Foto') + '</span><span>' + esc(f.data || '') + '</span></figcaption>' +
+                         '</figure>';
+                });
+                h += '</div>';
+            } else {
+                h += '<div class="empty"><i data-lucide="camera-off"></i><p>Nenhuma foto ainda. Peça ao professor para registrar seu "antes" na próxima aula — é assim que a evolução fica visível!</p></div>';
+            }
+            h += '</div>';
+
+            // linha do tempo
+            if (ALUNO.historico && ALUNO.historico.length) {
+                h += '<div class="card"><h3><i data-lucide="history"></i> Linha do tempo</h3><div class="timeline">';
+                ALUNO.historico.slice().reverse().forEach(function (ev) {
+                    h += '<div class="tl-item"><strong>' + esc(ev.titulo) + '</strong>' +
+                        '<time>' + esc(ev.data || '') + '</time>' +
+                        (ev.obs ? '<p>' + esc(ev.obs) + '</p>' : '') + '</div>';
+                });
+                h += '</div></div>';
+            }
+
+            // registro de peso (local)
+            var pesos = lsGet('peso', []);
+            h += '<div class="card"><h3><i data-lucide="scale"></i> Meu peso <span class="dim" style="font-weight:400;margin-left:auto">só neste aparelho</span></h3>' +
+                    '<div class="mini-form">' +
+                        '<input id="inp-peso" class="input" type="number" inputmode="decimal" step="0.1" placeholder="Ex: 72.5 kg">' +
+                        '<button id="btn-add-peso" class="btn btn-primary"><i data-lucide="plus"></i></button>' +
+                    '</div>';
+            if (pesos.length >= 2) h += sparkline(pesos.map(function (p) { return p.valor; }));
+            if (pesos.length) {
+                h += '<div class="peso-hist">';
+                pesos.slice(-6).reverse().forEach(function (p) {
+                    h += '<div class="l"><span>' + esc(String(p.valor).replace('.', ',')) + ' kg</span><small>' + esc(fmtData(p.data)) + '</small></div>';
+                });
+                h += '</div>';
+                var delta = (pesos[pesos.length - 1].valor - pesos[0].valor);
+                h += '<p class="dim" style="margin-top:10px">Variação desde o 1º registro: ' + (delta > 0 ? '+' : '') + delta.toFixed(1).replace('.', ',') + ' kg</p>';
+            } else {
+                h += '<p class="dim" style="margin-top:10px">Anote seu peso de vez em quando para ver a curva ao longo do tempo.</p>';
+            }
+            h += '</div>';
+
+            c.innerHTML = h;
+            icons();
+
+            var bp = $('btn-add-peso');
+            if (bp) bp.addEventListener('click', function () {
+                var v = parseFloat(String($('inp-peso').value).replace(',', '.'));
+                if (!v || v <= 0 || v > 400) { toast('Digite um peso válido.'); return; }
+                var arr = lsGet('peso', []);
+                arr.push({ data: hojeISO(), valor: Math.round(v * 10) / 10 });
+                lsSet('peso', arr.slice(-100));
+                toast('Peso registrado 📈');
+                renderEvolucao();
+            });
+        }
+
+        function sparkline(vals) {
+            if (vals.length < 2) return '';
+            var w = 280, hh = 54, pad = 6;
+            var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+            var rng = (max - min) || 1;
+            var pts = vals.map(function (v, i) {
+                var x = pad + (i * (w - pad * 2)) / (vals.length - 1);
+                var y = pad + (1 - (v - min) / rng) * (hh - pad * 2);
+                return x.toFixed(1) + ',' + y.toFixed(1);
+            }).join(' ');
+            var last = pts.split(' ').pop().split(',');
+            return '<svg class="spark" viewBox="0 0 ' + w + ' ' + hh + '" preserveAspectRatio="none">' +
+                   '<polyline points="' + pts + '"/><circle cx="' + last[0] + '" cy="' + last[1] + '" r="3"/></svg>';
+        }
+
+        // ---------- TREINOS ----------
+        function renderTreinos() {
+            if (!ALUNO) return;
+            var c = $('treinos-conteudo');
+            var zap = ALUNO.estudio && ALUNO.estudio.whatsapp;
+            var h = '';
+
+            // planilha
+            if (ALUNO.linkDrive && /^https?:\/\//i.test(ALUNO.linkDrive)) {
+                h += '<a class="btn btn-primary btn-block" style="margin-bottom:14px" target="_blank" rel="noopener" href="' + attr(ALUNO.linkDrive) + '"><i data-lucide="file-text"></i> Abrir minha planilha de treino</a>';
+            } else if (zap) {
+                h += '<div class="card"><h3><i data-lucide="file-text"></i> Planilha de treino</h3>' +
+                        '<p class="muted">Sua planilha ainda não está por aqui. Peça ao professor pelo WhatsApp.</p>' +
+                        '<a class="btn btn-outline btn-block" style="margin-top:12px" target="_blank" href="' + wa(zap, 'Oi! Pode me enviar/atualizar minha planilha de treino?') + '"><i data-lucide="message-circle"></i> Pedir planilha</a></div>';
+            }
+
+            // grade de horários
+            var hr = parseHorarios(ALUNO.estudio && ALUNO.estudio.horarios);
+            h += '<div class="card"><h3><i data-lucide="calendar-days"></i> Horários das aulas</h3>';
+            if (hr.dias.length) {
+                var hojeDia = new Date().getDay();
+                h += '<div class="grade">';
+                hr.dias.forEach(function (d) {
+                    h += '<div class="dia' + (d === hojeDia ? ' hoje' : '') + '"><span>' + DIAS_NOME[d] + '</span>' +
+                        '<span class="tag">' + (d === hojeDia ? 'HOJE' : (hr.horaTxt || '')) + '</span></div>';
+                });
+                h += '</div>';
+                h += '<p class="dim" style="margin-top:10px">' + esc(ALUNO.estudio.horarios) + '</p>';
+            } else {
+                h += '<p class="muted">' + esc((ALUNO.estudio && ALUNO.estudio.horarios) || 'Confira os horários com o professor.') + '</p>';
+            }
+            h += '</div>';
+
+            // meta da semana (local)
+            var meta = lsGet('meta', 3);
+            var feitos = checkinsNaSemana();
+            var pct = Math.min(100, Math.round((feitos / meta) * 100));
+            h += '<div class="card"><h3><i data-lucide="goal"></i> Meta da semana</h3>' +
+                    '<div class="row" style="margin-bottom:10px"><span class="muted">' + feitos + ' de ' + meta + ' treinos</span>' +
+                    '<span class="dim">' + pct + '%</span></div>' +
+                    '<div class="bar green"><span style="width:' + pct + '%"></span></div>' +
+                    '<div class="mini-form" style="align-items:center">' +
+                        '<span class="muted" style="flex:1">Quero treinar</span>' +
+                        '<button class="btn btn-outline" id="meta-menos">−</button>' +
+                        '<strong id="meta-val" style="min-width:70px;text-align:center;font-size:15px">' + meta + 'x / sem</strong>' +
+                        '<button class="btn btn-outline" id="meta-mais">+</button>' +
+                    '</div>' +
+                    (getCheckins().indexOf(hojeISO()) === -1
+                        ? '<button class="btn btn-primary btn-block" style="margin-top:12px" onclick="__registrarTreino()"><i data-lucide="check-circle-2"></i> Registrar treino de hoje</button>'
+                        : '<p class="dim" style="margin-top:12px;text-align:center">✅ Treino de hoje já registrado</p>') +
+                 '</div>';
+
+            // checklist
+            var marc = lsGet('checklist', {});
+            h += '<div class="card"><h3><i data-lucide="check-square"></i> Levar para a aula</h3><div class="check-list">';
+            CHECKLIST_AULA.forEach(function (item, i) {
+                h += '<label><input type="checkbox" data-ck="' + i + '"' + (marc[i] ? ' checked' : '') + '><span>' + esc(item) + '</span></label>';
+            });
+            h += '</div></div>';
+
+            // frequência recomendada
+            if (ALUNO.plano) {
+                h += '<div class="card"><h3><i data-lucide="repeat"></i> Seu plano</h3>' +
+                    '<p class="muted">' + esc(ALUNO.plano) + (ALUNO.planoDescricao ? ' — ' + esc(ALUNO.planoDescricao) : '') + '</p></div>';
+            }
+
+            c.innerHTML = h;
+            icons();
+
+            var mv = $('meta-val');
+            function setMeta(n) {
+                n = Math.max(1, Math.min(7, n));
+                lsSet('meta', n);
+                renderTreinos();
+            }
+            if ($('meta-menos')) $('meta-menos').addEventListener('click', function () { setMeta(lsGet('meta', 3) - 1); });
+            if ($('meta-mais')) $('meta-mais').addEventListener('click', function () { setMeta(lsGet('meta', 3) + 1); });
+
+            Array.prototype.forEach.call(c.querySelectorAll('input[data-ck]'), function (cb) {
+                cb.addEventListener('change', function () {
+                    var m = lsGet('checklist', {});
+                    m[cb.dataset.ck] = cb.checked;
+                    lsSet('checklist', m);
+                });
+            });
+        }
+
+        // ---------- CONQUISTAS ----------
+        function renderConquistas() {
+            if (!ALUNO) return;
+            var c = $('conquistas-conteudo');
+            var nv = nivelDe(ALUNO.pontos);
+            var meses = mesesTreinando(ALUNO.inicio);
+            var streak = sequenciaTreino();
+            var semana = checkinsNaSemana();
+            var pontos = Number(ALUNO.pontos) || 0;
+            var nascMes = ALUNO.dataNasc ? parseInt(String(ALUNO.dataNasc).slice(5, 7), 10) : 0;
+            var mesAtual = new Date().getMonth() + 1;
+            var perfilCompleto = !!(ALUNO.foto && ALUNO.objetivo && ALUNO.dataNasc);
+
+            var h = '';
+            h += '<div class="card card-lg nivel-card">' +
+                    '<div class="lv">NÍVEL ' + nv.numero + '</div>' +
+                    '<div class="lv-nome">' + esc(nv.nome) + '</div>' +
+                    '<div class="pts">' + pontos + ' pontos' + (nv.prox ? ' · faltam ' + nv.faltam + ' para ' + esc(nv.prox.nome) : ' · nível máximo! 🏆') + '</div>' +
+                    '<div class="bar"><span style="width:' + nv.pct + '%"></span></div>' +
+                    '<p class="dim" style="margin-top:12px">Você ganha pontos a cada compra no estúdio. Fale com o professor sobre bônus por indicação e presença!</p>' +
+                 '</div>';
+
+            var badges = [
+                { on: true, e: '🎯', t: 'Primeiro passo', d: 'Entrou pro Funcional' },
+                { on: meses >= 1, e: '🌱', t: '1 mês', d: 'Um mês treinando' },
+                { on: meses >= 3, e: '🔗', t: '3 meses', d: 'Trimestre completo' },
+                { on: meses >= 6, e: '⚡', t: '6 meses', d: 'Meio ano de constância' },
+                { on: meses >= 12, e: '👑', t: '1 ano', d: 'Um ano de evolução' },
+                { on: ALUNO.statusMensalidade === 'pago', e: '💚', t: 'Em dia', d: 'Mensalidade paga' },
+                { on: pontos >= 50, e: '⭐', t: 'Pontuador', d: '50+ pontos' },
+                { on: pontos >= 200, e: '🌟', t: 'Pontuador Pro', d: '200+ pontos' },
+                { on: pontos >= 500, e: '💫', t: 'Colecionador', d: '500+ pontos' },
+                { on: !!ALUNO.galeria && ALUNO.galeria.length >= 1, e: '📸', t: 'Antes e depois', d: 'Tem foto de evolução' },
+                { on: streak >= 3, e: '🔥', t: 'Pegando fogo', d: '3 dias seguidos' },
+                { on: streak >= 7, e: '🚀', t: 'Imparável', d: '7 dias seguidos' },
+                { on: semana >= 3, e: '💪', t: 'Semana cheia', d: '3 treinos numa semana' },
+                { on: nascMes === mesAtual && nascMes > 0, e: '🎂', t: 'Aniversariante', d: 'Faz aniversário este mês' },
+                { on: perfilCompleto, e: '✅', t: 'Perfil completo', d: 'Foto, objetivo e nascimento' },
+                { on: !!(ALUNO.linkDrive && /^https?:\/\//i.test(ALUNO.linkDrive)), e: '📋', t: 'Avaliado', d: 'Tem avaliação registrada' }
+            ];
+            var conquistadas = badges.filter(function (b) { return b.on; }).length;
+
+            h += '<div class="row" style="margin:16px 2px 12px"><strong style="font-size:15px">Seus troféus</strong>' +
+                 '<span class="pill ok">' + conquistadas + ' / ' + badges.length + '</span></div>';
+
+            h += '<div class="badges">';
+            badges.forEach(function (b) {
+                h += '<div class="badge-c' + (b.on ? ' on' : '') + '">' +
+                        (b.on ? '' : '<i data-lucide="lock" class="lock"></i>') +
+                        '<span class="emoji">' + b.e + '</span>' +
+                        '<strong>' + esc(b.t) + '</strong><span>' + esc(b.d) + '</span>' +
+                     '</div>';
+            });
+            h += '</div>';
+
+            h += '<div class="card" style="margin-top:16px"><h3><i data-lucide="flame"></i> Sua constância</h3>' +
+                    '<div class="stat-grid" style="margin:0">' +
+                        '<div class="stat warn"><span class="lbl">Sequência</span><span class="val">' + streak + '</span><span class="foot">dias seguidos</span></div>' +
+                        '<div class="stat"><span class="lbl">Nesta semana</span><span class="val">' + semana + '</span><span class="foot">treinos</span></div>' +
+                        '<div class="stat"><span class="lbl">Total registrado</span><span class="val">' + getCheckins().length + '</span><span class="foot">check-ins</span></div>' +
+                        '<div class="stat"><span class="lbl">Treinando</span><span class="val">' + meses + '</span><span class="foot">' + (meses === 1 ? 'mês' : 'meses') + '</span></div>' +
+                    '</div>' +
+                    (getCheckins().indexOf(hojeISO()) === -1
+                        ? '<button class="btn btn-primary btn-block" style="margin-top:14px" onclick="__registrarTreino()"><i data-lucide="check-circle-2"></i> Registrar treino de hoje</button>'
+                        : '') +
+                 '</div>';
+
+            c.innerHTML = h;
+            icons();
+        }
+
+        // ================= BOOT =================
+        (function boot() {
+            var salvo = lerLoginLocal();
+            if (salvo && salvo.telefone) {
+                var av = $('wb-avatar');
+                if (salvo.foto) { av.style.backgroundImage = "url('" + encodeURI(salvo.foto) + "')"; }
+                else av.textContent = iniciais(salvo.primeiroNome);
+                $('wb-nome').textContent = 'Olá, ' + (salvo.primeiroNome || 'Aluno') + '!';
+                mostrarTela('welcome');
+            } else {
+                mostrarTela('form');
+            }
+            icons();
+        })();
+    })();
+    </script>
+</body>
+</html>

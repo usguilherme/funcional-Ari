@@ -1,7 +1,7 @@
 # Funcional do Ari — Painel de Gestão
 
 PWA de gestão para o estúdio (alunos, agenda, PDV, financeiro, folha/RH, estoque)
-+ site público (`vitrine.html`, `agendar.html`).
++ site público (`vitrine.html`, `agendar.html`) + Área do Aluno (`area-aluno.html`).
 
 ## Stack
 
@@ -56,6 +56,32 @@ Ver `.env.example`. Necessárias para as funções `api/`:
 
 Apontar para `https://SEU_DOMINIO/api/gerar-pix` (evento *payments*) e copiar a
 assinatura secreta para `MERCADO_PAGO_WEBHOOK_SECRET`.
+
+## Área do Aluno (`area-aluno.html`)
+
+Portal do aluno, identificado só pelo WhatsApp cadastrado (sem senha). Consome
+`api/consulta-aluno.js` (que devolve perfil, plano, mensalidade, galeria de fotos,
+linha do tempo, histórico de compras e dados do estúdio) e reaproveita
+`api/gerar-pix.js` para o pagamento. Seções:
+
+- **Início:** saudação, tempo de treino, status da mensalidade, pontos/nível,
+  sequência de treinos, próxima aula, frase do dia, recado do estúdio, ações
+  rápidas (WhatsApp, agendar/repor aula, indicar amigo).
+- **Mensalidade:** status, Pix oficial (QR + copia-e-cola, confirmação em tempo
+  real via `clientes/$id/statusMensalidade`), plano atual, histórico de compras,
+  outros planos.
+- **Evolução:** objetivo, link da avaliação (Google Drive), galeria de fotos,
+  linha do tempo do professor e um registro de peso local (só no aparelho).
+- **Treinos:** planilha (Drive), grade de horários, meta semanal + check-in de
+  treino (local), checklist "levar para a aula".
+- **Conquistas:** nível por pontos (Iniciante → Lenda) e ~16 troféus calculados
+  (tempo de treino, mensalidade em dia, constância, aniversário, etc.).
+
+Check-ins, meta, peso e checklist ficam em `localStorage` (por aparelho, não vão
+para o banco). O texto das anotações técnicas do professor só aparece se
+`EXPOR_NOTAS_PROFESSOR=true` (ver `.env.example`); títulos e datas sempre aparecem.
+Os campos "Horários das aulas" e "Recado para os alunos" ficam na aba
+*Vitrine Online* do painel (`landingConfig.horariosAluno` / `recadoAluno`).
 
 ## Notas de operação
 

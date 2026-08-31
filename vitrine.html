@@ -461,7 +461,7 @@
     <header class="topbar" id="topbar">
         <div class="brand"><i data-lucide="triangle" class="brand-icon"></i> <span id="vt-header-titulo">FUNCIONALDOARI</span></div>
         <div class="topbar-actions">
-            <button class="btn-outline" onclick="abrirAreaAluno()"><i data-lucide="user"></i> <span>Área do Aluno</span></button>
+            <a href="area-aluno.html" class="btn-outline"><i data-lucide="user"></i> <span>Área do Aluno</span></a>
             <a href="agendar.html" class="btn-primary">Agendar aula</a>
         </div>
     </header>
@@ -644,52 +644,7 @@
         </a>
     </div>
 
-    <!-- MODAL ÁREA DO ALUNO (MERCADO PAGO) -->
-    <div id="modal-aluno" class="modal-backdrop">
-        <div class="glass-modal">
-            <button onclick="fecharAreaAluno()" class="close-btn">&times;</button>
-
-            <div id="etapa-busca">
-                <h3 class="modal-title">ÁREA DO ALUNO</h3>
-                <p class="modal-sub">Digite seu WhatsApp cadastrado para consultar sua mensalidade.</p>
-                <input type="tel" id="aluno-tel-busca" class="modern-input" placeholder="(83) 99999-9999" oninput="this.value = this.value.replace(/[^0-9() -]/g, '')">
-                <button onclick="buscarAluno()" class="btn-primary modal-btn">Consultar</button>
-                <p id="erro-busca" style="color:#f87171; font-size:13px; margin-top:12px; display:none; text-align:center;">Aluno não encontrado. Verifique o número.</p>
-            </div>
-
-            <div id="etapa-resultado" style="display:none; text-align:center;">
-                <h3 id="res-nome" class="modal-title" style="color:#fff; font-size:22px;">Olá, Aluno</h3>
-                <div id="res-status" style="display:inline-block; padding:6px 14px; border-radius:24px; font-size:12px; font-weight:800; margin-bottom:16px;">Status</div>
-
-                <div id="area-pagamento" style="display:none; background:rgba(0,0,0,0.25); padding:18px; border-radius:14px; border:1px solid var(--ring); text-align:center;">
-                    <p style="color:var(--text-muted); font-size:13px; margin-bottom:6px;">Vencimento: <strong id="res-vencimento" style="color:#fff;"></strong></p>
-                    <p style="font-size:26px; font-weight:800; color:var(--primary); margin-bottom:16px;" id="res-valor">R$ 0,00</p>
-
-                    <button id="btn-gerar-mp" class="btn-primary" style="width:100%; padding:15px; font-size:16px; background:linear-gradient(135deg,#00b3f0,#009ee3); box-shadow:0 10px 30px -10px rgba(0,158,227,0.5); margin-bottom: 10px;">Gerar Pix Oficial</button>
-
-                    <div id="caixa-qr-code" style="display: none;">
-                        <img id="qr-pix-mp" src="" alt="QR Code Pix" style="width: 100%; max-width: 200px; border-radius:12px; margin: 0 auto 15px; background: #fff; padding: 8px;">
-                        <input type="text" id="pix-copia-cola-mp" readonly style="width:100%; padding:11px; border-radius:10px; border:1px solid var(--ring-strong); background:rgba(0,0,0,0.35); color:var(--text-muted); font-size:12px; margin-bottom:10px; text-align:center;">
-                        <button onclick="copiarPixMP()" class="btn-outline" style="width:100%; padding:12px; font-size:14px; margin-bottom:15px;">Copiar Código Pix</button>
-
-                        <div style="display:flex; align-items:center; justify-content:center; gap:10px; color:var(--text-muted); font-size:13px;">
-                            <div class="spinner" style="width:20px; height:20px; margin:0; border-width:2px;"></div> Aguardando confirmação...
-                        </div>
-                    </div>
-                </div>
-
-                <div id="tela-sucesso-pagamento" style="display:none; padding: 30px 15px; text-align:center;">
-                    <i data-lucide="check-circle-2" style="width:64px; height:64px; color:#22c55e; margin-bottom:15px;"></i>
-                    <h2 style="color:#22c55e; margin-bottom:10px;">PAGAMENTO CONFIRMADO!</h2>
-                    <p style="color:var(--text-muted); font-size:14px;">O sistema já atualizou sua mensalidade automaticamente. Bom treino!</p>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- ÁUDIO DE SUCESSO OCULTO -->
-    <audio id="audio-sucesso" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3" preload="auto"></audio>
+    <!-- A Área do Aluno agora é uma página dedicada: area-aluno.html -->
 
     <!-- FIREBASE E SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -741,8 +696,6 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let listenerStatusPix = null;
-
         db.ref('landingConfig').once('value').then(snap => {
             const cfg = snap.val() || {};
             if (cfg.titulo) document.getElementById("vt-titulo").textContent = cfg.titulo;
@@ -762,186 +715,6 @@
             if (cfg.googleMapsUrl) document.getElementById('vt-btn-maps').href = cfg.googleMapsUrl;
         });
 
-        // ==========================================
-        // LÓGICA DA ÁREA DO ALUNO (MERCADO PAGO API)
-        // ==========================================
-        function abrirAreaAluno() {
-            const m = document.getElementById('modal-aluno');
-            m.style.display = 'flex';
-            m.classList.add('show');
-            document.getElementById('etapa-busca').style.display = 'block';
-            document.getElementById('etapa-resultado').style.display = 'none';
-            document.getElementById('tela-sucesso-pagamento').style.display = 'none';
-            document.getElementById('caixa-qr-code').style.display = 'none';
-            document.getElementById('btn-gerar-mp').style.display = 'block';
-            document.getElementById('aluno-tel-busca').value = '';
-            document.getElementById('erro-busca').style.display = 'none';
-
-            if(listenerStatusPix) listenerStatusPix.off();
-        }
-
-        function fecharAreaAluno() {
-            const m = document.getElementById('modal-aluno');
-            m.style.display = 'none';
-            m.classList.remove('show');
-            if(listenerStatusPix) listenerStatusPix.off();
-        }
-
-        function buscarAluno() {
-            const inputTel = document.getElementById('aluno-tel-busca').value;
-            const telLimpo = inputTel.replace(/\D/g, '');
-            const erroMsg = document.getElementById('erro-busca');
-
-            if (telLimpo.length < 8) {
-                erroMsg.innerText = "Digite um número válido.";
-                erroMsg.style.display = 'block';
-                return;
-            }
-
-            const btn = document.querySelector('#etapa-busca button');
-            const txtOriginal = btn.innerText;
-            btn.innerText = "Buscando...";
-            btn.disabled = true;
-
-            fetch('/api/consulta-aluno', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ telefone: telLimpo })
-            }).then(async (resp) => {
-                if (resp.status === 404) {
-                    erroMsg.innerText = "Aluno não encontrado. Verifique o número.";
-                    erroMsg.style.display = 'block';
-                    return;
-                }
-                if (!resp.ok) throw new Error('Falha na consulta');
-                const aluno = await resp.json();
-                mostrarResultadoAluno(aluno);
-            }).catch(err => {
-                console.error(err);
-                erroMsg.innerText = "Erro de conexão. Tente novamente.";
-                erroMsg.style.display = 'block';
-            }).finally(() => {
-                btn.innerText = txtOriginal;
-                btn.disabled = false;
-            });
-        }
-
-        function mostrarResultadoAluno(aluno) {
-            document.getElementById('etapa-busca').style.display = 'none';
-            document.getElementById('etapa-resultado').style.display = 'block';
-
-            document.getElementById('res-nome').innerText = `Olá, ${aluno.primeiroNome || 'Aluno'}!`;
-
-            const statusEl = document.getElementById('res-status');
-            const areaPagamento = document.getElementById('area-pagamento');
-            const statusBanco = aluno.statusMensalidade || 'atrasado';
-
-            statusEl.style.display = 'inline-block';
-
-            if (statusBanco === 'pago') {
-                statusEl.innerText = "✓ MENSALIDADE EM DIA";
-                statusEl.style.background = "rgba(34, 197, 94, 0.2)";
-                statusEl.style.color = "#22c55e";
-                statusEl.style.border = "1px solid rgba(34, 197, 94, 0.3)";
-                areaPagamento.style.display = 'none';
-            } else {
-                statusEl.innerText = "⚠️ PAGAMENTO PENDENTE";
-                statusEl.style.background = "rgba(248, 113, 113, 0.2)";
-                statusEl.style.color = "#f87171";
-                statusEl.style.border = "1px solid rgba(248, 113, 113, 0.3)";
-
-                document.getElementById('res-vencimento').innerText = `Dia ${aluno.vencimento || '10'}`;
-
-                const precoPlano = Number(aluno.valorPlano) || 0;
-                areaPagamento.style.display = 'block';
-
-                if (precoPlano > 0) {
-                    document.getElementById('res-valor').innerText = `R$ ${precoPlano.toFixed(2)}`;
-                    const btnMP = document.getElementById('btn-gerar-mp');
-                    btnMP.style.display = 'block';
-                    btnMP.onclick = () => solicitarPixServidor(aluno, precoPlano);
-                } else {
-                    document.getElementById('res-valor').innerText = `Valor sob consulta`;
-                    document.getElementById('btn-gerar-mp').style.display = 'none';
-                }
-            }
-        }
-
-        async function solicitarPixServidor(aluno, valor) {
-            const btnMP = document.getElementById('btn-gerar-mp');
-            const caixaQR = document.getElementById('caixa-qr-code');
-
-            btnMP.innerText = "Conectando ao banco...";
-            btnMP.disabled = true;
-
-            try {
-                const resposta = await fetch('/api/gerar-pix', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        clienteId: aluno.id,
-                        nome: aluno.nome,
-                        valor: valor
-                    })
-                });
-
-                const dados = await resposta.json();
-
-                if (!resposta.ok) {
-                    throw new Error(dados.erro || 'Falha ao gerar Pix');
-                }
-
-                btnMP.style.display = 'none';
-                caixaQR.style.display = 'block';
-
-                document.getElementById('qr-pix-mp').src = `data:image/png;base64,${dados.qr_code_base64}`;
-                document.getElementById('pix-copia-cola-mp').value = dados.qr_code;
-
-                iniciarEscutaPagamento(aluno.id);
-
-            } catch (erro) {
-                console.error(erro);
-                btnMP.innerText = "Erro. Tentar novamente";
-                btnMP.disabled = false;
-                alert("Ocorreu um erro ao conectar com o banco. O dono do sistema precisa configurar as chaves do Mercado Pago.");
-            }
-        }
-
-        function iniciarEscutaPagamento(clienteId) {
-            listenerStatusPix = db.ref(`clientes/${clienteId}/statusMensalidade`);
-
-            listenerStatusPix.on('value', snap => {
-                const status = snap.val();
-                if (status === 'pago') {
-                    const audio = document.getElementById('audio-sucesso');
-                    if(audio) audio.play().catch(e => console.log(e));
-
-                    document.getElementById('area-pagamento').style.display = 'none';
-                    document.getElementById('res-status').style.display = 'none';
-                    document.getElementById('tela-sucesso-pagamento').style.display = 'block';
-                    lucide.createIcons();
-
-                    listenerStatusPix.off();
-                }
-            });
-        }
-
-        function copiarPixMP() {
-            const input = document.getElementById("pix-copia-cola-mp");
-            input.select();
-            document.execCommand("copy");
-
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "Copiado! ✅";
-            setTimeout(() => { btn.innerText = originalText; }, 2000);
-        }
-
-        // Fecha modal ao clicar no fundo / ESC
-        document.getElementById('modal-aluno').addEventListener('click', (e) => {
-            if (e.target.id === 'modal-aluno') fecharAreaAluno();
-        });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharAreaAluno(); });
     </script>
 </body>
 </html>
