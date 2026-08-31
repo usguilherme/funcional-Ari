@@ -135,12 +135,25 @@ export default async function handler(req, res) {
       }
     });
   } catch (err) {
+    // Stack completo no log da Vercel — inclui a causa original (OpenSSL,
+    // decodificação do base64, initializeApp) quando existir.
     console.error('Erro na consulta de aluno:', err && err.stack ? err.stack : err);
-    const ehConfig = /vari[aá]veis de ambiente|formato inv[aá]lido|inicializar|Firebase Admin/i.test((err && err.message) || '');
+    if (err && err.cause) {
+      console.error('  causa:', err.cause && err.cause.stack ? err.cause.stack : err.cause);
+    }
+
+    const ehConfig = /vari[aá]veis de ambiente|formato inv[aá]lido|inicializar|cabe[çc]alho PEM|Firebase Admin/i.test((err && err.message) || '');
+
+    // EXPOR_ERRO_CONFIG=true faz a API devolver o motivo exato no corpo da
+    // resposta (aparece no console do navegador). Use só para diagnosticar e
+    // depois volte para "false" — a mensagem pode conter detalhes internos.
+    const exporDetalhe = String(process.env.EXPOR_ERRO_CONFIG || '').toLowerCase() === 'true';
+
     return res.status(500).json({
       erro: ehConfig
         ? 'Consulta indisponível no momento (configuração do servidor). Fale com o estúdio.'
-        : 'Erro interno'
+        : 'Erro interno',
+      ...(exporDetalhe ? { detalhe: (err && err.message) || String(err) } : {})
     });
   }
 }
