@@ -163,7 +163,9 @@ export function getAdminDb() {
   const clientEmail = limparEnv(process.env.FIREBASE_CLIENT_EMAIL) || cred.clientEmail || '';
   const privateKey = cred.privateKey || '';
   const databaseURL = normalizarUrlBanco(process.env.FIREBASE_DATABASE_URL) || urlBancoPadrao(projectId);
-  console.log('[firebase-admin] databaseURL -> "' + databaseURL + '" (projeto: ' + projectId + ')');
+  const _hex = (x) => Buffer.from(String(x), 'utf8').toString('hex');
+  console.log('[firebase-admin] DBURL raw  len=' + String(process.env.FIREBASE_DATABASE_URL || '').length + ' hex=' + _hex(process.env.FIREBASE_DATABASE_URL || ''));
+  console.log('[firebase-admin] DBURL norm len=' + databaseURL.length + ' hex=' + _hex(databaseURL));
 
   const faltando = [];
   if (!projectId) faltando.push('FIREBASE_PROJECT_ID');
