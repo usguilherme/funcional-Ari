@@ -98,7 +98,18 @@ function resolverCredencial() {
     if (privateKey) {
       return { privateKey, clientEmail, projectId, origem: nome };
     }
-    console.error('[firebase-admin] ' + nome + ' foi encontrada mas não contém um bloco PEM utilizável.');
+    // Diagnóstico: o que exatamente veio nessa variável (sem vazar a chave).
+    const bruto = String(valor).trim();
+    let decodificado = bruto;
+    const d = tentarBase64(bruto);
+    if (d) decodificado = d.trim();
+    const impressao = (s) => s.length + ' chars; ini="' +
+      s.slice(0, 24).replace(/\s/g, '·') + '"; fim="' +
+      s.slice(-24).replace(/\s/g, '·') + '"; BEGIN=' + s.includes('BEGIN') +
+      '; ENDPK=' + s.includes('END PRIVATE KEY') + '; json=' + s.trimStart().startsWith('{');
+    console.error('[firebase-admin] ' + nome + ' não produziu um PEM utilizável.');
+    console.error('[firebase-admin]   bruto      -> ' + impressao(bruto));
+    if (decodificado !== bruto) console.error('[firebase-admin]   decodificado-> ' + impressao(decodificado));
   }
   return { privateKey: '', clientEmail: null, projectId: null, origem: null };
 }
