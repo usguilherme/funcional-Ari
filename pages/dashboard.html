@@ -1,80 +1,114 @@
-<div class="glass-panel mb-15" style="display: flex; flex-direction: column; gap: 15px; padding: 15px 25px;">
-    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-        <h3 class="text-gradient" style="margin:0;">Desempenho</h3>
-    </div>
-    
-    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; width: 100%;">
-        <span class="label-small" style="width: 100%;">Instrutor:</span>
-        <select id="dash-filtro-profissional" class="modern-input compact" style="flex: 1;" onchange="atualizarKPIs(); atualizarGraficos();">
-            <option value="">Todos os Instrutores</option>
-        </select>
-    </div>
-    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; width: 100%;">
-        <span class="label-small" style="width: 100%;">Período:</span>
-        <input type="date" id="dash-grafico-inicio" class="modern-input compact" style="flex: 1;" onchange="atualizarGraficos()">
-        <span class="text-muted">até</span>
-        <input type="date" id="dash-grafico-fim" class="modern-input compact" style="flex: 1;" onchange="atualizarGraficos()">
-    </div>
-    <div style="display: flex; gap: 10px; width: 100%;">
-        <button onclick="setPeriodoGrafico('hoje')" class="btn-small bg-purple" style="flex: 1;">Hoje</button>
-        <button onclick="setPeriodoGrafico('7dias')" class="btn-small bg-glass" style="flex: 1;">7 Dias</button>
-    </div>
-</div>
+<div class="dashboard-view">
 
-<div class="kpi-grid">
-    <div class="kpi-card glass-panel gradient-1">
-        <div class="icon-box"><i data-lucide="dollar-sign"></i></div>
-        <div>
-            <span>Faturamento (Período)</span>
-            <h3 id="dash-faturamento">R$ 0,00</h3>
-        </div>
-    </div>
-    <div class="kpi-card glass-panel">
-        <div class="icon-box"><i data-lucide="calendar-check"></i></div>
-        <div>
-            <span>Agendamentos</span>
-            <h3 id="dash-atendimentos">0</h3>
-        </div>
-    </div>
-    <div class="kpi-card glass-panel">
-        <div class="icon-box warning"><i data-lucide="hourglass"></i></div>
-        <div>
-            <span>Retornos Pendentes</span>
-            <h3 id="dash-retornos">0</h3>
-        </div>
-    </div>
-    <div class="kpi-card glass-panel">
-        <div class="icon-box info"><i data-lucide="award"></i></div>
-        <div>
-            <span>Pontos Distribúidos</span>
-            <h3 id="dash-pontos">0</h3>
-        </div>
-    </div>
-</div>
+    <!-- ============================================================
+         BARRA DE FILTROS / DESEMPENHO
+         ============================================================ -->
+    <section class="dash-toolbar glass-panel">
+        <div class="dash-toolbar__head">
+            <div class="dash-toolbar__title">
+                <span class="dash-ico"><i data-lucide="sliders-horizontal"></i></span>
+                <h3 class="text-gradient">Desempenho</h3>
+            </div>
 
-<div class="charts-grid">
-    <div class="chart-box glass-panel">
-        <h4>🔥 Planos Mais Realizados</h4>
-        <div class="canvas-wrapper"><canvas id="chartTopServicos"></canvas></div>
-    </div>
-    <div class="chart-box glass-panel">
-        <h4>📈 Faturamento no Período</h4>
-        <div class="canvas-wrapper"><canvas id="chartSemanal"></canvas></div>
-    </div>
-</div>
-
-<div class="glass-panel mt-15" id="card-aniversariantes" style="display:none; border: 1px solid rgba(245,158,11,0.4);">
-    <h3>🎂 Aniversariantes de Hoje</h3>
-    <div id="lista-aniversariantes-dashboard" class="simple-list mt-10"></div>
-</div>
-
-<div class="glass-panel mt-15" style="margin-bottom: 80px;">
-    <div class="table-header" style="flex-wrap: wrap;">
-        <h3><i data-lucide="history" style="width:16px"></i> Alunos para Retornar</h3>
-        <div class="filter-controls" style="margin-top: 10px; width: 100%; display: flex; gap: 10px;">
-            <input type="date" id="dash-filtro-data" class="modern-input compact" style="flex: 1;" onchange="filtrarRetornosDashboard()">
-            <button onclick="limparFiltroRetorno()" class="btn-small bg-glass">Todos</button>
+            <div class="dash-segment" role="group" aria-label="Período rápido">
+                <button type="button" class="dash-seg-btn"
+                    onclick="setPeriodoGrafico('hoje'); this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('is-active')); this.classList.add('is-active');">
+                    Hoje
+                </button>
+                <button type="button" class="dash-seg-btn is-active"
+                    onclick="setPeriodoGrafico('7dias'); this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('is-active')); this.classList.add('is-active');">
+                    7 dias
+                </button>
+            </div>
         </div>
-    </div>
-    <div id="lista-retornos-dashboard" class="simple-list mt-10"></div>
+
+        <div class="dash-filters">
+            <div class="dash-field">
+                <label class="label-small" for="dash-filtro-profissional">Instrutor</label>
+                <select id="dash-filtro-profissional" class="modern-input compact" onchange="atualizarKPIs(); atualizarGraficos();">
+                    <option value="">Todos os Instrutores</option>
+                </select>
+            </div>
+
+            <div class="dash-field dash-field--range">
+                <label class="label-small">Período personalizado</label>
+                <div class="dash-range">
+                    <input type="date" id="dash-grafico-inicio" class="modern-input compact" onchange="atualizarGraficos()">
+                    <span class="dash-range__sep">até</span>
+                    <input type="date" id="dash-grafico-fim" class="modern-input compact" onchange="atualizarGraficos()">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         KPIs
+         ============================================================ -->
+    <section class="kpi-grid">
+        <div class="kpi-card glass-panel gradient-1 kpi-card--accent">
+            <div class="icon-box"><i data-lucide="dollar-sign"></i></div>
+            <div>
+                <span>Faturamento (Período)</span>
+                <h3 id="dash-faturamento">R$ 0,00</h3>
+            </div>
+        </div>
+        <div class="kpi-card glass-panel">
+            <div class="icon-box"><i data-lucide="calendar-check"></i></div>
+            <div>
+                <span>Agendamentos</span>
+                <h3 id="dash-atendimentos">0</h3>
+            </div>
+        </div>
+        <div class="kpi-card glass-panel">
+            <div class="icon-box warning"><i data-lucide="hourglass"></i></div>
+            <div>
+                <span>Retornos Pendentes</span>
+                <h3 id="dash-retornos">0</h3>
+            </div>
+        </div>
+        <div class="kpi-card glass-panel">
+            <div class="icon-box info"><i data-lucide="award"></i></div>
+            <div>
+                <span>Pontos Distribuídos</span>
+                <h3 id="dash-pontos">0</h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         GRÁFICOS
+         ============================================================ -->
+    <section class="charts-grid">
+        <div class="chart-box glass-panel">
+            <h4><span class="dash-ico dash-ico--sm"><i data-lucide="flame"></i></span> Planos Mais Realizados</h4>
+            <div class="canvas-wrapper"><canvas id="chartTopServicos"></canvas></div>
+        </div>
+        <div class="chart-box glass-panel">
+            <h4><span class="dash-ico dash-ico--sm"><i data-lucide="trending-up"></i></span> Faturamento no Período</h4>
+            <div class="canvas-wrapper"><canvas id="chartSemanal"></canvas></div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         ANIVERSARIANTES
+         ============================================================ -->
+    <section class="glass-panel dash-panel dash-panel--birthday" id="card-aniversariantes" style="display:none;">
+        <h3><span class="dash-ico dash-ico--sm dash-ico--gold"><i data-lucide="cake"></i></span> Aniversariantes de Hoje</h3>
+        <div id="lista-aniversariantes-dashboard" class="simple-list"></div>
+    </section>
+
+    <!-- ============================================================
+         ALUNOS PARA RETORNAR
+         ============================================================ -->
+    <section class="glass-panel dash-panel dash-panel--last">
+        <div class="table-header dash-panel__header">
+            <h3><span class="dash-ico dash-ico--sm"><i data-lucide="history"></i></span> Alunos para Retornar</h3>
+            <div class="dash-returns-filter">
+                <input type="date" id="dash-filtro-data" class="modern-input compact" onchange="filtrarRetornosDashboard()">
+                <button type="button" onclick="limparFiltroRetorno()" class="btn-small bg-glass">Todos</button>
+            </div>
+        </div>
+        <div id="lista-retornos-dashboard" class="simple-list"></div>
+    </section>
+
 </div>

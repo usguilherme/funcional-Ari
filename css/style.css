@@ -491,3 +491,234 @@ html[data-theme="light"] .notification-badge { border-color: var(--surface-2); }
 }
 
 @keyframes piscar { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+/* =========================================
+   15. DASHBOARD — VISÃO GERAL (REFINO PREMIUM)
+   Escopo isolado em .dashboard-view — não afeta outras telas.
+   ========================================= */
+.dashboard-view {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 40px;
+    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Legibilidade: no dark, o cinza padrão (#666) some no fundo preto.
+   Sobe o contraste dos textos secundários só dentro do dashboard. */
+html:not([data-theme="light"]) .dashboard-view {
+    --text-muted: rgba(255, 255, 255, 0.60);
+}
+
+/* ---- Chip de ícone com acento ---- */
+.dashboard-view .dash-ico {
+    width: 34px; height: 34px; flex-shrink: 0;
+    border-radius: 11px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--primary-dim);
+    color: var(--primary);
+    border: 1px solid rgba(192, 57, 43, 0.22);
+    transition: all 0.3s ease;
+}
+.dashboard-view .dash-ico i { width: 17px; height: 17px; }
+.dashboard-view .dash-ico--sm { width: 28px; height: 28px; border-radius: 9px; }
+.dashboard-view .dash-ico--sm i { width: 15px; height: 15px; }
+.dashboard-view .dash-ico--gold {
+    background: rgba(230, 126, 34, 0.14);
+    color: var(--secondary);
+    border-color: rgba(230, 126, 34, 0.28);
+}
+
+/* ---- Barra de filtros / Desempenho ---- */
+.dashboard-view .dash-toolbar {
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.dashboard-view .dash-toolbar__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+.dashboard-view .dash-toolbar__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.dashboard-view .dash-toolbar__title h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+/* ---- Controle segmentado (Hoje / 7 dias) ---- */
+.dashboard-view .dash-segment {
+    display: inline-flex;
+    padding: 4px;
+    gap: 4px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+}
+.dashboard-view .dash-seg-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.01em;
+}
+.dashboard-view .dash-seg-btn:hover { color: var(--text-main); }
+.dashboard-view .dash-seg-btn.is-active {
+    background: linear-gradient(135deg, var(--r), var(--r2));
+    color: #fff;
+    box-shadow: 0 4px 14px -4px rgba(192, 57, 43, 0.5);
+}
+
+/* ---- Grade de campos ---- */
+.dashboard-view .dash-filters {
+    display: grid;
+    grid-template-columns: minmax(200px, 1fr) minmax(280px, 1.4fr);
+    gap: 16px;
+    align-items: end;
+}
+.dashboard-view .dash-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.dashboard-view .dash-field .label-small { margin: 0 0 0 2px; }
+.dashboard-view .dash-range {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.dashboard-view .dash-range .modern-input { margin-top: 0; flex: 1; min-width: 0; }
+.dashboard-view .dash-range__sep {
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+/* ---- Inputs compactos e alinhados ---- */
+.dashboard-view .modern-input.compact {
+    height: 44px;
+    margin-top: 0;
+    border-radius: 11px;
+    font-size: 13.5px;
+}
+.dashboard-view .modern-input.compact:hover:not(:focus) { border-color: var(--border-hover); }
+.dashboard-view input.modern-input.compact[type="date"] { padding-right: 12px; }
+html:not([data-theme="light"]) .dashboard-view input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.55;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+html:not([data-theme="light"]) .dashboard-view input[type="date"]:hover::-webkit-calendar-picker-indicator { opacity: 0.9; }
+
+/* ---- KPIs ---- */
+.dashboard-view .kpi-grid { margin-bottom: 0; gap: 18px; }
+.dashboard-view .kpi-card {
+    padding: 22px 24px;
+    border-radius: 20px;
+    gap: 18px;
+}
+.dashboard-view .kpi-card span {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+}
+.dashboard-view .kpi-card h3 { font-size: 26px; margin-top: 2px; }
+.dashboard-view .kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.55);
+}
+.dashboard-view .kpi-card .icon-box { border-radius: 13px; }
+
+/* Cartão de destaque (Faturamento): faixa de acento no topo */
+.dashboard-view .kpi-card--accent { border-color: rgba(192, 57, 43, 0.28); }
+.dashboard-view .kpi-card--accent::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--r), var(--gold));
+}
+.dashboard-view .kpi-card--accent .icon-box {
+    background: var(--primary-dim);
+    color: var(--primary);
+    border-color: rgba(192, 57, 43, 0.25);
+}
+
+/* ---- Gráficos ---- */
+.dashboard-view .charts-grid { margin-bottom: 0; gap: 18px; }
+.dashboard-view .chart-box { padding: 22px 24px; border-radius: 20px; }
+.dashboard-view .chart-box h4 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+/* ---- Painéis inferiores ---- */
+.dashboard-view .dash-panel { border-radius: 20px; padding: 22px 24px; }
+.dashboard-view .dash-panel h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+.dashboard-view .dash-panel--birthday { border: 1px solid rgba(230, 126, 34, 0.35); }
+.dashboard-view .dash-panel--last { margin-bottom: 24px; }
+.dashboard-view .dash-panel__header {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+.dashboard-view .dash-returns-filter {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
+}
+.dashboard-view .dash-returns-filter .modern-input.compact { flex: 1; }
+.dashboard-view .dash-returns-filter .btn-small { margin: 0; height: 44px; padding: 0 18px; border-radius: 11px; }
+
+/* ---- Lista simples (retornos / aniversariantes) ---- */
+.dashboard-view .simple-list {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+}
+.dashboard-view .simple-list > div {
+    border-radius: 12px;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+.dashboard-view .simple-list > div:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+html[data-theme="light"] .dashboard-view .simple-list > div:hover { background: rgba(20, 24, 38, 0.04); }
+.dashboard-view .simple-list > div:last-child { border-bottom: none !important; }
+
+@media (max-width: 900px) {
+    .dashboard-view .dash-filters { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+    .dashboard-view { gap: 16px; }
+    .dashboard-view .dash-toolbar { padding: 18px; }
+    .dashboard-view .dash-toolbar__head { flex-direction: column; align-items: stretch; }
+    .dashboard-view .dash-segment { width: 100%; }
+    .dashboard-view .dash-seg-btn { flex: 1; }
+    .dashboard-view .dash-range { flex-wrap: wrap; }
+    .dashboard-view .dash-range .modern-input { flex: 1 1 40%; }
+}
