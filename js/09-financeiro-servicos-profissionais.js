@@ -84,9 +84,14 @@
             cancelarEdicaoServico();
         } catch (erro) {
             console.error("Erro ao salvar plano:", erro);
+            alert("Não foi possível salvar o plano.\n\n" + ((erro && erro.message) ? erro.message : "Verifique sua conexão e tente novamente."));
             dispararToast("Erro ao salvar o plano.", "error");
         } finally {
-            if (btn) { btn.disabled = false; if (btn.innerText === "ENVIANDO..." || btn.innerText === "SALVANDO...") btn.innerText = textoBtn || "Salvar"; }
+            // Destrava o botão SEMPRE.
+            if (btn) {
+                btn.disabled = false;
+                if (btn.innerText === "ENVIANDO..." || btn.innerText === "SALVANDO...") btn.innerText = textoBtn || "Salvar";
+            }
         }
     }
 

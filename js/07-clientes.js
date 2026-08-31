@@ -273,6 +273,7 @@
             if (fotoInput) fotoInput.value = "";
         } catch (erro) {
             console.error("Erro ao salvar aluno:", erro);
+            alert("Não foi possível salvar o aluno.\n\n" + ((erro && erro.message) ? erro.message : "Verifique sua conexão e tente novamente."));
             dispararToast("Erro ao salvar o aluno. Tente novamente.", "error");
         } finally {
             if (btn) { btn.disabled = false; btn.innerText = textoBtn || "SALVAR ALUNO"; }
@@ -384,6 +385,7 @@
             abrirModalAnamnese(clienteAnamneseAtual.id); // Reload
         } catch (erro) {
             console.error("Erro ao salvar foto:", erro);
+            alert("Não foi possível salvar a foto.\n\n" + ((erro && erro.message) ? erro.message : "Verifique sua conexão e tente novamente."));
             dispararToast("Erro ao enviar a foto.", "error");
         } finally {
             if (btn) { btn.disabled = false; btn.innerText = textoBtn || "SALVAR FOTO"; }

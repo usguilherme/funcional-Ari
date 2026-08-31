@@ -17,9 +17,10 @@
 
     const db = firebase.database();
     const auth = firebase.auth();
-    // Storage é usado para guardar as imagens (fotos de alunos, galeria e vitrine)
-    // fora do Realtime Database, evitando inchar o banco e o tráfego dos listeners.
-    const storage = (typeof firebase.storage === 'function') ? firebase.storage() : null;
+    // NÃO usamos Firebase Storage. O upload direto do navegador esbarra em CORS
+    // no bucket e trava o cadastro em "Comprimindo e salvando...". Todas as
+    // imagens são comprimidas aqui no cliente e salvas como string base64
+    // (data URL) direto no Realtime Database — ver uploadImagem() abaixo.
 
     let configSistema = {
         chavePix: "",
@@ -116,25 +117,51 @@
     }
 
     // Comprime uma imagem no canvas e devolve um Blob JPEG leve.
+    // Reduz qualidade/tamanho progressivamente até caber em ~180 KB, para a
+    // string base64 resultante (~33% maior) não inchar o Realtime Database.
     function comprimirImagem(file, larguraMax = 800, qualidade = 0.7) {
         return new Promise((resolve, reject) => {
             if (!file) return resolve(null);
+            if (!/^image\//.test(file.type || "")) {
+                return reject(new Error("O arquivo selecionado não é uma imagem."));
+            }
             const reader = new FileReader();
             reader.onerror = () => reject(new Error("Falha ao ler o arquivo"));
             reader.onload = (e) => {
                 const img = new Image();
                 img.onerror = () => reject(new Error("Arquivo de imagem inválido"));
                 img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const escala = img.width > larguraMax ? larguraMax / img.width : 1;
-                    canvas.width = Math.round(img.width * escala);
-                    canvas.height = Math.round(img.height * escala);
-                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                    canvas.toBlob(
-                        (blob) => blob ? resolve(blob) : reject(new Error("Falha ao compactar imagem")),
-                        'image/jpeg',
-                        qualidade
-                    );
+                    const gerarBlob = (largura, q) => new Promise((res, rej) => {
+                        const canvas = document.createElement('canvas');
+                        const escala = img.width > largura ? largura / img.width : 1;
+                        canvas.width = Math.max(1, Math.round(img.width * escala));
+                        canvas.height = Math.max(1, Math.round(img.height * escala));
+                        const ctx = canvas.getContext('2d');
+                        // Fundo branco: JPEG não tem transparência (evita PNGs "pretos").
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob(
+                            (blob) => blob ? res(blob) : rej(new Error("Falha ao compactar imagem")),
+                            'image/jpeg',
+                            q
+                        );
+                    });
+
+                    (async () => {
+                        const ALVO_BYTES = 180 * 1024;
+                        let largura = larguraMax;
+                        let q = qualidade;
+                        let blob = await gerarBlob(largura, q);
+                        let tentativas = 0;
+                        while (blob.size > ALVO_BYTES && tentativas < 7) {
+                            tentativas++;
+                            if (q > 0.45) q -= 0.12;
+                            else largura = Math.round(largura * 0.82);
+                            blob = await gerarBlob(largura, q);
+                        }
+                        resolve(blob);
+                    })().catch(reject);
                 };
                 img.src = e.target.result;
             };
@@ -142,25 +169,41 @@
         });
     }
 
-    // Faz upload da imagem para o Firebase Storage e devolve a URL pública.
-    // Se o Storage não estiver disponível (SDK não carregado), cai para dataURL
-    // como último recurso para não travar o cadastro.
+    function blobParaDataURL(blob) {
+        return new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onerror = () => reject(new Error("Falha ao converter a imagem"));
+            r.onloadend = () => resolve(r.result);
+            r.readAsDataURL(blob);
+        });
+    }
+
+    // Comprime a imagem no navegador e devolve uma string base64 (data URL),
+    // que é salva DIRETO no Realtime Database. Não há upload para servidor.
+    // O parâmetro `pasta` é mantido só por compatibilidade de assinatura.
     async function uploadImagem(file, pasta, larguraMax = 800, qualidade = 0.7) {
-        const blob = await comprimirImagem(file, larguraMax, qualidade);
-        if (!blob) return null;
+        const processar = (async () => {
+            const blob = await comprimirImagem(file, larguraMax, qualidade);
+            if (!blob) return null;
+            const dataUrl = await blobParaDataURL(blob);
+            // Trava final: data URLs gigantes incham o banco e os listeners.
+            if (dataUrl && dataUrl.length > 950000) {
+                throw new Error("Imagem muito pesada mesmo após compressão. Escolha uma foto menor.");
+            }
+            return dataUrl;
+        })();
 
-        if (!storage) {
-            return await new Promise((resolve) => {
-                const r = new FileReader();
-                r.onloadend = () => resolve(r.result);
-                r.readAsDataURL(blob);
-            });
+        // Nunca deixa o botão preso: se algo travar, rejeita em 20s.
+        let timer;
+        const timeout = new Promise((_, rej) => {
+            timer = setTimeout(() => rej(new Error("Tempo esgotado ao processar a imagem.")), 20000);
+        });
+        processar.catch(() => {}); // evita "unhandled rejection" se o timeout vencer
+        try {
+            return await Promise.race([processar, timeout]);
+        } finally {
+            clearTimeout(timer);
         }
-
-        const caminho = `${pasta}/${novoId()}.jpg`;
-        const ref = storage.ref().child(caminho);
-        await ref.put(blob, { contentType: 'image/jpeg' });
-        return await ref.getDownloadURL();
     }
 
     // ==========================================

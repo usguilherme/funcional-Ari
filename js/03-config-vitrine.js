@@ -31,9 +31,12 @@
     // VITRINE / LANDING PAGE PÚBLICA
     // ==========================================
     
-    // As imagens da vitrine vão para o Firebase Storage (helper uploadImagem em
-    // 01-config-firebase-estado.js). O landingConfig guarda só a URL.
-    const enviarImagemVitrine = (file) => uploadImagem(file, 'vitrine', 1200, 0.72);
+    // As imagens da vitrine são comprimidas no navegador e guardadas como
+    // string base64 no próprio landingConfig (helper uploadImagem em
+    // 01-config-firebase-estado.js). Não há upload para o Firebase Storage.
+    // Largura menor aqui porque o landingConfig é público e recarregado a
+    // cada visita da vitrine — segura o tamanho do payload.
+    const enviarImagemVitrine = (file) => uploadImagem(file, 'vitrine', 1000, 0.7);
 
     function preencherFormularioLanding() {
         if(!document.getElementById("landing-titulo")) return; // Aborta se a página não estiver montada
@@ -116,10 +119,13 @@
             dispararToast("🌐 Vitrine atualizada com sucesso!");
         } catch (error) {
             console.error(error);
+            const msg = (error && error.message) ? error.message : "Verifique sua conexão e tente novamente.";
+            alert("Não foi possível salvar a vitrine.\n\n" + msg);
             dispararToast("Erro ao salvar vitrine", "error");
         } finally {
-            btn.innerText = txtOriginal;
+            // Destrava o botão SEMPRE, mesmo se algo acima falhar.
             btn.disabled = false;
+            btn.innerText = txtOriginal || "SALVAR VITRINE";
         }
     }
 
