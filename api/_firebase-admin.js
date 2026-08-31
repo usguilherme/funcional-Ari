@@ -118,6 +118,24 @@ function urlBancoPadrao(projectId) {
   return projectId ? `https://${projectId}-default-rtdb.firebaseio.com` : '';
 }
 
+// Limpa a FIREBASE_DATABASE_URL: aspas, espaços/\n colados, barra final e
+// qualquer path/query (o Admin SDK quer só protocolo + host, senão dá
+// "Invalid Firebase Database URL ... path can't contain ...").
+function normalizarUrlBanco(u) {
+  if (!u) return '';
+  let s = String(u).trim()
+    .replace(/^["']|["']$/g, '')
+    .replace(/\\r|\\n/g, '')
+    .replace(/\s+/g, '')
+    .trim();
+  if (s && !/^https?:\/\//i.test(s)) s = 'https://' + s;
+  try {
+    return new URL(s).origin;
+  } catch {
+    return s.replace(/\/+$/, '');
+  }
+}
+
 export function getAdminDb() {
   if (dbInstance) return dbInstance;
 
@@ -132,7 +150,8 @@ export function getAdminDb() {
   const projectId = process.env.FIREBASE_PROJECT_ID || cred.projectId || '';
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || cred.clientEmail || '';
   const privateKey = cred.privateKey || '';
-  const databaseURL = process.env.FIREBASE_DATABASE_URL || urlBancoPadrao(projectId);
+  const databaseURL = normalizarUrlBanco(process.env.FIREBASE_DATABASE_URL) || urlBancoPadrao(projectId);
+  console.log('[firebase-admin] databaseURL bruta="' + JSON.stringify(process.env.FIREBASE_DATABASE_URL || '') + '" -> "' + databaseURL + '"');
 
   const faltando = [];
   if (!projectId) faltando.push('FIREBASE_PROJECT_ID');
@@ -165,6 +184,12 @@ export function getAdminDb() {
     }
   }
 
-  dbInstance = getDatabase();
+  try {
+    // URL explícita — não depende do que ficou salvo no app.
+    dbInstance = databaseURL ? getDatabase(getApps()[0], databaseURL) : getDatabase();
+  } catch (err) {
+    console.error('[firebase-admin] Falha em getDatabase (url="' + databaseURL + '"):', err && err.stack ? err.stack : err);
+    throw new Error('Firebase Admin: URL do Realtime Database inválida (' + (err && err.message ? err.message : err) + ')', { cause: err });
+  }
   return dbInstance;
 }
