@@ -242,7 +242,7 @@
             <div class="form-header">
                 <span class="selo-marca">Reserva Online</span>
                 <h2>Agendar Aula</h2>
-                <p>Preencha os dados e fale conosco pelo WhatsApp para agendar seu treino.</p>
+                <p>Preencha seus dados e a gente confirma sua aula experimental gratuita pelo WhatsApp.</p>
             </div>
 
             <div>
@@ -260,13 +260,6 @@
                     <label class="label-small"><i data-lucide="user-cog"></i> Instrutor Preferido</label>
                     <select id="pub-profissional" class="modern-input">
                         <option value="">Qualquer instrutor disponível</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="label-small"><i data-lucide="dumbbell"></i> Escolha o Plano/Treino</label>
-                    <select id="pub-servico" class="modern-input">
-                        <option value="">Carregando planos...</option>
                     </select>
                 </div>
 
@@ -317,8 +310,6 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let todosServicosGlobais = [];
-
         // ===== REGRA DE AGENDAMENTO: só Seg (1), Qua (3) e Sex (5), sempre 19:20 =====
         const DIAS_PERMITIDOS = [1, 3, 5];
         const HORARIO_FIXO = "19:20";
@@ -336,30 +327,10 @@
             if (inp) inp.min = new Date().toISOString().split("T")[0];
         })();
 
-        // Planos de teste/amostra não podem aparecer para o aluno — só valem
-        // para uso interno / cadastros administrativos. Identificamos por nome
-        // ("TESTE", "amostra", "experimental"...) ou por valor simbólico (< R$ 1).
-        function ehPlanoDeTeste(s) {
-            const nome = String(s && s.nome ? s.nome : '').toLowerCase().trim();
-            if (!nome) return true;
-            const termos = ['teste', 'amostra', 'experiment', 'exemplo', 'sample', 'demo', 'homolog', 'rascunho', 'nao usar', 'não usar'];
-            if (termos.some(t => nome.includes(t))) return true;
-            const preco = parseFloat(s && s.preco) || 0;
-            if (preco > 0 && preco < 1) return true; // R$ 0,01 e afins
-            return false;
-        }
+        // A aula é experimental e gratuita ("sua primeira aula é por nossa conta"),
+        // então o aluno não escolhe plano nenhum aqui.
 
-        // 1. Carrega os Serviços/Planos do Banco de Dados (só planos comerciais)
-        db.ref('servicos').once('value').then(snap => {
-            const servicosObj = snap.val() ? snap.val() : {};
-            todosServicosGlobais = Object.values(servicosObj)
-                .filter(s => s && s.nome && !ehPlanoDeTeste(s))
-                .sort((a, b) => a.nome.localeCompare(b.nome));
-
-            renderizarServicos();
-        }).catch(err => console.error("Erro ao carregar serviços:", err));
-
-        // 2. Carrega os Instrutores (lista pública { id: nome }, mantida pelo painel)
+        // Carrega os Instrutores (lista pública { id: nome }, mantida pelo painel)
         db.ref('profissionais_publicos').once('value').then(snap => {
             const mapa = snap.val() || {};
             const profissionais = Object.keys(mapa)
@@ -377,30 +348,6 @@
             return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
         function escAttr(v) { return escHtml(v); }
-
-        // ===== FUNÇÃO QUE MONTA A CAIXA DE PLANOS =====
-        function renderizarServicos() {
-            const sel = document.getElementById("pub-servico");
-
-            if (todosServicosGlobais.length === 0) {
-                sel.innerHTML = '<option value="">Nenhum plano disponível no momento</option>';
-                return;
-            }
-
-            let htmlBase = '<option value="">Selecione o plano...</option>';
-            let htmlPlanos = '<optgroup label="🏋️ Planos e Aulas">';
-
-            todosServicosGlobais.forEach(s => {
-                const precoNum = parseFloat(s.preco) || 0;
-                const precoFormatado = precoNum > 0 ? `R$ ${precoNum.toFixed(2)}` : 'Valor sob avaliação';
-                htmlPlanos += `<option value="${escAttr(s.nome)}" data-preco="${escAttr(precoNum)}">${escHtml(s.nome)} - ${precoFormatado}</option>`;
-            });
-
-            htmlPlanos += '</optgroup>';
-            htmlBase += htmlPlanos;
-
-            sel.innerHTML = htmlBase;
-        }
 
         // ===== EVENTOS DE MUDANÇA NA TELA =====
         let horariosOcupadosCache = [];
@@ -472,12 +419,6 @@
             const nome = document.getElementById("pub-nome").value.trim();
             const tel = document.getElementById("pub-tel").value.trim();
 
-            const servicoSelect = document.getElementById("pub-servico");
-            const opcaoSelecionada = servicoSelect.options[servicoSelect.selectedIndex];
-
-            const servicoNome = servicoSelect.value;
-            const precoServico = parseFloat(opcaoSelecionada?.getAttribute('data-preco')) || 0;
-
             const profSelect = document.getElementById("pub-profissional");
             const profId = profSelect.value;
             const profNome = profSelect.options[profSelect.selectedIndex]?.getAttribute('data-nome') || "Qualquer Instrutor";
@@ -485,7 +426,7 @@
             const data = document.getElementById("pub-data").value;
             const hora = HORARIO_FIXO; // horário travado para todas as turmas experimentais
 
-            if(!nome || !tel || !servicoNome || !data) {
+            if(!nome || !tel || !data) {
                 alert("Por favor, preencha todos os campos obrigatórios!");
                 return;
             }
@@ -507,11 +448,11 @@
                 hora: hora,
                 nomeCliente: nome.slice(0, 120),
                 telefoneCliente: tel.slice(0, 30),
-                servicoNome: (servicoNome || '').slice(0, 120),
+                servicoNome: "Aula experimental gratuita",
                 profissionalId: profId ? String(profId) : null,
                 profissionalNome: (profNome || 'Qualquer Instrutor').slice(0, 120),
-                valor: precoServico,
-                obs: "Agendado pelo site — aguardando confirmação",
+                valor: 0,
+                obs: "Agendado pelo site — aula experimental gratuita, aguardando confirmação",
                 criadoEm: Date.now()
             };
 
@@ -534,8 +475,7 @@
                         numeroWhats = numeroWhats.replace(/\D/g, '');
                         if(!numeroWhats.startsWith('55')) numeroWhats = '55' + numeroWhats;
 
-                        const precoFormatado = precoServico > 0 ? `R$ ${precoServico.toFixed(2)}` : 'A combinar/Avaliação';
-                        const msg = `Olá! Meu nome é ${nome}.\n\nQuero confirmar o agendamento da minha aula:\n🏋️ *Plano:* ${servicoNome}\n🧑‍🏫 *Instrutor:* ${profNome}\n📅 *Data:* ${dataFormatada}\n⏰ *Horário:* ${hora}\n💰 *Valor:* ${precoFormatado}`;
+                        const msg = `Olá! Meu nome é ${nome}.\n\nQuero confirmar o agendamento da minha *aula experimental gratuita*:\n🧑‍🏫 *Instrutor:* ${profNome}\n📅 *Data:* ${dataFormatada}\n⏰ *Horário:* ${hora}`;
 
                         alert("🎉 Horário reservado no sistema! Vamos te direcionar para o nosso WhatsApp para finalizar.");
                         window.location.href = `https://wa.me/${numeroWhats}?text=${encodeURIComponent(msg)}`;
