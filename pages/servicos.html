@@ -2,7 +2,7 @@
     <input type="hidden" id="id-servico-edicao">
     
     <div class="mobile-stack" style="display:flex; gap:10px; width:100%;">
-        <input type="text" id="serv-nome" placeholder="Nome do Plano/Treino" class="modern-input" style="flex:2;">
+        <input type="text" id="serv-nome" placeholder="Nome do Plano/Treino" class="modern-input" style="flex:2;" aria-label="Nome do Plano/Treino">
         
         <!-- Caixinha de Categoria -->
         <select id="serv-categoria" class="modern-input" style="flex:1.2;">
@@ -10,16 +10,16 @@
             <option value="manicure">🥊 Treino em Grupo</option>
         </select>
         
-        <input type="number" id="serv-preco" placeholder="Valor (R$)" class="modern-input" style="flex:1;">
+        <input type="number" id="serv-preco" placeholder="Valor (R$)" class="modern-input" style="flex:1;" aria-label="Valor (R$)">
     </div>
 
     <div class="mt-10">
-        <textarea id="serv-descricao" placeholder="Descrição curta (aparece na página de agendamento e no site, ex: 'Aula funcional de alta intensidade em grupo')" class="modern-input" rows="2" style="resize:vertical;"></textarea>
+        <textarea id="serv-descricao" placeholder="Descrição curta (aparece na página de agendamento e no site, ex: 'Aula funcional de alta intensidade em grupo')" class="modern-input" rows="2" style="resize:vertical;" aria-label="Descrição curta (aparece na página de agendamento e no site, ex: 'Aula funcional de alta intensidade em grupo')"></textarea>
     </div>
 
     <div class="mt-10" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
         <div style="flex:1; min-width:200px;">
-            <label class="label-small">Foto do plano (opcional)</label>
+            <label class="label-small" for="serv-foto">Foto do plano (opcional)</label>
             <input type="file" id="serv-foto" accept="image/*" class="modern-input">
         </div>
         <label style="display:flex; align-items:center; gap:8px; font-size:13px; white-space:nowrap; padding-top:18px;">

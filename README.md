@@ -136,6 +136,14 @@ Os campos "Horários das aulas" e "Recado para os alunos" ficam na aba
   do YouTube (>1 MB) só entra no clique — economia grande de dados/LCP.
 - **PWA:** manifests com `id`, `description`, `categories` e ícone `maskable`
   (`assets/icon-maskable-512.png`).
+- **Captura global de erro** (`js/00-utils.js`): `window.onerror` +
+  `unhandledrejection` → aviso discreto ao usuário + beacon para `api/log.js`
+  (aparece em `vercel logs`). Erro de JS não é mais silencioso.
+- **Janela de histórico do painel:** `atendimentos` / `despesas` carregam **18
+  meses** (`MESES_HISTORICO` em `js/02-tema-init-auth.js`) em vez de 24. Aumente
+  a constante se um relatório precisar de mais fundo.
+- **Acessibilidade:** `<label for>` / `aria-label` nos formulários do painel
+  (`index.html` + `pages/*.html`).
 
 ### Pendências (exigem conta/serviço externo ou refatoração maior)
 

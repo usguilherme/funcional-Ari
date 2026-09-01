@@ -350,11 +350,14 @@
             if (typeof renderTabelaAvaliacoes === 'function') renderTabelaAvaliacoes();
         });
 
-        // Janela de dados: em vez de um número fixo de registros (que fazia
-        // relatórios ficarem silenciosamente incompletos), carregamos tudo a
-        // partir de ~24 meses atrás — cobre qualquer relatório real e continua
-        // limitado. Requer índice em "timestamp" (ver database.rules.json).
-        const CORTE_HISTORICO_MS = Date.now() - 1000 * 60 * 60 * 24 * 730;
+        // Janela de dados: carrega `atendimentos` e `despesas` a partir de N
+        // meses atrás (em vez de um número fixo de registros, que deixava
+        // relatório incompleto em silêncio). O painel puxa isso inteiro a cada
+        // abertura — 18 meses cobre o operacional (mês corrente, mês anterior,
+        // comparativos) e mantém o payload leve. Aumente aqui se algum relatório
+        // precisar de mais fundo. Requer índice em "timestamp" (database.rules.json).
+        const MESES_HISTORICO = 18;
+        const CORTE_HISTORICO_MS = Date.now() - 1000 * 60 * 60 * 24 * 30 * MESES_HISTORICO;
 
         db.ref('atendimentos').orderByChild('timestamp').startAt(CORTE_HISTORICO_MS).on('value', snap => {
             store.atendimentos = snap.val() ? Object.values(snap.val()) : [];
