@@ -48,6 +48,7 @@
         // NOVO: preenche o formulário da vitrine ao abrir essa aba
         if (idAba === 'landing') {
             setTimeout(preencherFormularioLanding, 250);
+            if (typeof renderListaEventosVitrine === 'function') setTimeout(renderListaEventosVitrine, 250);
         }
 
         // Hooks por aba (antes eram feitos monkey-patchando window.abrirAba

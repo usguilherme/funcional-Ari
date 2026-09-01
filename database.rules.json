@@ -55,6 +55,12 @@
       ".write": "auth != null"
     },
 
+    "vitrine_eventos": {
+      ".read": true,
+      ".write": "auth != null",
+      ".indexOn": ["dataISO"]
+    },
+
     "profissionais": {
       ".read": "auth != null",
       ".write": "auth != null"

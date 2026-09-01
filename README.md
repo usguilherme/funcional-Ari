@@ -35,7 +35,8 @@ firebase deploy --only database,storage
 ```
 
 `database.rules.json` fecha o banco: só usuário autenticado lê/escreve os dados
-internos. São públicos apenas: `servicos`, `landingConfig`, `profissionais_publicos`
+internos. São públicos apenas: `servicos`, `landingConfig`, `vitrine_eventos`
+(aulões/eventos exibidos na vitrine), `profissionais_publicos`
 (espelho `{id:nome}` mantido pelo painel), `disponibilidade` (só horários) e o
 campo `clientes/$id/statusMensalidade` (usado pela Área do Aluno). Agendamentos do
 site entram em `agendamentos_publicos` (o visitante só cria; o painel confirma).

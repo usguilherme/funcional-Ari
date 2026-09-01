@@ -119,4 +119,50 @@
         <p style="margin:0; font-size:13px; color:var(--text-muted);">Marque "Destacar no site" na edição de cada plano (aba Planos/Treinos) para que ele apareça com evidência na vitrine. Foto e descrição também são editados por lá.</p>
         <button onclick="abrirAba('servicos')" class="btn-small mt-10" style="margin-top: 15px;">Ir para Planos/Treinos</button>
     </div>
+
+    <!-- ===== AULÕES / EVENTOS ESPECIAIS ===== -->
+    <div id="config-eventos" class="glass-panel" style="margin-top:20px; padding:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:10px; flex-wrap:wrap;">
+            <h4 style="margin:0; color:var(--primary); display:flex; align-items:center; gap:8px;"><i data-lucide="calendar-heart" style="width:18px;"></i> Aulões / Eventos Especiais</h4>
+        </div>
+        <p style="margin:0 0 20px 0; font-size:13px; color:var(--text-muted);">Cadastre aulões e eventos que aparecerão na seção "Nossos Aulões" da vitrine pública. Se não houver nenhum, a seção some do site.</p>
+
+        <div class="grid-2 mobile-stack">
+            <div>
+                <label class="label-small">Título do Aulão *</label>
+                <input type="text" id="evt-titulo" class="modern-input" placeholder="Ex: Aulão de Carnaval">
+            </div>
+            <div>
+                <label class="label-small">Data / Dia *</label>
+                <input type="date" id="evt-data" class="modern-input">
+            </div>
+        </div>
+
+        <div class="mt-10">
+            <label class="label-small">Descrição curta *</label>
+            <input type="text" id="evt-descricao" class="modern-input" placeholder="Ex: Treino temático aberto a convidados, das 9h às 11h.">
+        </div>
+
+        <div class="grid-2 mobile-stack mt-10">
+            <div>
+                <label class="label-small">Foto (upload) *</label>
+                <input type="file" id="evt-foto" accept="image/*" class="modern-input">
+            </div>
+            <div>
+                <label class="label-small">...ou URL da imagem</label>
+                <input type="url" id="evt-foto-url" class="modern-input" placeholder="https://...">
+            </div>
+        </div>
+        <div id="evt-foto-preview" style="margin-top:10px;"></div>
+
+        <div style="display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;">
+            <button id="btn-salvar-evento" class="btn-glow" onclick="salvarEventoVitrine()" style="flex:1; min-width:180px;">SALVAR AULÃO</button>
+            <button id="btn-cancelar-evento" class="btn-small bg-purple" onclick="cancelarEdicaoEvento()" style="display:none;">Cancelar edição</button>
+        </div>
+
+        <div class="divider" style="margin:24px 0; border-top:1px solid rgba(255,255,255,0.05);"></div>
+        <div id="lista-eventos-cad">
+            <p style="font-size:13px; color:var(--text-muted);">Nenhum aulão cadastrado ainda.</p>
+        </div>
+    </div>
 </div>

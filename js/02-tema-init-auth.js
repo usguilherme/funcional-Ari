@@ -288,6 +288,12 @@
             landingConfig = snap.val() || {};
             preencherFormularioLanding();
         });
+
+        // NOVO: AULÕES / EVENTOS ESPECIAIS DA VITRINE
+        db.ref('vitrine_eventos').on('value', snap => {
+            eventosVitrine = snap.val() ? Object.values(snap.val()) : [];
+            if (typeof renderListaEventosVitrine === 'function') renderListaEventosVitrine();
+        });
         
         db.ref('servicos').on('value', snap => {
             store.servicos = snap.val() ? Object.values(snap.val()) : [];

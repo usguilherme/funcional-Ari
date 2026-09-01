@@ -129,6 +129,161 @@
         }
     }
 
-    
+    // ==========================================
+    // AULÕES / EVENTOS ESPECIAIS DA VITRINE
+    // ==========================================
+    // Salvos em vitrine_eventos/{id}. É um nó público (lido direto pela
+    // vitrine.html), então as imagens seguem o mesmo padrão do resto da vitrine:
+    // comprimidas no navegador e guardadas como data URL. O admin também pode
+    // colar uma URL de imagem pronta em vez de subir um arquivo.
+    let eventosVitrine = [];
+    let idEventoVitrineEdicao = null;
+
+    function formatarDataEvento(iso) {
+        if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || "";
+        const [a, m, d] = iso.split('-').map(Number);
+        const dt = new Date(a, m - 1, d);
+        const txt = dt.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+        return txt.charAt(0).toUpperCase() + txt.slice(1);
+    }
+
+    function fonteImagemEvento(foto) {
+        const s = String(foto || "").trim();
+        if (!s) return "";
+        return s.startsWith('data:') ? s : encodeURI(s);
+    }
+
+    function renderListaEventosVitrine() {
+        const div = document.getElementById("lista-eventos-cad");
+        if (!div) return;
+
+        const lista = [...eventosVitrine].sort((x, y) =>
+            String(x.dataISO || "").localeCompare(String(y.dataISO || "")));
+
+        if (!lista.length) {
+            div.innerHTML = `<p style="font-size:13px; color:var(--text-muted);">Nenhum aulão cadastrado ainda.</p>`;
+            return;
+        }
+
+        div.innerHTML = lista.map(e => `<div class="glass-panel" style="padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:10px;">
+            <div style="display:flex; gap:12px; align-items:center; flex:1; min-width:0;">
+                ${e.foto ? `<img src="${fonteImagemEvento(e.foto)}" alt="" style="width:50px; height:50px; object-fit:cover; border-radius:8px; flex-shrink:0;">` : ''}
+                <div style="min-width:0;">
+                    <strong>${escapeHtml(e.titulo)}</strong><br>
+                    <span class="text-gradient">${escapeHtml(formatarDataEvento(e.dataISO))}</span>
+                    ${e.descricao ? `<br><small class="text-muted" style="display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:240px;">${escapeHtml(e.descricao)}</small>` : ''}
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; flex-shrink:0;">
+                <button class="btn-small bg-yellow" onclick="prepararEdicaoEvento('${escapeAttr(e.id)}')" title="Editar"><i data-lucide="pencil" style="width:14px"></i></button>
+                <button class="btn-small bg-purple" onclick="excluirEventoVitrine('${escapeAttr(e.id)}')" title="Excluir"><i data-lucide="trash-2" style="width:14px"></i></button>
+            </div>
+        </div>`).join("");
+
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function excluirEventoVitrine(id) {
+        if (!confirm("Excluir este aulão da vitrine?")) return;
+        db.ref(`vitrine_eventos/${id}`).remove()
+            .then(() => dispararToast("Aulão excluído."))
+            .catch(err => dispararToast("Erro ao excluir: " + err.message, "error"));
+    }
+
+    function prepararEdicaoEvento(id) {
+        const e = eventosVitrine.find(x => String(x.id) === String(id));
+        if (!e) return;
+
+        document.getElementById("evt-titulo").value = e.titulo || "";
+        document.getElementById("evt-data").value = e.dataISO || "";
+        document.getElementById("evt-descricao").value = e.descricao || "";
+        document.getElementById("evt-foto").value = "";
+        document.getElementById("evt-foto-url").value = (e.foto && !String(e.foto).startsWith('data:')) ? e.foto : "";
+
+        const preview = document.getElementById("evt-foto-preview");
+        if (preview) preview.innerHTML = e.foto
+            ? `<img src="${fonteImagemEvento(e.foto)}" style="width:90px; height:90px; object-fit:cover; border-radius:10px;">`
+            : "";
+
+        idEventoVitrineEdicao = id;
+        const btn = document.getElementById("btn-salvar-evento");
+        if (btn) { btn.innerText = "ATUALIZAR AULÃO"; btn.style.background = "var(--warning)"; }
+        const cancelar = document.getElementById("btn-cancelar-evento");
+        if (cancelar) cancelar.style.display = "inline-flex";
+
+        const alvo = document.getElementById("config-eventos");
+        if (alvo) alvo.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function cancelarEdicaoEvento() {
+        idEventoVitrineEdicao = null;
+        ["evt-titulo", "evt-data", "evt-descricao", "evt-foto", "evt-foto-url"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = "";
+        });
+        const preview = document.getElementById("evt-foto-preview");
+        if (preview) preview.innerHTML = "";
+        const btn = document.getElementById("btn-salvar-evento");
+        if (btn) { btn.innerText = "SALVAR AULÃO"; btn.style.background = ""; }
+        const cancelar = document.getElementById("btn-cancelar-evento");
+        if (cancelar) cancelar.style.display = "none";
+    }
+
+    async function salvarEventoVitrine() {
+        const titulo = document.getElementById("evt-titulo").value.trim();
+        const dataISO = document.getElementById("evt-data").value;
+        const descricao = document.getElementById("evt-descricao").value.trim();
+        const fotoInput = document.getElementById("evt-foto");
+        const fotoUrl = document.getElementById("evt-foto-url").value.trim();
+        const btn = document.getElementById("btn-salvar-evento");
+
+        if (!titulo) return dispararToast("Preencha o título do aulão!", "error");
+        if (!dataISO) return dispararToast("Escolha a data do aulão!", "error");
+        if (!descricao) return dispararToast("Escreva uma descrição curta!", "error");
+
+        const emEdicao = eventosVitrine.find(x => String(x.id) === String(idEventoVitrineEdicao));
+        const temFoto = (fotoInput && fotoInput.files[0]) || fotoUrl || (emEdicao && emEdicao.foto);
+        if (!temFoto) return dispararToast("Adicione uma foto (upload ou URL).", "error");
+
+        const txtOriginal = btn ? btn.innerText : "";
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = (fotoInput && fotoInput.files[0]) ? "ENVIANDO FOTO..." : "SALVANDO...";
+        }
+
+        try {
+            const dados = { titulo, dataISO, descricao };
+
+            if (fotoInput && fotoInput.files[0]) {
+                dados.foto = await enviarImagemVitrine(fotoInput.files[0]);
+            } else if (fotoUrl) {
+                dados.foto = fotoUrl;
+            } else if (emEdicao && emEdicao.foto) {
+                dados.foto = emEdicao.foto;
+            }
+
+            if (idEventoVitrineEdicao) {
+                await db.ref(`vitrine_eventos/${idEventoVitrineEdicao}`).update(dados);
+                dispararToast("🔥 Aulão atualizado!");
+            } else {
+                const id = novoId();
+                await db.ref(`vitrine_eventos/${id}`).set({ id, ...dados, criadoEm: Date.now() });
+                dispararToast("🔥 Aulão publicado na vitrine!");
+            }
+            cancelarEdicaoEvento();
+        } catch (error) {
+            console.error("Erro ao salvar aulão:", error);
+            const msg = (error && error.message) ? error.message : "Verifique sua conexão e tente novamente.";
+            alert("Não foi possível salvar o aulão.\n\n" + msg);
+            dispararToast("Erro ao salvar o aulão.", "error");
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                if (btn.innerText === "ENVIANDO FOTO..." || btn.innerText === "SALVANDO...") {
+                    btn.innerText = txtOriginal || "SALVAR AULÃO";
+                }
+            }
+        }
+    }
 
     // ==========================================
