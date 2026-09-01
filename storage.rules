@@ -1,16 +1,22 @@
 rules_version = '2';
 
 // Firebase Storage do Funcional do Ari.
-// As imagens (fotos de alunos, galeria e vitrine) sao publicas para leitura
-// porque aparecem no painel e na pagina publica. Escrita apenas autenticada,
-// limitada a arquivos de imagem de ate 5 MB.
+// Hoje as imagens são salvas como data URL no Realtime Database (ver
+// js/01-config-firebase-estado.js). Quando a migração para o Storage entrar,
+// os arquivos ficam sob `fotos/` — leitura pública (aparecem no site e no
+// painel), escrita só autenticada, só imagem, até 5 MB. Qualquer outro caminho
+// fica fechado.
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
+    match /fotos/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null
                    && request.resource.size < 5 * 1024 * 1024
                    && request.resource.contentType.matches('image/.*');
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }

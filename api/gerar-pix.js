@@ -127,18 +127,57 @@ export default async function handler(req, res) {
     return res.status(429).json({ erro: 'Muitas tentativas. Aguarde um minuto e tente novamente.' });
   }
 
-  const { clienteId, nome, valor } = body;
-  const valorNum = parseFloat(valor);
+  // Só o `clienteId` é confiável aqui. O VALOR e o NOME são buscados no banco —
+  // nunca no corpo da requisição — para que ninguém consiga pagar R$ 1 e ficar
+  // com a mensalidade marcada como "pago".
+  const clienteId = String(body.clienteId == null ? '' : body.clienteId).trim();
+  if (!clienteId || clienteId.length > 200 || /[.#$\[\]/\s\u0000-\u001f\u007f]/.test(clienteId)) {
+    return res.status(400).json({ erro: 'clienteId inválido' });
+  }
 
-  if (clienteId === undefined || clienteId === null || String(clienteId).length === 0) {
-    return res.status(400).json({ erro: 'clienteId obrigatório' });
+  let valorNum;
+  let nomeAluno;
+  try {
+    const db = getAdminDb();
+    const [snapCliente, snapServicos] = await Promise.all([
+      db.ref('clientes/' + clienteId).once('value'),
+      db.ref('servicos').once('value')
+    ]);
+
+    const cliente = snapCliente.val();
+    if (!cliente || typeof cliente !== 'object') {
+      return res.status(404).json({ erro: 'Aluno não encontrado' });
+    }
+    nomeAluno = String(cliente.nome || 'Aluno').slice(0, 80);
+
+    const servicosVal = snapServicos.val();
+    const servicos = servicosVal && typeof servicosVal === 'object' ? Object.values(servicosVal) : [];
+    const plano = servicos.find(s => s && typeof s === 'object' && s.nome === cliente.frequencia);
+    const preco = plano ? parseFloat(plano.preco) : NaN;
+
+    if (!Number.isFinite(preco) || preco <= 0) {
+      return res.status(422).json({
+        erro: 'Não há um valor de mensalidade configurado para o seu plano. Fale com o estúdio.'
+      });
+    }
+    valorNum = Number(preco.toFixed(2));
+  } catch (err) {
+    console.error('Erro ao apurar o valor da mensalidade:', err && err.stack ? err.stack : err);
+    return res.status(500).json({ erro: 'Não foi possível apurar o valor da mensalidade agora.' });
   }
-  if (!Number.isFinite(valorNum) || valorNum <= 0) {
-    return res.status(400).json({ erro: 'Valor inválido' });
-  }
+
   if (valorNum > VALOR_MAXIMO) {
     return res.status(400).json({ erro: `Valor acima do limite permitido (R$ ${VALOR_MAXIMO}).` });
   }
+
+  // Idempotência: o cliente manda uma chave estável por tentativa de pagamento
+  // (reaproveitada em retry / duplo-clique). Sem ela, cai numa "janela" de 1h
+  // por aluno — evita cobrança duplicada sem travar uma 2ª via legítima no dia
+  // seguinte.
+  const chaveCliente = String(body.idempotencyKey || '');
+  const idempotencyKey = /^[A-Za-z0-9_-]{8,64}$/.test(chaveCliente)
+    ? chaveCliente
+    : `${clienteId}-${new Date().toISOString().slice(0, 13)}`;
 
   try {
     const mpResponse = await fetch('https://api.mercadopago.com/v1/payments', {
@@ -146,14 +185,14 @@ export default async function handler(req, res) {
       headers: {
         Authorization: `Bearer ${MP_TOKEN}`,
         'Content-Type': 'application/json',
-        'X-Idempotency-Key': `${clienteId}-${Date.now()}`
+        'X-Idempotency-Key': idempotencyKey
       },
       body: JSON.stringify({
-        transaction_amount: Number(valorNum.toFixed(2)),
-        description: `Mensalidade - ${String(nome || '').slice(0, 80) || 'Aluno'}`,
+        transaction_amount: valorNum,
+        description: `Mensalidade - ${nomeAluno}`,
         payment_method_id: 'pix',
-        payer: { email: `aluno_${String(clienteId).replace(/[^a-zA-Z0-9_-]/g, '')}@funcionalari.com` },
-        metadata: { cliente_id: String(clienteId) }
+        payer: { email: `aluno_${clienteId.replace(/[^a-zA-Z0-9_-]/g, '')}@funcionalari.com` },
+        metadata: { cliente_id: clienteId }
       })
     });
 

@@ -18,8 +18,16 @@ estoque) + site público (`vitrine.html`, `agendar.html`) + Área do Aluno
 - **Imagens:** comprimidas no navegador e salvas como data URL no próprio banco
   (helper `uploadImagem`). O modelo do estúdio é 100% mensalidade — o antigo
   módulo de PDV/venda avulsa foi removido.
-- **Serverless (Vercel):** `api/gerar-pix.js` (Pix + webhook Mercado Pago) e
-  `api/consulta-aluno.js` (consulta de mensalidade pela vitrine).
+- **Serverless (Vercel):**
+  - `api/consulta-aluno.js` — consulta de mensalidade pela Área do Aluno.
+  - `api/gerar-pix.js` — Pix + webhook Mercado Pago. O **valor da mensalidade é
+    apurado no servidor** pelo `clienteId` (nunca vem do navegador).
+  - `api/agendar.js` / `api/lead.js` — agendamento e fila de espera do site
+    (antes o navegador escrevia direto no banco). Firebase Admin + limite por IP
+    + honeypot. As regras do banco fecham a escrita pública nesses nós.
+  - `api/upload-foto.js` — recebe a imagem comprimida do painel autenticado e
+    grava no Firebase Storage (`fotos/`), devolvendo a URL. `uploadImagem` usa
+    isto de forma tolerante: se o Storage falhar, volta a salvar data URL no RTDB.
 
 ## Rodando os checks
 
@@ -41,11 +49,20 @@ firebase deploy --only database,storage
 ```
 
 `database.rules.json` fecha o banco: só usuário autenticado lê/escreve os dados
-internos. São públicos apenas: `servicos`, `landingConfig`, `vitrine_eventos`
-(aulões/eventos exibidos na vitrine), `profissionais_publicos`
-(espelho `{id:nome}` mantido pelo painel), `disponibilidade` (só horários) e o
-campo `clientes/$id/statusMensalidade` (usado pela Área do Aluno). Agendamentos do
-site entram em `agendamentos_publicos` (o visitante só cria; o painel confirma).
+internos. **Leitura** pública apenas em: `servicos`, `landingConfig`,
+`vitrine_eventos`, `profissionais_publicos`, `disponibilidade` e o campo
+`clientes/$id/statusMensalidade`. **Escrita** pública: nenhuma — `agendamentos_publicos`,
+`leads_espera` e `disponibilidade` agora só aceitam escrita autenticada; o site
+grava neles via `api/agendar` / `api/lead` (Firebase Admin).
+
+> ⚠️ **Ordem ao atualizar:** publique o front + as funções na Vercel **antes** de
+> rodar `firebase deploy --only database`. Se as regras forem apertadas enquanto
+> um `agendar.html` antigo (em cache) ainda escreve direto no banco, o
+> agendamento quebra até o Service Worker atualizar. Espere ~1 dia após o deploy
+> da Vercel, ou aceite essa janela curta.
+
+Falta ainda (defesa em profundidade, exige console do Firebase): **App Check**
+(reCAPTCHA) para proteger também as *leituras* dos nós públicos.
 
 ### 2. Variáveis de ambiente na Vercel
 
@@ -56,11 +73,17 @@ Ver `.env.example`. Necessárias para as funções `api/`:
 | `FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY` / `FIREBASE_DATABASE_URL` | Service Account do Firebase Admin |
 | `MERCADO_PAGO_ACCESS_TOKEN` | Criar cobranças Pix |
 | `MERCADO_PAGO_WEBHOOK_SECRET` | Validar a assinatura do webhook (recomendado) |
-| `ALLOWED_ORIGIN` | Origem(ns) liberada(s) no CORS **e** na trava de origem do `api/gerar-pix` (lista separada por vírgula; sem valor = não bloqueia). |
+| `ALLOWED_ORIGIN` | Origem(ns) liberada(s) no CORS **e** na trava de origem de `api/gerar-pix` / `api/agendar` / `api/lead` (lista separada por vírgula; sem valor = não bloqueia). |
 | `PIX_VALOR_MAXIMO` | Teto de valor por cobrança (padrão 2000) |
+| `FIREBASE_STORAGE_BUCKET` | Opcional — bucket do Storage (padrão: `<projectId>.firebasestorage.app`). Usado por `api/upload-foto`. |
 
-As rotas públicas `api/gerar-pix` e `api/consulta-aluno` têm um rate limit simples
-em memória (`api/_rate-limit.js`): 5/min e 20/min por IP, respectivamente.
+Todas as rotas públicas têm rate limit em memória (`api/_rate-limit.js`),
+tipicamente 5/min por IP (`consulta-aluno`: 20/min).
+
+**Backup automático:** `.github/workflows/backup-db.yml` exporta o banco toda
+madrugada como artefato criptografado (14 dias). Precisa dos secrets
+`FIREBASE_SERVICE_ACCOUNT` (JSON) e `BACKUP_PASSPHRASE` no GitHub. Restaurar:
+`gpg -d backup-db-AAAA-MM-DD.json.gpg > backup.json`.
 
 ### 3. Webhook do Mercado Pago
 

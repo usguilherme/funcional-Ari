@@ -1,0 +1,66 @@
+name: Backup do Realtime Database
+
+# Exporta o banco inteiro toda madrugada e guarda como artefato CRIPTOGRAFADO
+# (gpg simétrico) por 14 dias. É a rede de segurança contra edição errada no
+# painel — o banco é a fonte de verdade de receita e cadastro e é editado ao vivo.
+#
+# Secrets necessários (Settings > Secrets and variables > Actions):
+#   FIREBASE_SERVICE_ACCOUNT  -> JSON da service account (o mesmo do Admin SDK)
+#   BACKUP_PASSPHRASE         -> senha para descriptografar o backup
+#
+# Para restaurar:  gpg -d backup-db-AAAA-MM-DD.json.gpg > backup.json
+
+on:
+  schedule:
+    - cron: '17 6 * * *'   # 06:17 UTC = 03:17 em Brasília
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checar secrets
+        id: precheck
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$SA" ] || [ -z "$PASS" ]; then
+            echo "::warning::Backup pulado — configure os secrets FIREBASE_SERVICE_ACCOUNT e BACKUP_PASSPHRASE."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node
+        if: steps.precheck.outputs.ok == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Exportar e criptografar
+        if: steps.precheck.outputs.ok == 'true'
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          STAMP=$(date -u +%Y-%m-%d)
+          npx -y firebase-tools@13 database:get / \
+            --project funcional-ari \
+            --output "backup-db-$STAMP.json"
+          gpg --batch --yes --passphrase "$BACKUP_PASSPHRASE" \
+            --symmetric --cipher-algo AES256 "backup-db-$STAMP.json"
+          rm -f "backup-db-$STAMP.json" "$RUNNER_TEMP/sa.json"
+          echo "STAMP=$STAMP" >> "$GITHUB_ENV"
+
+      - name: Subir artefato
+        if: steps.precheck.outputs.ok == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-db-${{ env.STAMP }}
+          path: backup-db-*.json.gpg
+          retention-days: 14
+          if-no-files-found: error

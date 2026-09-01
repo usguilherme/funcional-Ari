@@ -11,8 +11,11 @@
 // quando ele é fornecido e as variáveis dedicadas estão vazias.
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getDatabase } from 'firebase-admin/database';
+import { getAuth } from 'firebase-admin/auth';
+import { getStorage } from 'firebase-admin/storage';
 
 let dbInstance = null;
+let projectIdCache = '';
 
 // Caracteres de controle (C0/C1) e invisíveis (BOM, zero-width, NBSP,
 // ideographic space, marcas bidi, soft hyphen) que o copiar-e-colar às vezes
@@ -163,6 +166,7 @@ export function getAdminDb() {
   }
 
   const projectId = limparEnv(process.env.FIREBASE_PROJECT_ID) || cred.projectId || '';
+  projectIdCache = projectId;
   const clientEmail = limparEnv(process.env.FIREBASE_CLIENT_EMAIL) || cred.clientEmail || '';
   const privateKey = cred.privateKey || '';
   const databaseURL = normalizarUrlBanco(process.env.FIREBASE_DATABASE_URL) || urlBancoPadrao(projectId);
@@ -206,4 +210,21 @@ export function getAdminDb() {
     throw new Error('Firebase Admin: URL do Realtime Database inválida (' + (err && err.message ? err.message : err) + ')', { cause: err });
   }
   return dbInstance;
+}
+
+// Firebase Authentication (Admin) — usado para validar o ID token do usuário
+// logado no painel antes de aceitar um upload.
+export function getAdminAuth() {
+  getAdminDb(); // garante o initializeApp
+  return getAuth(getApps()[0]);
+}
+
+// Bucket do Firebase Storage. Nome vem de FIREBASE_STORAGE_BUCKET ou é deduzido
+// do project id (padrão dos projetos novos: <projectId>.firebasestorage.app).
+export function getAdminBucket() {
+  getAdminDb();
+  const nome = limparEnv(process.env.FIREBASE_STORAGE_BUCKET)
+    || (projectIdCache ? projectIdCache + '.firebasestorage.app' : '');
+  if (!nome) throw new Error('Firebase Admin: bucket do Storage não configurado (FIREBASE_STORAGE_BUCKET).');
+  return getStorage(getApps()[0]).bucket(nome);
 }

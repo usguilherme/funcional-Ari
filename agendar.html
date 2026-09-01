@@ -319,6 +319,8 @@
                     ⚠️ Esse horário já está ocupado com esse instrutor. Escolha outro, por favor.
                 </div>
 
+                <input type="text" id="hp-agendar" name="empresa" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;width:1px;height:1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);left:-9999px;opacity:0">
+
                 <button onclick="salvarAgendamentoPublico()" class="btn-glow"><i data-lucide="message-circle"></i> AGENDAR E IR PARA WHATSAPP</button>
 
                 <button type="button" onclick="mostrarFilaEspera()" class="btn-fila-espera">
@@ -345,6 +347,8 @@
                     <label class="label-small"><i data-lucide="phone"></i> Seu WhatsApp (com DDD)</label>
                     <input type="text" id="fila-tel" class="modern-input" placeholder="(83) 99999-9999" inputmode="tel">
                 </div>
+
+                <input type="text" id="hp-fila" name="empresa" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;width:1px;height:1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);left:-9999px;opacity:0">
 
                 <button onclick="entrarNaFilaEspera()" class="btn-glow"><i data-lucide="bell-plus"></i> ENTRAR NA FILA DE ESPERA</button>
 
@@ -516,29 +520,38 @@
                 return;
             }
 
-            const registro = {
-                data: data,
-                hora: hora,
-                nomeCliente: nome.slice(0, 120),
-                telefoneCliente: tel.slice(0, 30),
-                servicoNome: "Aula experimental gratuita",
-                profissionalId: profId ? String(profId) : null,
-                profissionalNome: (profNome || 'Qualquer Instrutor').slice(0, 120),
-                valor: 0,
-                obs: "Agendado pelo site — aula experimental gratuita, aguardando confirmação",
-                criadoEm: Date.now()
-            };
-
             const btn = document.querySelector(".btn-glow");
+            const restaurarBtn = () => {
+                btn.innerText = "AGENDAR E IR PARA WHATSAPP";
+                btn.style.opacity = "1";
+                btn.style.pointerEvents = "auto";
+            };
             btn.innerText = "PROCESSANDO...";
             btn.style.opacity = "0.7";
             btn.style.pointerEvents = "none";
 
-            db.ref('agendamentos_publicos').push(registro)
-                .then(() => {
-                    if(profId) {
-                        db.ref(`disponibilidade/${data}/${profId}/${chaveHora(hora)}`).set(true)
-                            .catch(err => console.error("Erro ao registrar disponibilidade:", err));
+            // A escrita agora passa pela função serverless (/api/agendar), que
+            // grava via Firebase Admin com limite por IP e validação. O banco
+            // não aceita mais escrita pública nesse nó.
+            fetch('/api/agendar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nome: nome,
+                    telefone: tel,
+                    data: data,
+                    hora: hora,
+                    profissionalId: profId ? String(profId) : null,
+                    profissionalNome: profNome || 'Qualquer Instrutor',
+                    hp: (document.getElementById('hp-agendar') || {}).value || ''
+                })
+            })
+                .then(async (resp) => {
+                    const dados = await resp.json().catch(() => ({}));
+                    if (!resp.ok) {
+                        alert(dados.erro || "Erro ao realizar o agendamento. Tente novamente.");
+                        restaurarBtn();
+                        return;
                     }
 
                     const dataFormatada = data.split('-').reverse().join('/');
@@ -555,11 +568,9 @@
                     });
                 })
                 .catch(err => {
-                    alert("Erro ao realizar o agendamento. Tente novamente.");
+                    alert("Erro ao realizar o agendamento. Verifique sua conexão e tente novamente.");
                     console.error(err);
-                    btn.innerText = "AGENDAR E IR PARA WHATSAPP";
-                    btn.style.opacity = "1";
-                    btn.style.pointerEvents = "auto";
+                    restaurarBtn();
                 });
         }
 
@@ -595,16 +606,27 @@
                 btn.style.pointerEvents = "auto";
             };
 
-            // O nó valida telefone com regex /^[0-9 ()+.-]{8,30}$/ — remove
-            // qualquer outro caractere (letras, emoji) antes de gravar.
+            // O telefone é limpo aqui e revalidado no servidor.
             const telLimpo = telBruto.replace(/[^0-9 ()+.-]/g, "").trim().slice(0, 30) || telDigitos;
 
-            db.ref("leads_espera").push({
-                nome: nome.slice(0, 120),
-                telefone: telLimpo,
-                criadoEm: Date.now(),
-                origem: "agendar"
-            }).then(() => {
+            // A escrita em `leads_espera` agora passa por /api/lead (Firebase
+            // Admin + limite por IP). O banco não aceita mais escrita pública.
+            fetch('/api/lead', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nome: nome,
+                    telefone: telLimpo,
+                    origem: "agendar",
+                    hp: (document.getElementById('hp-fila') || {}).value || ''
+                })
+            }).then(async (resp) => {
+                const dados = await resp.json().catch(() => ({}));
+                if (!resp.ok) {
+                    alert(dados.erro || "Não foi possível entrar na fila agora. Tente de novo.");
+                    restaurarBtn();
+                    return;
+                }
                 alert("✅ Pronto! Você está na fila de espera. A gente te chama no WhatsApp assim que abrir vaga.");
                 document.getElementById("fila-nome").value = "";
                 document.getElementById("fila-tel").value = "";

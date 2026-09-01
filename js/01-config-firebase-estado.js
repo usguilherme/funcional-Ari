@@ -163,9 +163,36 @@
         });
     }
 
-    // Comprime a imagem no navegador e devolve uma string base64 (data URL),
-    // que é salva DIRETO no Realtime Database. Não há upload para servidor.
-    // O parâmetro `pasta` é mantido só por compatibilidade de assinatura.
+    // Sobe a imagem comprimida para o Firebase Storage via /api/upload-foto e
+    // devolve a URL pública. Se QUALQUER coisa falhar (Storage não configurado,
+    // sem rede, sem login), cai de volta para a data URL salva no Realtime
+    // Database — o comportamento antigo. Ou seja, é seguro: nunca quebra o
+    // cadastro, só deixa de otimizar.
+    async function enviarParaStorage(dataUrl, pasta) {
+        if (!auth || !auth.currentUser) return null;
+        let token;
+        try { token = await auth.currentUser.getIdToken(); } catch (e) { return null; }
+
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 8000);
+        try {
+            const resp = await fetch('/api/upload-foto', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify({ dataUrl: dataUrl, pasta: pasta }),
+                signal: ctrl.signal
+            });
+            if (!resp.ok) return null;
+            const dados = await resp.json();
+            return (dados && typeof dados.url === 'string' && /^https:\/\//.test(dados.url)) ? dados.url : null;
+        } catch (e) {
+            console.warn('[uploadImagem] Storage indisponível, salvando como data URL:', e && e.message || e);
+            return null;
+        } finally {
+            clearTimeout(t);
+        }
+    }
+
     async function uploadImagem(file, pasta, larguraMax = 800, qualidade = 0.7) {
         const processar = (async () => {
             const blob = await comprimirImagem(file, larguraMax, qualidade);
@@ -175,7 +202,8 @@
             if (dataUrl && dataUrl.length > 950000) {
                 throw new Error("Imagem muito pesada mesmo após compressão. Escolha uma foto menor.");
             }
-            return dataUrl;
+            const urlStorage = await enviarParaStorage(dataUrl, pasta);
+            return urlStorage || dataUrl;
         })();
 
         // Nunca deixa o botão preso: se algo travar, rejeita em 20s.

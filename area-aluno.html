@@ -1065,23 +1065,36 @@
             icons();
 
             var btnGerar = $('btn-gerar-mp');
-            if (btnGerar) btnGerar.addEventListener('click', function () { solicitarPix(valor); });
+            if (btnGerar) btnGerar.addEventListener('click', function () { solicitarPix(); });
             var btnCopiar = $('btn-copiar-pix');
             if (btnCopiar) btnCopiar.addEventListener('click', copiarPix);
         }
 
-        async function solicitarPix(valor) {
+        // Chave de idempotência: estável enquanto o aluno tenta pagar (retry /
+        // duplo-clique reaproveitam a mesma). Zerada ao gerar o Pix com sucesso,
+        // para que uma cobrança futura (outro mês) receba uma chave nova.
+        var _pixIdem = null;
+        function _novoIdemPix() {
+            try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID().replace(/-/g, ''); } catch (e) {}
+            return (String(Date.now()) + Math.random().toString(36).slice(2)).slice(0, 32);
+        }
+
+        async function solicitarPix() {
             var btn = $('btn-gerar-mp');
             btn.disabled = true;
             btn.innerHTML = 'Conectando ao banco...';
+            if (!_pixIdem) _pixIdem = _novoIdemPix();
             try {
+                // O valor da mensalidade é apurado no servidor pelo clienteId —
+                // não é mais enviado pelo navegador.
                 var resp = await fetch('/api/gerar-pix', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ clienteId: ALUNO.id, nome: ALUNO.nome, valor: valor })
+                    body: JSON.stringify({ clienteId: ALUNO.id, idempotencyKey: _pixIdem })
                 });
                 var dados = await resp.json();
                 if (!resp.ok) throw new Error(dados.erro || 'falha');
 
+                _pixIdem = null;
                 btn.style.display = 'none';
                 $('caixa-qr-code').style.display = 'block';
                 $('qr-pix-mp').src = 'data:image/png;base64,' + dados.qr_code_base64;
