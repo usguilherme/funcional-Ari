@@ -15,7 +15,16 @@
         
         const btnMobile = document.querySelector(`.mobile-nav-item[onclick*="${idAba}"]`);
         if(btnMobile) btnMobile.classList.add('active');
-        
+
+        // Menu móvel: a barra inferior só tem 4 atalhos. Se a aba aberta veio do
+        // bottom sheet, destaca o botão "Menu" e o item correspondente na folha.
+        const abasNaBarra = ['dashboard', 'agenda', 'clientes'];
+        const btnMenuMobile = document.getElementById('mobile-nav-menu-btn');
+        if (btnMenuMobile && !abasNaBarra.includes(idAba)) btnMenuMobile.classList.add('active');
+        document.querySelectorAll('.mobile-sheet-grid a').forEach(a => {
+            a.classList.toggle('active', (a.getAttribute('onclick') || '').includes(`'${idAba}'`));
+        });
+
         setTimeout(() => {
             const aba = document.getElementById(idAba);
             if(aba) {
@@ -66,6 +75,35 @@
             if (typeof renderAgendamentosPublicos === 'function') renderAgendamentosPublicos();
             if (typeof renderAgenda === 'function') renderAgenda();
         }
+    }
+
+    // ==========================================
+    // MENU MÓVEL COMPLETO (bottom sheet)
+    // ==========================================
+    // A barra inferior só cabe 4 atalhos; o resto das abas fica aqui. Só é
+    // visível em telas pequenas (CSS em @media max-width:768px).
+    function abrirMenuMobile() {
+        const bd = document.getElementById('mobile-menu-backdrop');
+        const sheet = document.getElementById('mobile-menu-sheet');
+        if (!bd || !sheet) return;
+        bd.classList.add('open');
+        sheet.classList.add('open');
+        document.body.classList.add('sheet-open');
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function fecharMenuMobile() {
+        const bd = document.getElementById('mobile-menu-backdrop');
+        const sheet = document.getElementById('mobile-menu-sheet');
+        if (bd) bd.classList.remove('open');
+        if (sheet) sheet.classList.remove('open');
+        document.body.classList.remove('sheet-open');
+    }
+
+    // Item do bottom sheet: navega e fecha a folha.
+    function irParaAba(idAba) {
+        fecharMenuMobile();
+        abrirAba(idAba);
     }
 
     function dispararToast(msg, tipo = 'success') {

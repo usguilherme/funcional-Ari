@@ -380,16 +380,41 @@
         <a onclick="abrirAba('agenda')" class="mobile-nav-item">
             <i data-lucide="calendar-days"></i> Agenda
         </a>
-        <a onclick="abrirAba('novo_atendimento')" class="mobile-nav-item">
-            <i data-lucide="sparkles"></i> Venda
+        <a onclick="abrirAba('clientes')" class="mobile-nav-item">
+            <i data-lucide="users"></i> Alunos
         </a>
-        <a onclick="abrirAba('rh')" class="mobile-nav-item">
-            <i data-lucide="briefcase"></i> RH
-        </a>
-        <a onclick="abrirAba('financeiro')" class="mobile-nav-item">
-            <i data-lucide="menu"></i> +Menu
+        <a onclick="abrirMenuMobile()" id="mobile-nav-menu-btn" class="mobile-nav-item">
+            <i data-lucide="menu"></i> Menu
         </a>
     </nav>
+
+    <!-- ===== MENU COMPLETO (bottom sheet) — só telas pequenas ===== -->
+    <div id="mobile-menu-backdrop" class="mobile-sheet-backdrop" onclick="fecharMenuMobile()"></div>
+    <div id="mobile-menu-sheet" class="mobile-sheet" role="dialog" aria-modal="true" aria-label="Menu completo do painel">
+        <div class="mobile-sheet-handle"></div>
+        <div class="mobile-sheet-head">
+            <span class="mobile-sheet-title">MENU</span>
+            <button class="mobile-sheet-close" onclick="fecharMenuMobile()" aria-label="Fechar menu">&times;</button>
+        </div>
+        <div class="mobile-sheet-grid">
+            <a onclick="irParaAba('dashboard')"><i data-lucide="layout-grid"></i><span>Visão Geral</span></a>
+            <a onclick="irParaAba('agenda')"><i data-lucide="calendar-days"></i><span>Agenda</span></a>
+            <a onclick="irParaAba('novo_atendimento')"><i data-lucide="sparkles"></i><span>Atualização</span></a>
+            <a onclick="irParaAba('clientes')"><i data-lucide="users"></i><span>Alunos</span></a>
+            <a onclick="irParaAba('profissionais')"><i data-lucide="user-cog"></i><span>Instrutores</span></a>
+            <a onclick="irParaAba('avaliacoes')"><i data-lucide="clipboard-check"></i><span>Avaliações</span></a>
+            <a onclick="irParaAba('estoque')"><i data-lucide="package"></i><span>Estoque</span></a>
+            <a onclick="irParaAba('financeiro')"><i data-lucide="trending-up"></i><span>Financeiro</span></a>
+            <a onclick="irParaAba('servicos')"><i data-lucide="dumbbell"></i><span>Planos / Treinos</span></a>
+            <a onclick="irParaAba('despesas')"><i data-lucide="receipt"></i><span>Despesas</span></a>
+            <a onclick="irParaAba('rh')"><i data-lucide="briefcase"></i><span>Folha / RH</span></a>
+            <a onclick="irParaAba('landing')"><i data-lucide="globe"></i><span>Site / Vitrine</span></a>
+        </div>
+        <div class="mobile-sheet-foot">
+            <button onclick="fecharMenuMobile(); abrirModalConfig();"><i data-lucide="settings"></i> Configurações</button>
+            <button onclick="fecharMenuMobile(); fazerBackup();"><i data-lucide="file-spreadsheet"></i> Backup Excel</button>
+        </div>
+    </div>
 
     <div id="modal-modo-tv" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#09090b; z-index:999999; padding:40px; box-sizing:border-box; color:white; font-family:var(--font-display);">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid rgba(255,255,255,0.1); padding-bottom:20px; margin-bottom:30px;">
