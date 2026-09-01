@@ -1,9 +1,11 @@
 // Service Worker do Funcional do Ari.
-// Estratégia: "network first" para navegação/estáticos (sempre tenta a versão
-// nova e cai para o cache quando offline). Chamadas ao Firebase/APIs passam
-// direto pela rede, sem cache.
+// Estratégia: "stale-while-revalidate" para o App Shell (HTML, CSS, JS e páginas
+// estáticas do mesmo domínio): responde na hora com o cache (carregamento
+// secundário/offline instantâneo) e atualiza o cache em 2º plano com a versão
+// nova da rede. Chamadas ao Firebase/APIs passam direto pela rede, sem cache.
+// O próprio sw.js nunca é servido do cache, para não travar futuras atualizações.
 
-const VERSAO = 'v18';
+const VERSAO = 'v19';
 const CACHE_NOME = `funcionaldoari-${VERSAO}`;
 
 const ASSETS = [
@@ -79,15 +81,26 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET' || ehExterno(req.url)) return;
 
+  const url = new URL(req.url);
+  // Só tratamos o App Shell (mesmo domínio). Externos já saíram acima.
+  if (url.origin !== self.location.origin) return;
+  // O próprio Service Worker sempre vem da rede, nunca do cache.
+  if (url.pathname.endsWith('/sw.js')) return;
+
   event.respondWith(
-    fetch(req)
-      .then((resp) => {
-        if (resp && resp.status === 200 && resp.type === 'basic') {
-          const clone = resp.clone();
-          caches.open(CACHE_NOME).then((cache) => cache.put(req, clone));
-        }
-        return resp;
-      })
-      .catch(() => caches.match(req).then((c) => c || caches.match('./index.html')))
+    caches.match(req).then((cacheado) => {
+      const daRede = fetch(req)
+        .then((resp) => {
+          if (resp && resp.status === 200 && resp.type === 'basic') {
+            const clone = resp.clone();
+            caches.open(CACHE_NOME).then((cache) => cache.put(req, clone));
+          }
+          return resp;
+        })
+        .catch(() => cacheado || caches.match('./index.html'));
+
+      // stale-while-revalidate: cache na hora, rede atualiza em 2º plano.
+      return cacheado || daRede;
+    })
   );
 });
