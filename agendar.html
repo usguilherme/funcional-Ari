@@ -336,10 +336,25 @@
             if (inp) inp.min = new Date().toISOString().split("T")[0];
         })();
 
-        // 1. Carrega os Serviços/Planos do Banco de Dados
+        // Planos de teste/amostra não podem aparecer para o aluno — só valem
+        // para uso interno / cadastros administrativos. Identificamos por nome
+        // ("TESTE", "amostra", "experimental"...) ou por valor simbólico (< R$ 1).
+        function ehPlanoDeTeste(s) {
+            const nome = String(s && s.nome ? s.nome : '').toLowerCase().trim();
+            if (!nome) return true;
+            const termos = ['teste', 'amostra', 'experiment', 'exemplo', 'sample', 'demo', 'homolog', 'rascunho', 'nao usar', 'não usar'];
+            if (termos.some(t => nome.includes(t))) return true;
+            const preco = parseFloat(s && s.preco) || 0;
+            if (preco > 0 && preco < 1) return true; // R$ 0,01 e afins
+            return false;
+        }
+
+        // 1. Carrega os Serviços/Planos do Banco de Dados (só planos comerciais)
         db.ref('servicos').once('value').then(snap => {
             const servicosObj = snap.val() ? snap.val() : {};
-            todosServicosGlobais = Object.values(servicosObj).sort((a, b) => a.nome.localeCompare(b.nome));
+            todosServicosGlobais = Object.values(servicosObj)
+                .filter(s => s && s.nome && !ehPlanoDeTeste(s))
+                .sort((a, b) => a.nome.localeCompare(b.nome));
 
             renderizarServicos();
         }).catch(err => console.error("Erro ao carregar serviços:", err));
@@ -368,7 +383,7 @@
             const sel = document.getElementById("pub-servico");
 
             if (todosServicosGlobais.length === 0) {
-                sel.innerHTML = '<option value="">Nenhum plano cadastrado</option>';
+                sel.innerHTML = '<option value="">Nenhum plano disponível no momento</option>';
                 return;
             }
 
