@@ -74,23 +74,8 @@
         return Date.now() * 1000 + Math.floor(Math.random() * 1000);
     }
 
-    // Escapa texto vindo do banco antes de injetar em innerHTML.
-    // Vários campos (nome do aluno, observações, nome de serviço) podem ser
-    // preenchidos pela página pública de agendamento, então precisam ser tratados.
-    function escapeHtml(valor) {
-        if (valor === null || valor === undefined) return "";
-        return String(valor)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;");
-    }
-
-    // Escapa um valor para uso dentro de atributo entre aspas simples de um onclick.
-    function escapeAttr(valor) {
-        return escapeHtml(valor).replace(/\\/g, "&#92;");
-    }
+    // escapeHtml / escapeAttr / soDigitos / formatarData vivem em js/00-utils.js
+    // (carregado antes deste arquivo).
 
     // Preço do plano de um aluno: fonte única de verdade = cadastro de serviços.
     // c.frequencia guarda o NOME do serviço escolhido no cadastro do aluno.

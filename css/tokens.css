@@ -1,0 +1,25 @@
+/* =====================================================================
+   PALETA OFICIAL DA MARCA — Funcional do Ari
+   Fonte única de verdade para a identidade visual. Carregado ANTES de
+   qualquer outro CSS nas 4 telas do produto: painel de gestão,
+   vitrine pública, página de agendamento e Área do Aluno.
+
+   Antes desta faxina cada tela tinha um vermelho diferente
+   (#C0392B / #d13b3b / #e6432f). Agora todas apontam para os tokens
+   abaixo. Ajuste a marca só aqui.
+   ===================================================================== */
+:root {
+    /* Vermelho da marca */
+    --brand-red:        #C0392B;
+    --brand-red-strong: #8B1A0F;
+    --brand-red-hover:  #d0473a;
+    --brand-red-soft:   rgba(192, 57, 43, 0.12);
+    --brand-red-dim:    rgba(192, 57, 43, 0.15);
+    --brand-red-glow:   rgba(192, 57, 43, 0.40);
+
+    /* Laranja de apoio (acento quente) */
+    --brand-amber:      #E67E22;
+
+    /* Gradiente "brasa" padrão de botões e destaques */
+    --brand-ember:      linear-gradient(135deg, #E67E22 0%, #C0392B 55%, #8B1A0F 100%);
+}

@@ -5,20 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0605">
     <title>Agendar Aula | Funcional do Ari</title>
-    <link rel="icon" type="image/jpeg" href="logofuncionalari.jpg">
+    <link rel="icon" type="image/webp" href="logofuncionalari.webp">
     <link rel="apple-touch-icon" href="assets/icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tokens.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --bg-dark: #0a0605;
             --bg-surface: rgba(24, 17, 16, 0.72);
-            --primary: #e6432f;
-            --primary-hover: #ff5a44;
-            --gold: #ff8a4c;
-            --ember: linear-gradient(135deg, #ff8a4c 0%, #e6432f 55%, #a12417 100%);
+            --primary: var(--brand-red);
+            --primary-hover: var(--brand-red-hover);
+            --gold: var(--brand-amber);
+            --ember: var(--brand-ember);
             --text-main: #ffffff;
             --text-muted: #9ca3af;
             --text-dim: #6b6b72;
@@ -49,9 +50,9 @@
         .bg-mesh {
             position: fixed; inset: -25%; z-index: 0; pointer-events: none;
             background:
-                radial-gradient(closest-side at 25% 25%, rgba(230, 67, 47, 0.30), transparent 70%),
+                radial-gradient(closest-side at 25% 25%, rgba(192, 57, 43, 0.30), transparent 70%),
                 radial-gradient(closest-side at 78% 30%, rgba(255, 138, 76, 0.18), transparent 70%),
-                radial-gradient(closest-side at 55% 82%, rgba(230, 67, 47, 0.16), transparent 70%);
+                radial-gradient(closest-side at 55% 82%, rgba(192, 57, 43, 0.16), transparent 70%);
             filter: blur(30px);
             animation: meshDrift 24s ease-in-out infinite alternate;
         }
@@ -97,7 +98,7 @@
         .aside-panel {
             padding: 44px 38px;
             background:
-                linear-gradient(180deg, rgba(230, 67, 47, 0.14), rgba(10, 6, 5, 0.2)),
+                linear-gradient(180deg, rgba(192, 57, 43, 0.14), rgba(10, 6, 5, 0.2)),
                 radial-gradient(circle at 20% 10%, rgba(255, 138, 76, 0.2), transparent 55%);
             border-bottom: 1px solid var(--ring);
             display: flex; flex-direction: column; gap: 26px;
@@ -105,7 +106,7 @@
         @media (min-width: 860px) { .aside-panel { border-bottom: none; border-right: 1px solid var(--ring); } }
 
         .aside-brand { display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-size: 20px; letter-spacing: 1.5px; }
-        .aside-brand img { width: 34px; height: 34px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--ring-strong); box-shadow: 0 0 18px -4px rgba(230, 67, 47, 0.5); }
+        .aside-brand img { width: 34px; height: 34px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--ring-strong); box-shadow: 0 0 18px -4px rgba(192, 57, 43, 0.5); }
 
         .aside-panel h1 {
             font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
@@ -129,13 +130,13 @@
         .selo-marca {
             font-family: var(--font-display); text-transform: uppercase; letter-spacing: 3px;
             font-size: 10px; color: var(--primary); margin-bottom: 12px; display: inline-block;
-            background: rgba(230, 67, 47, 0.12); padding: 5px 14px; border-radius: 30px;
-            border: 1px solid rgba(230, 67, 47, 0.3);
+            background: rgba(192, 57, 43, 0.12); padding: 5px 14px; border-radius: 30px;
+            border: 1px solid rgba(192, 57, 43, 0.3);
         }
         .form-header h2 {
             font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.5px;
             font-size: 26px; font-weight: 400;
-            background: linear-gradient(to right, #fff, #e6432f);
+            background: linear-gradient(to right, #fff, #C0392B);
             -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
         }
         .form-header p { color: var(--text-muted); font-size: 13.5px; margin-top: 6px; }
@@ -159,7 +160,7 @@
         }
         .modern-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(230, 67, 47, 0.14);
+            box-shadow: 0 0 0 4px rgba(192, 57, 43, 0.14);
             background: rgba(0, 0, 0, 0.5);
         }
         .modern-input::placeholder { color: rgba(255,255,255,0.28); }
@@ -191,7 +192,7 @@
             font-family: var(--font-display); text-transform: uppercase; letter-spacing: 1px;
             font-weight: 400; font-size: 15px;
             padding: 17px 32px; border-radius: 50px; text-align: center; text-decoration: none;
-            box-shadow: 0 14px 34px -10px rgba(230, 67, 47, 0.5);
+            box-shadow: 0 14px 34px -10px rgba(192, 57, 43, 0.5);
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
             border: none; cursor: pointer; width: 100%; margin-top: 12px;
         }
@@ -200,7 +201,7 @@
             background: linear-gradient(100deg, transparent, rgba(255,255,255,0.4), transparent);
             transform: skewX(-20deg); transition: left 0.6s ease;
         }
-        .btn-glow:hover { transform: translateY(-3px); box-shadow: 0 20px 44px -12px rgba(230, 67, 47, 0.65); }
+        .btn-glow:hover { transform: translateY(-3px); box-shadow: 0 20px 44px -12px rgba(192, 57, 43, 0.65); }
         .btn-glow:hover::after { left: 130%; }
         .btn-glow i { width: 18px; height: 18px; }
 
@@ -226,7 +227,7 @@
 
     <div class="agendar-shell animate-up">
         <aside class="aside-panel">
-            <div class="aside-brand"><img src="logofuncionalari.jpg" alt="Funcional do Ari"> FUNCIONALDOARI</div>
+            <div class="aside-brand"><img src="logofuncionalari.webp" alt="Funcional do Ari"> FUNCIONALDOARI</div>
             <h1>Sua primeira aula é <span class="accent">por nossa conta</span></h1>
             <p>Turmas experimentais às <strong>segundas, quartas e sextas</strong>, sempre às <strong>19:20</strong>. Reserve em menos de um minuto &mdash; a gente confirma tudo com você pelo WhatsApp.</p>
             <div class="aside-benefits">
@@ -278,7 +279,7 @@
                 </div>
 
                 <div id="pub-aviso-dia" class="aviso-caixa">
-                    📅 Você tem que anexar uma data que seja ou segunda, ou quarta, ou sexta, e só aceite o agendamento se for uma dessas desses dias.
+                    📅 Escolha uma data que caia numa <strong>segunda, quarta ou sexta-feira</strong> — são os únicos dias com turma experimental.
                 </div>
                 <div id="pub-horarios-ocupados" class="aviso-caixa"></div>
                 <div id="pub-aviso-conflito" class="aviso-caixa">
@@ -293,6 +294,7 @@
     </div>
 
     <!-- SDKs oficiais do Firebase -->
+    <script src="js/00-utils.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -313,7 +315,7 @@
         // ===== REGRA DE AGENDAMENTO: só Seg (1), Qua (3) e Sex (5), sempre 19:20 =====
         const DIAS_PERMITIDOS = [1, 3, 5];
         const HORARIO_FIXO = "19:20";
-        const MSG_DIA_INVALIDO = "Você tem que anexar uma data que seja ou segunda, ou quarta, ou sexta, e só aceite o agendamento se for uma dessas desses dias";
+        const MSG_DIA_INVALIDO = "Escolha uma data que caia numa segunda, quarta ou sexta-feira — são os únicos dias com turma experimental.";
 
         function ehDiaPermitido(dataStr) {
             if (!dataStr || !/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) return false;
@@ -342,14 +344,10 @@
 
             const sel = document.getElementById("pub-profissional");
             sel.innerHTML = '<option value="">Qualquer instrutor disponível</option>' +
-                profissionais.map(p => `<option value="${escAttr(p.id)}" data-nome="${escAttr(p.nome)}">${escHtml(p.nome)}</option>`).join('');
+                profissionais.map(p => `<option value="${escapeAttr(p.id)}" data-nome="${escapeAttr(p.nome)}">${escapeHtml(p.nome)}</option>`).join('');
         }).catch(err => console.error("Erro ao carregar profissionais:", err));
 
-        // Helpers de escape para montar HTML com dados do banco.
-        function escHtml(v) {
-            return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-        }
-        function escAttr(v) { return escHtml(v); }
+        // escapeHtml / escapeAttr / soDigitos vêm de js/00-utils.js
 
         // ===== EVENTOS DE MUDANÇA NA TELA =====
         let horariosOcupadosCache = [];

@@ -3,6 +3,7 @@
 // A busca acontece no servidor (Firebase Admin) e só os campos necessários
 // voltam para o site — o navegador nunca lê a coleção /clientes inteira.
 import { getAdminDb } from './_firebase-admin.js';
+import { ipDaRequisicao, limiteExcedido } from './_rate-limit.js';
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 
@@ -72,6 +73,12 @@ export default async function handler(req, res) {
   const corpo = await lerCorpo(req);
   const query = req.query || {};
   const telefoneBruto = corpo.telefone ?? query.telefone ?? corpo.phone ?? query.phone;
+
+  // Trava básica contra enumeração de números: limite de consultas por IP.
+  const ip = ipDaRequisicao(req);
+  if (limiteExcedido('consulta:' + ip, 20, 60000)) {
+    return res.status(429).json({ erro: 'Muitas consultas. Aguarde um minuto e tente novamente.' });
+  }
 
   const telefone = soDigitos(telefoneBruto);
   if (telefone.length < 8) {

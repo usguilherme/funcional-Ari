@@ -5,20 +5,21 @@
     /* =========================================
        PALETA PRINCIPAL
        ========================================= */
-    --r: #C0392B;
-    --r2: #8B1A0F;
+    /* Cores da marca vêm de css/tokens.css (fonte única). */
+    --r: var(--brand-red);
+    --r2: var(--brand-red-strong);
     --dk: #0a0a0a;
     --dk2: #0f0f0f;
     --card: #161616;
     --mu: #666;
-    --gold: #E67E22;
+    --gold: var(--brand-amber);
 
     /* Base - Deep Space */
     --bg-body: var(--dk); /* Preto profundo */
     
     /* Acentos - Neon Refinado */
-    --primary: var(--r);      /* Vermelho */
-    --primary-dim: rgba(192, 57, 43, 0.15);
+    --primary: var(--r);      /* Vermelho da marca */
+    --primary-dim: var(--brand-red-dim);
     --secondary: var(--gold);    /* Laranja */
     
     /* Estados Semânticos */
@@ -40,8 +41,9 @@
     --input-text: #ffffff;
     --input-placeholder: rgba(255, 255, 255, 0.4);
     
-    /* Efeitos */
-    --glass-blur: blur(20px);
+    /* Efeitos — blur reduzido de 20px p/ 10px: custo de composição bem menor,
+       diferença visual imperceptível sobre o fundo escuro. */
+    --glass-blur: blur(10px);
     --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
     --glass-bg-top: rgba(255,255,255,0.05);
     --glass-bg-bottom: rgba(255,255,255,0.01);
@@ -109,21 +111,13 @@ html[data-theme="light"] .notification-dropdown { background: var(--surface-2); 
 html[data-theme="light"] .dropdown-header { background: rgba(20, 24, 38, 0.06); color: var(--primary); }
 html[data-theme="light"] .notif-item, html[data-theme="light"] .notif-item strong { color: var(--text-main); }
 html[data-theme="light"] .notif-item span { color: var(--text-muted); }
-html[data-theme="light"] .swipe-front { background: var(--surface-2); }
 html[data-theme="light"] .top-header.glass-panel { background: rgba(255,255,255,0.82); }
 html[data-theme="light"] .btn-primary { background: var(--text-main); color: #ffffff; box-shadow: 0 4px 12px rgba(20, 24, 38, 0.2); }
 html[data-theme="light"] .btn-primary:hover { box-shadow: 0 6px 20px rgba(20, 24, 38, 0.28); }
-html[data-theme="light"] .btn-icon { background: rgba(20, 24, 38, 0.06); color: var(--text-main); border-color: var(--border); }
-html[data-theme="light"] .btn-icon:hover { background: rgba(20, 24, 38, 0.12); border-color: var(--text-main); }
-html[data-theme="light"] .bg-glass { background: rgba(20, 24, 38, 0.10); color: var(--text-main); border: 1px solid rgba(20, 24, 38, 0.22); }
-html[data-theme="light"] .btn-dark-danger { background: var(--surface-2); border-color: var(--border); }
 html[data-theme="light"] .search-box { background: #ffffff; border-color: var(--input-border); }
 html[data-theme="light"] .search-input { color: var(--text-main); }
 html[data-theme="light"] .modern-table td { background: rgba(255,255,255,0.65); border-color: var(--border); color: var(--text-main); }
 html[data-theme="light"] .modern-table tr:hover td { background: #ffffff; }
-html[data-theme="light"] .carrinho-list li { background: rgba(255,255,255,0.7); border-color: var(--border); color: var(--text-main); }
-html[data-theme="light"] .checkout-area { background: rgba(20, 24, 38, 0.05); }
-html[data-theme="light"] .step-num { box-shadow: 0 0 15px var(--primary-dim); }
 html[data-theme="light"] .avatar { background: linear-gradient(135deg, #d3d7e3, #b7bcd1); color: var(--text-main); border-color: var(--border); }
 html[data-theme="light"] .device-option { background: #ffffff; border-color: var(--border); color: var(--text-main); }
 html[data-theme="light"] .skeleton { background: linear-gradient(90deg, rgba(20,24,38,0.07) 25%, rgba(20,24,38,0.14) 50%, rgba(20,24,38,0.07) 75%); background-size: 200% 100%; }
@@ -227,51 +221,19 @@ button { font-family: var(--font-main); letter-spacing: 0.02em; }
 .btn-glow { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--r), var(--r2)); border: none; border-radius: 14px; color: white; font-weight: 700; box-shadow: 0 8px 24px -4px rgba(192, 57, 43, 0.4); cursor: pointer; transition: 0.2s; }
 .btn-glow:hover { filter: brightness(1.1); transform: translateY(-2px); }
 
-.btn-checkout { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--success), #059669); border: none; border-radius: 14px; color: #064e3b; font-weight: 700; box-shadow: 0 8px 24px -4px rgba(52, 211, 153, 0.3); cursor: pointer; transition: 0.2s; }
-.btn-checkout:hover { transform: translateY(-2px); filter: brightness(1.1); }
-
 .btn-danger { background: rgba(255, 255, 255, 0.03); color: var(--danger); border: 1px solid var(--danger); padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
 .btn-danger:hover { background: rgba(248, 113, 113, 0.1); box-shadow: 0 0 10px rgba(248, 113, 113, 0.2); }
-
-.btn-dark-danger { background: var(--dk2); color: var(--danger); border: 1px solid var(--border); padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-.btn-dark-danger:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--danger); }
-
-.btn-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 6px; transition: 0.2s; flex-shrink: 0; }
-.btn-icon:hover { background: rgba(255,255,255,0.1); border-color: white; }
 
 .btn-small { padding: 8px 14px; font-size: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; margin-right: 6px; transition: 0.2s; }
 .btn-small:hover { transform: translateY(-1px); }
 .bg-purple { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.2); }
 .bg-green { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
 .bg-yellow { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
-.bg-glass { background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); }
 
 .btn-logout, .btn-backup { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.2s; background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
 .btn-backup:hover { background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.2); }
 .btn-logout:hover { background: rgba(248, 113, 113, 0.1); color: var(--danger); border-color: rgba(248, 113, 113, 0.3); }
 html[data-theme="light"] .btn-backup:hover { color: var(--text-main); border-color: rgba(20,24,38,0.25); }
-
-/* =========================================
-   5. DASHBOARD & GRÁFICOS
-   ========================================= */
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.kpi-card { padding: 24px; display: flex; align-items: flex-start; gap: 20px; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.kpi-card:hover { transform: translateY(-5px); border-color: var(--border-hover); }
-.kpi-card span { display: block; font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-.kpi-card h3 { font-family: var(--font-display); font-size: 28px; font-weight: 600; line-height: 1; letter-spacing: -0.03em; margin: 0; color: var(--text-main); }
-.kpi-card.gradient-1 h3 { background: linear-gradient(to right, var(--text-main), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-.icon-box { width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: white; transition: 0.3s; flex-shrink: 0; }
-html[data-theme="light"] .icon-box { background: rgba(20,24,38,0.06); color: var(--text-main); }
-.kpi-card:hover .icon-box { background: white; color: black; border-color: white; transform: rotate(-5deg); }
-html[data-theme="light"] .kpi-card:hover .icon-box { background: var(--text-main); color: white; border-color: var(--text-main); }
-.icon-box.warning { color: var(--warning); }
-.icon-box.info { color: #60a5fa; }
-
-.charts-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 24px; }
-.chart-box { height: 300px; display: flex; flex-direction: column; overflow: hidden; }
-.chart-box h4 { font-size: 16px; margin-bottom: 15px; font-weight: 600; color: var(--text-main); }
-.canvas-wrapper { flex: 1; position: relative; width: 100%; height: 100%; min-height: 0; }
 
 /* =========================================
    6. TABELAS & FINANCEIRO
@@ -305,25 +267,10 @@ html[data-theme="light"] .fin-card.profit { background: linear-gradient(135deg, 
 .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 
 /* =========================================
-   7. PDV & GRIDS
+   7. GRIDS
    ========================================= */
-.pdv-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; height: 100%; }
-.pdv-left, .pdv-right { display: flex; flex-direction: column; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
-
-.step-box { margin-bottom: 24px; position: relative; padding-left: 20px; }
-.step-num { position: absolute; left: -10px; top: 0; width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; box-shadow: 0 0 15px var(--primary-dim); }
-.step-box h3 { font-size: 16px; margin-bottom: 12px; color: var(--text-main); font-weight: 600; margin-top: 0; }
 .divider { height: 1px; background: var(--border); margin: 24px 0; }
-
-.carrinho-list { list-style: none; flex: 1; overflow-y: auto; padding-right: 8px; margin-bottom: 20px; }
-.carrinho-list li { background: rgba(255,255,255,0.02); padding: 12px 16px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid transparent; transition: 0.2s; }
-.carrinho-list li:hover { background: rgba(255,255,255,0.05); border-color: var(--border); }
-
-.checkout-area { background: rgba(0,0,0,0.2); border-top: 1px solid var(--border); margin: -24px; padding: 24px; margin-top: auto; }
-.total-display { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
-.total-display span { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-.total-display h2 { font-size: 32px; font-family: var(--font-display); line-height: 1; color: var(--text-main); margin: 0; }
 
 /* =========================================
    8. LOGIN & MODAIS
@@ -406,10 +353,6 @@ html[data-theme="light"] .logo-circle { border-color: rgba(20, 24, 38, 0.12); }
 .fade-in { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.click-particle { position: fixed; top: 0; left: 0; pointer-events: none; width: 6px; height: 6px; border-radius: 50%; background: white; box-shadow: 0 0 10px white; z-index: 99999; animation: particle-pop 0.6s ease-out forwards; }
-.click-particle.alt { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
-@keyframes particle-pop { 0% { opacity: 1; transform: translate(var(--start-x), var(--start-y)) scale(1); } 100% { opacity: 0; transform: translate(var(--end-x), var(--end-y)) scale(0); } }
-
 .ripple { position: absolute; border-radius: 50%; transform: scale(0); animation: ripple 0.6s linear; background-color: rgba(255, 255, 255, 0.2); pointer-events: none; }
 @keyframes ripple { to { transform: scale(4); opacity: 0; } }
 
@@ -438,8 +381,6 @@ html[data-theme="light"] .notification-badge { border-color: var(--surface-2); }
 .full-width { width: 100%; }
 
 @media (max-width: 900px) {
-    .charts-grid { grid-template-columns: 1fr; }
-    .chart-box { height: 280px; }
     .finance-cards { grid-template-columns: 1fr; }
 }
 
@@ -447,24 +388,33 @@ html[data-theme="light"] .notification-badge { border-color: var(--surface-2); }
     body { overflow-y: auto !important; height: auto !important; }
     .app-layout { padding: 0; gap: 0; height: auto; display: block; }
     .sidebar { display: none; }
-    .top-header { border-radius: 0 0 24px 24px; margin-bottom: 16px; background: rgba(15, 16, 22, 0.95); }
-    html[data-theme="light"] .top-header { background: rgba(255, 255, 255, 0.92); }
+    .top-header { border-radius: 0 0 24px 24px; margin-bottom: 16px; background: rgba(15, 16, 22, 0.97); }
+    html[data-theme="light"] .top-header { background: rgba(255, 255, 255, 0.97); }
     .main-content { height: auto; min-height: 100vh; padding-bottom: 90px; overflow: visible; }
     .content-scroll { overflow: visible; padding: 0 16px; }
-    .pdv-layout { grid-template-columns: 1fr; gap: 24px; display: flex; flex-direction: column; }
     .grid-2 { grid-template-columns: 1fr; }
     .mobile-stack { display: flex; flex-direction: column; gap: 10px; }
     .mobile-stack-cards { grid-template-columns: 1fr; display: flex; flex-direction: column; gap: 10px; }
-    .glass-panel { padding: 16px; }
-    .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; width: 100%; height: 70px; background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border); z-index: 9000; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
-    html[data-theme="light"] .mobile-bottom-nav { background: rgba(255, 255, 255, 0.95); }
+
+    /* No mobile o backdrop-filter em dezenas de painéis derrubava o FPS ao rolar.
+       Trocamos o "vidro" por um fundo sólido — visualmente quase idêntico sobre
+       o fundo escuro, sem o custo de composição. */
+    .glass-panel, .top-header.glass-panel, .modal-backdrop, .mobile-bottom-nav {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    .glass-panel { padding: 16px; background: var(--surface); }
+    html[data-theme="light"] .glass-panel { background: var(--surface-2); }
+
+    .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; width: 100%; height: 70px; background: rgba(10, 10, 15, 0.97); border-top: 1px solid var(--border); z-index: 9000; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
+    html[data-theme="light"] .mobile-bottom-nav { background: rgba(255, 255, 255, 0.97); }
     .mobile-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); text-decoration: none; font-size: 10px; padding: 8px; border-radius: 8px; transition: 0.2s; }
     .mobile-nav-item.active { color: var(--text-main); transform: translateY(-4px); }
     .mobile-nav-item.active i { color: var(--primary); fill: var(--primary-dim); }
     .mobile-logout-icon { display: block; margin-left: auto; color: var(--danger); }
     .search-box, .search-input { width: 100%; }
     .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .btn-primary, .modern-input, .btn-danger, .btn-checkout { width: 100%; box-sizing: border-box; }
+    .btn-primary, .modern-input, .btn-danger { width: 100%; box-sizing: border-box; }
 }
 
 /* =========================================
@@ -474,13 +424,6 @@ html[data-theme="light"] .notification-badge { border-color: var(--surface-2); }
 @keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 .skeleton-box { height: 60px; margin-bottom: 10px; border-radius: 12px; }
 .skeleton-circle { width: 40px; height: 40px; border-radius: 50%; }
-
-/* =========================================
-   13. SWIPE-TO-DELETE
-   ========================================= */
-.swipe-item-container { position: relative; overflow: hidden; border-radius: 12px; margin-bottom: 8px; }
-.swipe-front { position: relative; z-index: 2; background: var(--dk2); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s ease-out; touch-action: pan-y; }
-.swipe-back { position: absolute; top: 0; right: 0; width: 100%; height: 100%; background: var(--danger); z-index: 1; border-radius: 12px; display: flex; justify-content: flex-end; align-items: center; padding-right: 20px; color: white; font-weight: bold; font-size: 14px; }
 
 /* =========================================
    14. REFINAMENTOS PREMIUM
@@ -926,7 +869,7 @@ html[data-theme="light"] .dashboard-view .dash-kpi__icon { background: rgba(20, 
 @media (max-width: 640px) {
     .dashboard-view { gap: 14px; }
     .dashboard-view .dash-bento { grid-template-columns: 1fr; gap: 14px; }
-    .dashboard-view .dash-card { padding: 18px; border-radius: 18px; }
+    .dashboard-view .dash-card { padding: 18px; border-radius: 18px; backdrop-filter: none; -webkit-backdrop-filter: none; }
     .dashboard-view .dash-kpi,
     .dashboard-view .dash-kpi--hero,
     .dashboard-view .dash-kpi--wide { grid-column: 1 / -1; }

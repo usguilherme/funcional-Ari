@@ -1,17 +1,23 @@
 # Funcional do Ari — Painel de Gestão
 
-PWA de gestão para o estúdio (alunos, agenda, PDV, financeiro, folha/RH, estoque)
-+ site público (`vitrine.html`, `agendar.html`) + Área do Aluno (`area-aluno.html`).
+PWA de gestão para o estúdio (alunos, agenda, mensalidades, financeiro, folha/RH,
+estoque) + site público (`vitrine.html`, `agendar.html`) + Área do Aluno
+(`area-aluno.html`).
 
 ## Stack
 
 - **Front-end:** HTML/CSS/JS puro, sem build. `index.html` carrega os fragmentos
-  de `pages/` e os módulos `js/01..15-*.js` (scripts clássicos, escopo global
-  compartilhado, carregados na ordem numérica).
+  de `pages/` e os módulos `js/00..15-*.js` (scripts clássicos, escopo global
+  compartilhado, carregados na ordem numérica). `js/00-utils.js` tem os helpers
+  compartilhados (`escapeHtml`, `escapeAttr`, `soDigitos`, `formatarData`), usados
+  também pelas telas públicas. `css/tokens.css` é a paleta oficial da marca —
+  carregado antes de tudo nas 4 telas.
 - **Banco:** Firebase Realtime Database (projeto `funcional-ari`), acessado do
   navegador para o painel autenticado.
 - **Auth:** Firebase Authentication (e-mail/senha).
-- **Imagens:** Firebase Storage (`js` usa o helper `uploadImagem`).
+- **Imagens:** comprimidas no navegador e salvas como data URL no próprio banco
+  (helper `uploadImagem`). O modelo do estúdio é 100% mensalidade — o antigo
+  módulo de PDV/venda avulsa foi removido.
 - **Serverless (Vercel):** `api/gerar-pix.js` (Pix + webhook Mercado Pago) e
   `api/consulta-aluno.js` (consulta de mensalidade pela vitrine).
 
@@ -50,8 +56,11 @@ Ver `.env.example`. Necessárias para as funções `api/`:
 | `FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY` / `FIREBASE_DATABASE_URL` | Service Account do Firebase Admin |
 | `MERCADO_PAGO_ACCESS_TOKEN` | Criar cobranças Pix |
 | `MERCADO_PAGO_WEBHOOK_SECRET` | Validar a assinatura do webhook (recomendado) |
-| `ALLOWED_ORIGIN` | Origem liberada no CORS das APIs |
+| `ALLOWED_ORIGIN` | Origem(ns) liberada(s) no CORS **e** na trava de origem do `api/gerar-pix` (lista separada por vírgula; sem valor = não bloqueia). |
 | `PIX_VALOR_MAXIMO` | Teto de valor por cobrança (padrão 2000) |
+
+As rotas públicas `api/gerar-pix` e `api/consulta-aluno` têm um rate limit simples
+em memória (`api/_rate-limit.js`): 5/min e 20/min por IP, respectivamente.
 
 ### 3. Webhook do Mercado Pago
 

@@ -160,13 +160,33 @@
     // perigoso demais. Um reset completo, se necessário, deve ser feito
     // manualmente pelo console do Firebase.
 
-    function fazerBackup() {
-        if (typeof XLSX === 'undefined') {
-            dispararToast("Erro: Biblioteca Excel não carregada.", "error");
+    // A lib XLSX (~900 KB) só é usada aqui. Em vez de carregar no <head> de
+    // toda visita, baixamos sob demanda no primeiro clique do backup.
+    let _xlsxPromise = null;
+    function carregarXLSX() {
+        if (window.XLSX) return Promise.resolve(window.XLSX);
+        if (_xlsxPromise) return _xlsxPromise;
+        _xlsxPromise = new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+            s.onload = () => window.XLSX ? resolve(window.XLSX) : reject(new Error('XLSX não inicializou'));
+            s.onerror = () => { _xlsxPromise = null; reject(new Error('Falha ao baixar a biblioteca Excel')); };
+            document.head.appendChild(s);
+        });
+        return _xlsxPromise;
+    }
+
+    async function fazerBackup() {
+        try {
+            dispararToast("Preparando planilha...");
+            await carregarXLSX();
+        } catch (e) {
+            console.error(e);
+            dispararToast("Não foi possível carregar a biblioteca Excel. Verifique a conexão.", "error");
             return;
         }
 
-        const wb = XLSX.utils.book_new(); 
+        const wb = XLSX.utils.book_new();
         const dataHoje = new Date().toISOString().split('T')[0];
 
         // --- ABA 1: CLIENTES ---
@@ -230,7 +250,7 @@
 
     function initRippleEffect() {
         document.addEventListener('click', function (e) {
-            const target = e.target.closest('.btn-primary, .btn-glow, .btn-checkout, .btn-danger, .device-option, .nav-item, .mobile-nav-item');
+            const target = e.target.closest('.btn-primary, .btn-glow, .btn-danger, .device-option, .nav-item, .mobile-nav-item');
             if (target) {
                 const ripple = document.createElement('span');
                 ripple.classList.add('ripple');
@@ -297,7 +317,6 @@
         
         db.ref('servicos').on('value', snap => {
             store.servicos = snap.val() ? Object.values(snap.val()) : [];
-            renderServicosPDV();
             renderListaServicosCad();
             if (typeof renderSelectPlanosAluno === 'function') renderSelectPlanosAluno(); // 👈 Atualiza a lista de planos no cadastro do aluno
             // Preços de plano dependem de servicos: recalcula os painéis financeiros.
@@ -308,7 +327,6 @@
         db.ref('clientes').on('value', snap => {
             store.clientes = snap.val() ? Object.values(snap.val()) : [];
             resetarMensalidadesDoMes();
-            renderClientesPDV();
             renderTabelaClientes();
             atualizarKPIs();
             filtrarRetornosDashboard();
@@ -360,7 +378,6 @@
         db.ref('estoque').on('value', snap => {
             store.estoque = snap.val() ? Object.values(snap.val()) : [];
             renderEstoque();
-            renderServicosPDV(); 
         });
 
         // NOVO: Profissionais

@@ -3,25 +3,25 @@
 // nova e cai para o cache quando offline). Chamadas ao Firebase/APIs passam
 // direto pela rede, sem cache.
 
-const VERSAO = 'v15';
+const VERSAO = 'v16';
 const CACHE_NOME = `funcionaldoari-${VERSAO}`;
 
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './css/tokens.css',
   './css/style.css',
+  './js/00-utils.js',
   './js/01-config-firebase-estado.js',
   './js/02-tema-init-auth.js',
   './js/03-config-vitrine.js',
   './js/04-navegacao-ui.js',
-  './js/05-pdv-pix.js',
   './js/06-agenda.js',
   './js/07-clientes.js',
   './js/08-estoque.js',
   './js/09-financeiro-servicos-profissionais.js',
   './js/10-notificacoes-mascaras.js',
-  './js/11-impressao-swipe-contador.js',
   './js/12-modo-tv-fila.js',
   './js/13-rh-folha-pagamento.js',
   './js/14-cobrancas-mensalidades.js',
@@ -40,7 +40,7 @@ const ASSETS = [
   './area-aluno.html',
   './manifest-aluno.json',
   './assets/ding.mp3',
-  './logofuncionalari.jpg',
+  './logofuncionalari.webp',
   './assets/icon-192.png',
   './assets/icon-512.png'
 ];

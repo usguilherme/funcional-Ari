@@ -5,11 +5,25 @@
 //      mensalidade do aluno como "pago" no Realtime Database.
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { getAdminDb } from './_firebase-admin.js';
+import { ipDaRequisicao, limiteExcedido } from './_rate-limit.js';
 
 const MP_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN;
 const MP_WEBHOOK_SECRET = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '';
 const VALOR_MAXIMO = Number(process.env.PIX_VALOR_MAXIMO || 2000);
+
+// Só o site do estúdio pode pedir a geração de um Pix. Se ALLOWED_ORIGIN não
+// estiver configurado (ou for "*"), não bloqueia — mantém o comportamento antigo
+// em dev. O webhook do Mercado Pago NÃO passa por aqui (não tem header Origin).
+function origemPermitida(req) {
+  if (!ALLOWED_ORIGIN || ALLOWED_ORIGIN === '*') return true;
+  const permitidas = ALLOWED_ORIGIN.split(',').map(s => s.trim()).filter(Boolean);
+  const origin = req.headers.origin || '';
+  const referer = req.headers.referer || '';
+  if (origin) return permitidas.includes(origin);
+  // Sem Origin (alguns navegadores em same-origin): cai no Referer.
+  return permitidas.some(o => referer === o || referer.startsWith(o + '/'));
+}
 
 function aplicarCors(req, res) {
   const origin = req.headers.origin || '';
@@ -104,6 +118,15 @@ export default async function handler(req, res) {
   }
 
   // ================= ROTA 1: GERAR PIX =================
+  // Trava básica: só o site oficial + limite de tentativas por IP.
+  if (!origemPermitida(req)) {
+    return res.status(403).json({ erro: 'Origem não autorizada.' });
+  }
+  const ip = ipDaRequisicao(req);
+  if (limiteExcedido('pix:' + ip, 5, 60000)) {
+    return res.status(429).json({ erro: 'Muitas tentativas. Aguarde um minuto e tente novamente.' });
+  }
+
   const { clienteId, nome, valor } = body;
   const valorNum = parseFloat(valor);
 
