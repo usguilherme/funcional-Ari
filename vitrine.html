@@ -802,8 +802,10 @@
 
         // ===== AULÕES / EVENTOS ESPECIAIS =====
         // Nó vitrine_eventos: cada item tem { titulo, dataISO, descricao, foto }.
-        // A seção só aparece se houver pelo menos um aulão com data de hoje em
-        // diante — eventos passados sem apagar somem sozinhos.
+        // A seção funciona como portfólio/galeria: mostra TODOS os aulões
+        // cadastrados (inclusive de datas passadas), do mais recente para o mais
+        // antigo, até o admin excluir manualmente pelo painel. Só some quando não
+        // há nenhum aulão no banco.
         (function () {
             const esc = (v) => String(v == null ? '' : v)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -827,15 +829,9 @@
                 const sec = document.getElementById('section-auloes');
                 if (!val || !grid || !sec) return;
 
-                const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
                 const eventos = Object.values(val)
                     .filter(e => e && e.titulo)
-                    .filter(e => {
-                        if (!/^\d{4}-\d{2}-\d{2}$/.test(e.dataISO || '')) return true;
-                        const [a, m, d] = e.dataISO.split('-').map(Number);
-                        return new Date(a, m - 1, d) >= hoje;
-                    })
-                    .sort((x, y) => String(x.dataISO || '').localeCompare(String(y.dataISO || '')));
+                    .sort((x, y) => String(y.dataISO || '').localeCompare(String(x.dataISO || '')));
 
                 if (!eventos.length) return;
 
