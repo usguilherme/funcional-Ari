@@ -132,16 +132,29 @@ Os campos "Horários das aulas" e "Recado para os alunos" ficam na aba
   Twitter Card, `canonical` e JSON-LD (`ExerciseGym`). `robots.txt`, `sitemap.xml`
   e `404.html` na raiz. Imagem de compartilhamento: `assets/og-image.jpg` (1200×630).
 - **`index.html` e `area-aluno.html`** têm `noindex`.
+- **Vídeos da vitrine:** facade (miniatura `i.ytimg.com` + botão play). O iframe
+  do YouTube (>1 MB) só entra no clique — economia grande de dados/LCP.
+- **PWA:** manifests com `id`, `description`, `categories` e ícone `maskable`
+  (`assets/icon-maskable-512.png`).
 
 ### Pendências (exigem conta/serviço externo ou refatoração maior)
 
 - Monitoramento de erro (Sentry) no front e nas funções `api/`.
 - Analytics de funil (vitrine → agendar → WhatsApp) e Web Vitals.
+- **App Check** (reCAPTCHA) — protege também as *leituras* dos nós públicos do RTDB.
 - Rate limit persistente (Vercel KV / Upstash) no lugar do limitador em memória.
 - Login da Área do Aluno por OTP (código no WhatsApp) em vez de só telefone.
+- `api/gerar-pix`: **`MERCADO_PAGO_ACCESS_TOKEN` não está configurado na Vercel** —
+  a geração de Pix online está inativa (retorna "configuração ausente"). A lógica
+  já está pronta (valor apurado no servidor); falta só a env var + o webhook.
 - `api/consulta-aluno.js` lê coleções inteiras (`clientes`, `atendimentos`) a cada
   chamada — migrar para consulta indexada exige padronizar o formato do telefone
   no banco antes.
+- Migração das fotos base64 → Storage: `api/upload-foto` já existe e `uploadImagem`
+  já tenta usá-lo (com fallback). Falta: confirmar um upload de teste no bucket e
+  rodar um script de migração para as fotos antigas.
+- PWA `screenshots` e `shortcuts`: precisam de rotas por hash/query no painel
+  (hoje não há) e de capturas reais de tela.
 - Passo de build (esbuild): minificação + hash no nome do arquivo (destrava cache
   `immutable` de verdade em `css/` e `js/`). Hoje não há build de propósito.
 - Self-host das fontes Google.

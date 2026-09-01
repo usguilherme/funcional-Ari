@@ -5,7 +5,7 @@
 // nova da rede. Chamadas ao Firebase/APIs passam direto pela rede, sem cache.
 // O próprio sw.js nunca é servido do cache, para não travar futuras atualizações.
 
-const VERSAO = 'v21';
+const VERSAO = 'v22';
 const CACHE_NOME = `funcionaldoari-${VERSAO}`;
 
 const ASSETS = [
@@ -47,7 +47,8 @@ const ASSETS = [
   './assets/ding.mp3',
   './logofuncionalari.webp',
   './assets/icon-192.png',
-  './assets/icon-512.png'
+  './assets/icon-512.png',
+  './assets/icon-maskable-512.png'
 ];
 
 self.addEventListener('install', (event) => {

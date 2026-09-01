@@ -1,13 +1,20 @@
 {
+  "id": "/area-aluno.html",
   "name": "Área do Aluno — Funcional do Ari",
   "short_name": "Meu Treino",
+  "description": "Acompanhe sua mensalidade, evolução, treinos e conquistas no Funcional do Ari.",
+  "lang": "pt-BR",
+  "dir": "ltr",
   "start_url": "/area-aluno.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0d0d0e",
   "theme_color": "#0d0d0e",
   "orientation": "portrait",
+  "categories": ["health", "fitness", "lifestyle"],
   "icons": [
-    { "src": "assets/icon-192.png", "type": "image/png", "sizes": "192x192" },
-    { "src": "assets/icon-512.png", "type": "image/png", "sizes": "512x512" }
+    { "src": "assets/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "assets/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "assets/icon-maskable-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
   ]
 }

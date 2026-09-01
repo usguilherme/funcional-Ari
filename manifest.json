@@ -1,21 +1,35 @@
 {
-  "name": "Funcional do Ari Gestão",
+  "id": "/index.html",
+  "name": "Funcional do Ari — Gestão",
   "short_name": "Funcional do Ari",
+  "description": "Painel de gestão do estúdio Funcional do Ari: alunos, agenda, mensalidades, financeiro, folha e estoque.",
+  "lang": "pt-BR",
+  "dir": "ltr",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#09090b",
   "theme_color": "#e6432f",
   "orientation": "portrait",
+  "categories": ["business", "productivity"],
   "icons": [
     {
       "src": "assets/icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any"
     },
     {
       "src": "assets/icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-maskable-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ]
 }
