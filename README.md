@@ -93,6 +93,36 @@ para o banco). O texto das anotações técnicas do professor só aparece se
 Os campos "Horários das aulas" e "Recado para os alunos" ficam na aba
 *Vitrine Online* do painel (`landingConfig.horariosAluno` / `recadoAluno`).
 
+## Performance, SEO e segurança
+
+- **Service Worker (`sw.js`):** App Shell em *stale-while-revalidate* (cache na
+  hora, revalida em 2º plano). Firebase/APIs sempre pela rede. Ao mudar HTML/CSS/JS
+  do shell, **incremente `VERSAO`** no topo do arquivo.
+- **Cabeçalhos (`vercel.json`):** CSP, `Permissions-Policy` e `Cache-Control`
+  (assets estáticos `immutable`; `css/` e `js/` com `stale-while-revalidate`;
+  HTML e `sw.js` sem cache). Ao adicionar um domínio externo novo (script, fonte,
+  API), libere na CSP — senão o navegador bloqueia silenciosamente.
+- **CDN com versão fixa + SRI:** `lucide@1.38.0` e `chart.js@4.5.1` têm hash
+  `integrity`. Ao trocar a versão, recalcule o hash:
+  `curl -s <url> | openssl dgst -sha384 -binary | openssl base64 -A`.
+- **SEO (só telas públicas):** `vitrine.html` e `agendar.html` têm Open Graph,
+  Twitter Card, `canonical` e JSON-LD (`ExerciseGym`). `robots.txt`, `sitemap.xml`
+  e `404.html` na raiz. Imagem de compartilhamento: `assets/og-image.jpg` (1200×630).
+- **`index.html` e `area-aluno.html`** têm `noindex`.
+
+### Pendências (exigem conta/serviço externo ou refatoração maior)
+
+- Monitoramento de erro (Sentry) no front e nas funções `api/`.
+- Analytics de funil (vitrine → agendar → WhatsApp) e Web Vitals.
+- Rate limit persistente (Vercel KV / Upstash) no lugar do limitador em memória.
+- Login da Área do Aluno por OTP (código no WhatsApp) em vez de só telefone.
+- `api/consulta-aluno.js` lê coleções inteiras (`clientes`, `atendimentos`) a cada
+  chamada — migrar para consulta indexada exige padronizar o formato do telefone
+  no banco antes.
+- Passo de build (esbuild): minificação + hash no nome do arquivo (destrava cache
+  `immutable` de verdade em `css/` e `js/`). Hoje não há build de propósito.
+- Self-host das fontes Google.
+
 ## Notas de operação
 
 - **Mensalidades:** marque cada aluno como pago na aba *Atualização*. Isso grava

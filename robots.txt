@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /index.html
+Disallow: /area-aluno.html
+Disallow: /pages/
+Disallow: /api/
+
+Sitemap: https://funcional-ari.vercel.app/sitemap.xml

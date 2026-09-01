@@ -16,7 +16,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/tokens.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@1.38.0/dist/umd/lucide.min.js"
+            integrity="sha384-yi0Nt4uuEMu/6z2xkzY7OkOlSzF+Spi8SreFE+kyQGlSDSV56UXyFUP0SPMo/xvL"
+            crossorigin="anonymous"></script>
     <style>
         :root {
             --bg-dark: #0d0d0e;
@@ -394,6 +396,7 @@
             .badges { grid-template-columns: repeat(3, 1fr); }
         }
         @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
             *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
         }
     </style>
@@ -440,8 +443,8 @@
                 <strong id="tb-nome">Aluno</strong>
                 <span id="tb-plano">—</span>
             </div>
-            <button class="icon-btn" id="btn-atualizar" title="Atualizar"><i data-lucide="refresh-cw"></i></button>
-            <button class="icon-btn" id="btn-sair" title="Sair"><i data-lucide="log-out"></i></button>
+            <button class="icon-btn" id="btn-atualizar" title="Atualizar" aria-label="Atualizar meus dados"><i data-lucide="refresh-cw" aria-hidden="true"></i></button>
+            <button class="icon-btn" id="btn-sair" title="Sair" aria-label="Sair da minha conta"><i data-lucide="log-out" aria-hidden="true"></i></button>
         </header>
 
         <!-- ---------- INÍCIO ---------- -->

@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
     <title>Funcional do Ari | Painel de Gestão</title>
 
     <script>
@@ -18,11 +19,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Bibliotecas de CDN: carregadas com defer (não bloqueiam a 1ª pintura).
-         qrious foi removido junto com o PDV; xlsx agora é carregado sob demanda
-         (só ao clicar em "Backup Excel"). -->
-    <script src="https://unpkg.com/lucide@latest" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <!-- Bibliotecas de CDN: versão fixada + Subresource Integrity (SRI) para que
+         o navegador rejeite o arquivo se a CDN devolver bytes diferentes.
+         Carregadas com defer (não bloqueiam a 1ª pintura). qrious foi removido
+         junto com o PDV; xlsx agora é carregado sob demanda (só ao clicar em
+         "Backup Excel"). -->
+    <script src="https://unpkg.com/lucide@1.38.0/dist/umd/lucide.min.js"
+            integrity="sha384-yi0Nt4uuEMu/6z2xkzY7OkOlSzF+Spi8SreFE+kyQGlSDSV56UXyFUP0SPMo/xvL"
+            crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
+            integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ"
+            crossorigin="anonymous" defer></script>
 
     <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/style.css">
