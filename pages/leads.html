@@ -1,0 +1,29 @@
+<div class="glass-panel" style="padding: 25px; margin-bottom: 40px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+        <div>
+            <h2 style="color: var(--primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="bell-ring"></i> Fila de Espera
+            </h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">
+                Pessoas que não acharam vaga nos dias fixos e querem ser chamadas quando abrir turma.
+            </p>
+        </div>
+        <span class="badge bg-yellow" id="leads-contador" style="font-size: 13px; padding: 6px 12px;">0 na fila</span>
+    </div>
+
+    <div class="table-responsive" style="overflow-x: auto;">
+        <table class="modern-table" style="width: 100%; min-width: 560px;">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>WhatsApp</th>
+                    <th>Entrou em</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-leads-espera">
+                <tr><td colspan="4" style="text-align:center; padding:20px; opacity:0.5;">Carregando...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>

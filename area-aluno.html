@@ -212,6 +212,31 @@
         .stat.warn .val { color: var(--amber); }
         .stat.bad .val { color: #f87171; }
 
+        /* botão "Instalar app" (PWA) — nasce hidden, só aparece se o navegador oferecer */
+        .btn-instalar-aluno[hidden] { display: none; }
+        .btn-instalar-aluno {
+            width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+            margin-bottom: 14px; padding: 13px; border-radius: 14px; cursor: pointer;
+            font-family: var(--font-body); font-size: 13.5px; font-weight: 700;
+            background: var(--primary-soft); color: #ffb4a8;
+            border: 1px solid rgba(192, 57, 43, 0.32);
+        }
+        .btn-instalar-aluno:active { transform: scale(0.98); }
+        .btn-instalar-aluno i { width: 17px; height: 17px; }
+
+        /* Bento card da Ofensiva 🔥 (gamificação) */
+        .ofensiva-card {
+            position: relative; overflow: hidden;
+            background: var(--ember);
+            border-radius: 20px; padding: 20px 22px; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 18px;
+            box-shadow: var(--shadow-glow);
+        }
+        .ofensiva-card .oc-flame { font-size: 46px; line-height: 1; flex-shrink: 0; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35)); }
+        .ofensiva-card .oc-lbl { font-size: 11px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.92); }
+        .ofensiva-card .oc-num { font-family: var(--font-display); font-size: 34px; line-height: 1.05; color: #fff; margin: 2px 0 4px; }
+        .ofensiva-card .oc-sub { font-size: 12.5px; line-height: 1.4; color: rgba(255,255,255,0.9); }
+
         .pill {
             display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 30px;
             font-size: 12px; font-weight: 800; letter-spacing: .4px;
@@ -421,6 +446,9 @@
 
         <!-- ---------- INÍCIO ---------- -->
         <section id="v-inicio" class="view active">
+            <button id="btn-instalar-app-aluno" class="btn-instalar-aluno" hidden>
+                <i data-lucide="download"></i> Instalar o app no meu celular
+            </button>
             <div id="inicio-conteudo"></div>
         </section>
 
@@ -863,6 +891,20 @@
                     (ALUNO.inicio ? '<div class="tempo">Treinando com a gente ' + esc(textoTempo(ALUNO.inicio)) + ' 🎯</div>' : '') +
                  '</div>';
 
+            // ---- OFENSIVA 🔥 (semanas consecutivas de presença, definidas pelo professor) ----
+            var ofensiva = Number(ALUNO.streak) || 0;
+            var ofMsg = ofensiva >= 4
+                ? 'Você tá voando! Não deixa a chama apagar. 💪'
+                : (ofensiva > 0 ? 'Mantém a presença que a chama cresce a cada semana!' : 'Comece sua ofensiva: apareça nas aulas desta semana!');
+            h += '<div class="ofensiva-card">' +
+                    '<div class="oc-flame">' + (ofensiva > 0 ? '🔥' : '🫧') + '</div>' +
+                    '<div>' +
+                        '<div class="oc-lbl">Ofensiva de presença</div>' +
+                        '<div class="oc-num">' + ofensiva + ' ' + (ofensiva === 1 ? 'semana' : 'semanas') + '</div>' +
+                        '<div class="oc-sub">' + ofMsg + '</div>' +
+                    '</div>' +
+                 '</div>';
+
             h += '<div class="stat-grid">' +
                     '<button class="stat tap ' + (pago ? 'ok' : 'bad') + '" onclick="__trocarView(\'mensalidade\')">' +
                         '<span class="lbl"><i data-lucide="wallet"></i> Mensalidade</span>' +
@@ -875,7 +917,7 @@
                         '<span class="foot">nível ' + nv.numero + ' · ' + esc(nv.nome) + '</span>' +
                     '</button>' +
                     '<div class="stat ' + (streak > 0 ? 'warn' : '') + '">' +
-                        '<span class="lbl"><i data-lucide="flame"></i> Sequência</span>' +
+                        '<span class="lbl"><i data-lucide="footprints"></i> Meus check-ins</span>' +
                         '<span class="val">' + streak + '</span>' +
                         '<span class="foot">' + (streak === 1 ? 'dia seguido' : 'dias seguidos') + '</span>' +
                     '</div>' +
@@ -1345,6 +1387,11 @@
 
         // ================= BOOT =================
         (function boot() {
+            // Botão "Instalar app" (PWA) — só aparece se o navegador oferecer.
+            if (typeof configurarBotaoInstalar === 'function') {
+                configurarBotaoInstalar($('btn-instalar-app-aluno'));
+            }
+
             var salvo = lerLoginLocal();
             if (salvo && salvo.telefone) {
                 var av = $('wb-avatar');

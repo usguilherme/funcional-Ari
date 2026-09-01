@@ -48,6 +48,11 @@
 
         atualizarIconeTema();
 
+        // Botão "Instalar App" (PWA) — só aparece se o navegador oferecer.
+        if (typeof configurarBotaoInstalar === 'function') {
+            configurarBotaoInstalar(document.getElementById('btn-instalar-app'));
+        }
+
         tentarIniciarSistema();
     });
 
@@ -313,6 +318,13 @@
         db.ref('vitrine_eventos').on('value', snap => {
             eventosVitrine = snap.val() ? Object.values(snap.val()) : [];
             if (typeof renderListaEventosVitrine === 'function') renderListaEventosVitrine();
+        });
+
+        // NOVO: FILA DE ESPERA / LEADS (capturados pelo agendar.html)
+        db.ref('leads_espera').on('value', snap => {
+            const val = snap.val();
+            leadsEspera = val ? Object.entries(val).map(([id, v]) => ({ id, ...v })) : [];
+            if (typeof renderLeadsEspera === 'function') renderLeadsEspera();
         });
         
         db.ref('servicos').on('value', snap => {

@@ -3,7 +3,7 @@
 // nova e cai para o cache quando offline). Chamadas ao Firebase/APIs passam
 // direto pela rede, sem cache.
 
-const VERSAO = 'v17';
+const VERSAO = 'v18';
 const CACHE_NOME = `funcionaldoari-${VERSAO}`;
 
 const ASSETS = [
@@ -26,6 +26,7 @@ const ASSETS = [
   './js/13-rh-folha-pagamento.js',
   './js/14-cobrancas-mensalidades.js',
   './js/15-atualizacao-avaliacoes.js',
+  './js/16-leads.js',
   './pages/dashboard.html',
   './pages/agenda.html',
   './pages/novo_atendimento.html',
@@ -37,6 +38,7 @@ const ASSETS = [
   './pages/servicos.html',
   './pages/despesas.html',
   './pages/landing.html',
+  './pages/leads.html',
   './area-aluno.html',
   './manifest-aluno.json',
   './assets/ding.mp3',

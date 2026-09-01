@@ -193,6 +193,9 @@
                 <a onclick="abrirAba('agenda')" class="nav-item">
                     <i data-lucide="calendar-days"></i> Agenda
                 </a>
+                <a onclick="abrirAba('leads')" class="nav-item">
+                    <i data-lucide="bell-ring"></i> Fila de Espera
+                </a>
                 <a onclick="abrirAba('novo_atendimento')" class="nav-item">
                     <i data-lucide="sparkles"></i> Atualização
                 </a>
@@ -289,6 +292,7 @@
                 <section id="servicos" class="aba fade-in" style="display:none"></section>
                 <section id="landing" class="aba fade-in" style="display:none"></section>
                 <section id="despesas" class="aba fade-in" style="display:none"></section>
+                <section id="leads" class="aba fade-in" style="display:none"></section>
 
                 <section id="rh" class="aba fade-in" style="display:none">
                     <div class="glass-panel" style="padding: 20px;">
@@ -399,6 +403,7 @@
         <div class="mobile-sheet-grid">
             <a onclick="irParaAba('dashboard')"><i data-lucide="layout-grid"></i><span>Visão Geral</span></a>
             <a onclick="irParaAba('agenda')"><i data-lucide="calendar-days"></i><span>Agenda</span></a>
+            <a onclick="irParaAba('leads')"><i data-lucide="bell-ring"></i><span>Fila de Espera</span></a>
             <a onclick="irParaAba('novo_atendimento')"><i data-lucide="sparkles"></i><span>Atualização</span></a>
             <a onclick="irParaAba('clientes')"><i data-lucide="users"></i><span>Alunos</span></a>
             <a onclick="irParaAba('profissionais')"><i data-lucide="user-cog"></i><span>Instrutores</span></a>
@@ -629,8 +634,8 @@
     <script>
         async function carregarComponentes() {
             const paginas = [
-                'dashboard', 'agenda', 'novo_atendimento', 'profissionais', 'clientes', 
-                'estoque', 'financeiro', 'servicos', 'despesas', 'landing', 'avaliacoes'
+                'dashboard', 'agenda', 'novo_atendimento', 'profissionais', 'clientes',
+                'estoque', 'financeiro', 'servicos', 'despesas', 'landing', 'avaliacoes', 'leads'
             ];
 
             const loads = paginas.map(async (pagina) => {
@@ -713,5 +718,6 @@
     <script src="js/13-rh-folha-pagamento.js"></script>
     <script src="js/14-cobrancas-mensalidades.js"></script>
     <script src="js/15-atualizacao-avaliacoes.js"></script>
+    <script src="js/16-leads.js"></script>
 </body>
 </html>

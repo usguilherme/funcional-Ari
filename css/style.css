@@ -383,6 +383,21 @@ html[data-theme="light"] .notification-badge { border-color: var(--surface-2); }
 /* Menu móvel (bottom sheet): existe no DOM sempre, mas só aparece no mobile. */
 .mobile-sheet-backdrop, .mobile-sheet { display: none; }
 
+/* Botão "Instalar app" (PWA): nasce hidden; o js/00-utils só mostra quando
+   o navegador oferece a instalação. */
+.btn-instalar-app[hidden] { display: none; }
+.btn-instalar-app {
+    align-self: flex-start; margin-top: 8px;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 10px; cursor: pointer;
+    font-family: var(--font-main); font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
+    background: var(--brand-red-dim); color: var(--primary);
+    border: 1px solid rgba(192, 57, 43, 0.3);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-instalar-app:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-instalar-app i { width: 15px; height: 15px; }
+
 @media (max-width: 900px) {
     .finance-cards { grid-template-columns: 1fr; }
 }

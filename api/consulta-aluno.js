@@ -172,6 +172,7 @@ export default async function handler(req, res) {
 
       // --- engajamento ---
       pontos: Number(aluno.pontos) || 0,
+      streak: Number(aluno.streak) || 0,
       linkDrive: typeof aluno.linkDrive === 'string' ? aluno.linkDrive.trim() : '',
       galeria,
       historico,

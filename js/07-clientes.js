@@ -20,6 +20,7 @@
             // Formata a data de YYYY-MM-DD para DD/MM/YYYY
             const inicio = cli.inicio ? cli.inicio.split('-').reverse().join('/') : '-';
             const vencimento = cli.vencimento ? `Dia ${escapeHtml(cli.vencimento)}` : '-';
+            const ofensiva = Number(cli.streak) || 0;
 
             // Formata o número para o link do WhatsApp (tira parênteses e traços)
             const telefoneClean = cli.telefone ? String(cli.telefone).replace(/\D/g, '') : '';
@@ -38,6 +39,13 @@
                 <td>${tempo}</td>
                 <td>${inicio}</td>
                 <td><span class="badge bg-purple">${vencimento}</span></td>
+                <td style="white-space: nowrap;">
+                    <span style="font-family: var(--font-display); font-size: 16px; color: ${ofensiva > 0 ? 'var(--secondary)' : 'var(--text-muted)'};">🔥 ${ofensiva}</span>
+                    <div style="display: flex; gap: 4px; margin-top: 4px;">
+                        <button class="btn-small bg-green" style="padding: 4px 9px; margin: 0;" onclick="somarOfensiva('${idAttr}')" title="Marcou presença: +1 semana">+1</button>
+                        <button class="btn-small" style="padding: 4px 9px; margin: 0; background: rgba(248,113,113,0.12); color: var(--danger); border: 1px solid rgba(248,113,113,0.25);" onclick="zerarOfensiva('${idAttr}')" title="Faltou / quebrou a sequência: zerar">0</button>
+                    </div>
+                </td>
                 <td style="white-space: nowrap; display: flex; gap: 6px;">
                     <button class="btn-small bg-yellow" onclick="editarCliente('${idAttr}')" title="Editar">
                         <i data-lucide="pencil" style="width:16px; height:16px;"></i>
@@ -62,6 +70,27 @@
             db.ref(`clientes/${id}`).remove()
             .then(() => dispararToast("Cliente removido!", "error"));
         }
+    }
+
+    // ==========================================
+    // OFENSIVA / STREAK (gamificação — controle manual do professor)
+    // Guardado em clientes/$id/streak (número de semanas seguidas de presença).
+    // O aluno vê no card "Ofensiva 🔥" da Área do Aluno.
+    // ==========================================
+    function somarOfensiva(id) {
+        const c = store.clientes.find(x => x.id == id);
+        const atual = Number(c && c.streak) || 0;
+        db.ref(`clientes/${id}/streak`).set(atual + 1)
+            .then(() => dispararToast(`🔥 ${c ? String(c.nome).split(' ')[0] : 'Aluno'}: ${atual + 1} semana(s) de ofensiva!`))
+            .catch(err => { console.error(err); dispararToast("Erro ao atualizar a ofensiva.", "error"); });
+    }
+
+    function zerarOfensiva(id) {
+        const c = store.clientes.find(x => x.id == id);
+        if (!confirm(`Zerar a ofensiva de ${c ? c.nome : 'este aluno'}?\n(faltou ou quebrou a sequência)`)) return;
+        db.ref(`clientes/${id}/streak`).set(0)
+            .then(() => dispararToast("Ofensiva zerada."))
+            .catch(err => { console.error(err); dispararToast("Erro ao zerar a ofensiva.", "error"); });
     }
 
     function filtrarRetornosDashboard() {

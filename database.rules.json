@@ -104,6 +104,21 @@
         "confirmadoEm": { ".validate": "auth != null && newData.isNumber()" },
         "$outro": { ".validate": "auth != null" }
       }
+    },
+
+    "leads_espera": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$id": {
+        ".write": "auth != null || (!data.exists() && newData.exists())",
+        ".validate": "newData.hasChildren(['nome','telefone','criadoEm'])",
+        "nome": { ".validate": "newData.isString() && newData.val().length > 1 && newData.val().length <= 120" },
+        "telefone": { ".validate": "newData.isString() && newData.val().matches(/^[0-9 ()+.-]{8,30}$/)" },
+        "criadoEm": { ".validate": "newData.isNumber() && (auth != null || (newData.val() <= now + 300000 && newData.val() > now - 3600000))" },
+        "origem": { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "atendido": { ".validate": "auth != null && newData.isBoolean()" },
+        "$outro": { ".validate": "auth != null" }
+      }
     }
   }
 }

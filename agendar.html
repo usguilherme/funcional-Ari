@@ -213,6 +213,19 @@
         .btn-voltar:hover { color: var(--primary); }
         .btn-voltar i { width: 15px; height: 15px; }
 
+        /* Botão secundário: Fila de Espera */
+        .btn-fila-espera {
+            width: 100%; margin-top: 12px; padding: 14px 18px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--ring-strong); border-radius: 50px;
+            color: var(--text-main); font-family: var(--font-body);
+            font-size: 13.5px; font-weight: 600; cursor: pointer;
+            transition: border-color 0.25s ease, background 0.25s ease;
+        }
+        .btn-fila-espera:hover { border-color: var(--primary); background: rgba(192, 57, 43, 0.10); }
+        .btn-fila-espera i { width: 16px; height: 16px; color: var(--primary); }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
             .animate-up { opacity: 1; transform: none; }
@@ -240,6 +253,7 @@
         </aside>
 
         <div class="form-panel">
+            <div id="agendar-form-principal">
             <div class="form-header">
                 <span class="selo-marca">Reserva Online</span>
                 <h2>Agendar Aula</h2>
@@ -288,7 +302,34 @@
 
                 <button onclick="salvarAgendamentoPublico()" class="btn-glow"><i data-lucide="message-circle"></i> AGENDAR E IR PARA WHATSAPP</button>
 
+                <button type="button" onclick="mostrarFilaEspera()" class="btn-fila-espera">
+                    <i data-lucide="bell-plus"></i> Não encontrou vaga? Entre na Fila de Espera
+                </button>
+
                 <a href="vitrine.html" class="btn-voltar"><i data-lucide="arrow-left"></i> Voltar para a vitrine</a>
+            </div>
+            </div><!-- /#agendar-form-principal -->
+
+            <!-- ===== FILA DE ESPERA (captura de lead) ===== -->
+            <div id="agendar-fila-espera" style="display:none;">
+                <div class="form-header">
+                    <span class="selo-marca">Fila de Espera</span>
+                    <h2>Entrar na Fila</h2>
+                    <p>Sem vaga nos dias fixos (seg/qua/sex)? Deixa seu contato — a gente te chama assim que abrir uma turma nova ou um horário.</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="label-small"><i data-lucide="user"></i> Seu Nome</label>
+                    <input type="text" id="fila-nome" class="modern-input" placeholder="Ex: João Silva">
+                </div>
+                <div class="form-group">
+                    <label class="label-small"><i data-lucide="phone"></i> Seu WhatsApp (com DDD)</label>
+                    <input type="text" id="fila-tel" class="modern-input" placeholder="(83) 99999-9999" inputmode="tel">
+                </div>
+
+                <button onclick="entrarNaFilaEspera()" class="btn-glow"><i data-lucide="bell-plus"></i> ENTRAR NA FILA DE ESPERA</button>
+
+                <a onclick="voltarAgendamento()" class="btn-voltar" style="cursor:pointer;"><i data-lucide="arrow-left"></i> Voltar para o agendamento</a>
             </div>
         </div>
     </div>
@@ -501,6 +542,60 @@
                     btn.style.opacity = "1";
                     btn.style.pointerEvents = "auto";
                 });
+        }
+
+        // ===== FILA DE ESPERA (captura de lead) =====
+        function mostrarFilaEspera() {
+            document.getElementById("agendar-form-principal").style.display = "none";
+            document.getElementById("agendar-fila-espera").style.display = "block";
+            if (window.lucide) lucide.createIcons();
+        }
+        function voltarAgendamento() {
+            document.getElementById("agendar-fila-espera").style.display = "none";
+            document.getElementById("agendar-form-principal").style.display = "block";
+            if (window.lucide) lucide.createIcons();
+        }
+        function entrarNaFilaEspera() {
+            const nome = document.getElementById("fila-nome").value.trim();
+            const telBruto = document.getElementById("fila-tel").value.trim();
+            const telDigitos = soDigitos(telBruto);
+
+            if (nome.length < 2) { alert("Por favor, digite seu nome."); return; }
+            if (telDigitos.length < 10 || telDigitos.length > 13) {
+                alert("Digite um WhatsApp válido com DDD (ex: 83 99999-9999).");
+                return;
+            }
+
+            const btn = document.querySelector("#agendar-fila-espera .btn-glow");
+            btn.innerText = "ENVIANDO...";
+            btn.style.opacity = "0.7";
+            btn.style.pointerEvents = "none";
+            const restaurarBtn = () => {
+                btn.innerText = "ENTRAR NA FILA DE ESPERA";
+                btn.style.opacity = "1";
+                btn.style.pointerEvents = "auto";
+            };
+
+            // O nó valida telefone com regex /^[0-9 ()+.-]{8,30}$/ — remove
+            // qualquer outro caractere (letras, emoji) antes de gravar.
+            const telLimpo = telBruto.replace(/[^0-9 ()+.-]/g, "").trim().slice(0, 30) || telDigitos;
+
+            db.ref("leads_espera").push({
+                nome: nome.slice(0, 120),
+                telefone: telLimpo,
+                criadoEm: Date.now(),
+                origem: "agendar"
+            }).then(() => {
+                alert("✅ Pronto! Você está na fila de espera. A gente te chama no WhatsApp assim que abrir vaga.");
+                document.getElementById("fila-nome").value = "";
+                document.getElementById("fila-tel").value = "";
+                restaurarBtn();
+                voltarAgendamento();
+            }).catch(err => {
+                console.error(err);
+                alert("Não foi possível entrar na fila agora. Verifique sua conexão e tente de novo.");
+                restaurarBtn();
+            });
         }
     </script>
 </body>
