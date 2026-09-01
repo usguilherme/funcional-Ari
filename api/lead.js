@@ -20,13 +20,9 @@ function aplicarCors(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
-function origemPermitida(req) {
-  if (!ALLOWED_ORIGIN || ALLOWED_ORIGIN === '*') return true;
-  const permitidas = ALLOWED_ORIGIN.split(',').map(s => s.trim()).filter(Boolean);
-  const origin = req.headers.origin || '';
-  const referer = req.headers.referer || '';
-  if (origin) return permitidas.includes(origin);
-  return permitidas.some(o => referer === o || referer.startsWith(o + '/'));
+// Ver comentário em api/agendar.js: só barra cross-site declarado pelo browser.
+function pedidoCrossSite(req) {
+  return String(req.headers['sec-fetch-site'] || '') === 'cross-site';
 }
 
 async function lerCorpo(req) {
@@ -51,7 +47,7 @@ export default async function handler(req, res) {
   aplicarCors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ erro: 'Método não permitido' });
-  if (!origemPermitida(req)) return res.status(403).json({ erro: 'Origem não autorizada.' });
+  if (pedidoCrossSite(req)) return res.status(403).json({ erro: 'Origem não autorizada.' });
 
   const ip = ipDaRequisicao(req);
   if (limiteExcedido('lead:' + ip, 5, 60000)) {
