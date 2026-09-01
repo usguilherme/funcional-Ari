@@ -278,7 +278,7 @@
                 </div>
 
                 <div id="pub-aviso-dia" class="aviso-caixa">
-                    📅 As aulas experimentais acontecem só às <strong>segundas, quartas e sextas</strong>, sempre às <strong>19:20</strong>. Escolha uma dessas datas, por favor.
+                    📅 Turmas experimentais disponíveis apenas às <strong>segundas, quartas e sextas</strong> (19:20). Escolha uma dessas datas, por favor.
                 </div>
                 <div id="pub-horarios-ocupados" class="aviso-caixa"></div>
                 <div id="pub-aviso-conflito" class="aviso-caixa">
@@ -315,10 +315,11 @@
         const HORARIO_FIXO = "19:20";
 
         function ehDiaPermitido(dataStr) {
-            if (!dataStr) return false;
-            // meio-dia evita qualquer efeito de fuso horário ao ler o dia da semana
-            const d = new Date(dataStr + "T12:00:00");
-            return DIAS_PERMITIDOS.includes(d.getDay());
+            if (!dataStr || !/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) return false;
+            // string ISO (AAAA-MM-DD) + "Z" é lida como UTC; getUTCDay() devolve o
+            // dia da semana exato (0=Dom, 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex, 6=Sáb)
+            const dia = new Date(dataStr + "T00:00:00Z").getUTCDay();
+            return DIAS_PERMITIDOS.includes(dia);
         }
 
         // Não deixa escolher datas passadas
@@ -399,18 +400,27 @@
             carregarHorariosOcupados();
         });
 
-        document.getElementById("pub-data").addEventListener("change", function () {
+        // Só deixa passar Segunda, Quarta ou Sexta. Se o usuário escolher outro
+        // dia no calendário do navegador, avisa na hora e limpa o campo — assim
+        // o formulário nunca é enviado com um dia inválido.
+        function validarDataAgendamento() {
+            const campo = document.getElementById("pub-data");
             const avisoDia = document.getElementById("pub-aviso-dia");
-            if (this.value && !ehDiaPermitido(this.value)) {
+            if (campo.value && !ehDiaPermitido(campo.value)) {
                 avisoDia.style.display = "block";
-                this.value = "";
+                campo.value = "";
                 document.getElementById("pub-horarios-ocupados").style.display = "none";
                 document.getElementById("pub-aviso-conflito").style.display = "none";
                 horariosOcupadosCache = [];
-                return;
+                return false;
             }
             avisoDia.style.display = "none";
-            carregarHorariosOcupados();
+            return true;
+        }
+
+        document.getElementById("pub-data").addEventListener("input", validarDataAgendamento);
+        document.getElementById("pub-data").addEventListener("change", function () {
+            if (validarDataAgendamento()) carregarHorariosOcupados();
         });
         document.getElementById("pub-hora").addEventListener("change", verificarConflitoHorario);
 
@@ -434,7 +444,7 @@
             if(!ehDiaPermitido(data)) {
                 document.getElementById("pub-aviso-dia").style.display = "block";
                 document.getElementById("pub-data").value = "";
-                alert("As aulas experimentais são só às segundas, quartas e sextas, sempre às 19:20. Escolha uma dessas datas, por favor.");
+                alert("Turmas experimentais disponíveis apenas às segundas, quartas e sextas. Escolha uma dessas datas, por favor.");
                 return;
             }
 
