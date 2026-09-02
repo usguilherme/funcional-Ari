@@ -158,7 +158,7 @@
             'id-cliente-edicao', 'novo-cli-nome', 'novo-cli-sexo', 'novo-cli-idade',
             'novo-cli-tel', 'novo-cli-email', 'novo-cli-objetivo', 'novo-cli-frequencia',
             'novo-cli-tempo', 'novo-cli-inicio', 'novo-cli-vencimento', 'novo-cli-nasc', 'novo-cli-foto',
-            'novo-cli-drive'
+            'novo-cli-drive', 'novo-cli-codigo'
         ];
 
         // 3. Limpa os campos de forma SEGURA (se o campo não existir, ele ignora e não trava)
@@ -216,6 +216,7 @@
         preencherCampo("novo-cli-inicio", c.inicio);
         preencherCampo("novo-cli-vencimento", c.vencimento);
         preencherCampo("novo-cli-drive", c.linkDrive);
+        preencherCampo("novo-cli-codigo", c.codigoCliente);
 
         preencherCampo("novo-cli-nasc", c.dataNasc);
 
@@ -247,6 +248,11 @@
         // Captura o link do Google Drive para avaliações
         const linkDrive = document.getElementById("novo-cli-drive")?.value.trim() || "";
 
+        // Código do Cliente (opcional) — monta o link de evolução na Área do Aluno.
+        // Só letras, números, espaço, ponto, hífen e underline (bate com database.rules.json).
+        const codigoCliente = (document.getElementById("novo-cli-codigo")?.value || "")
+            .trim().slice(0, 40).replace(/[^A-Za-z0-9 ._-]/g, "");
+
         // AUTOMATIZAÇÃO DO VENCIMENTO: Pega o dia exato da data de início escolhida
         let vencimento = document.getElementById("novo-cli-vencimento")?.value;
         if (!vencimento && inicio) {
@@ -272,7 +278,8 @@
             if (editando) {
                 const updates = {
                     nome, sexo, idade, telefone: tel, email, dataNasc,
-                    objetivo, frequencia, tempoTreino, inicio, vencimento, linkDrive
+                    objetivo, frequencia, tempoTreino, inicio, vencimento, linkDrive,
+                    codigoCliente
                 };
                 if (fotoUrl) updates.foto = fotoUrl;
                 await db.ref(`clientes/${idClienteEdicao}`).update(updates);
@@ -282,6 +289,7 @@
                 await db.ref(`clientes/${id}`).set({
                     id, nome, sexo, idade, telefone: tel, email, dataNasc,
                     objetivo, frequencia, tempoTreino, inicio, vencimento, linkDrive,
+                    codigoCliente,
                     dataCadastro: new Date().toISOString(),
                     pontos: 0,
                     statusMensalidade: 'atrasado',
@@ -295,7 +303,7 @@
 
             ["novo-cli-nome","novo-cli-sexo","novo-cli-idade","novo-cli-tel","novo-cli-email",
              "novo-cli-objetivo","novo-cli-frequencia","novo-cli-tempo","novo-cli-inicio",
-             "novo-cli-nasc","novo-cli-drive","novo-cli-vencimento"].forEach(campo => {
+             "novo-cli-nasc","novo-cli-drive","novo-cli-codigo","novo-cli-vencimento"].forEach(campo => {
                 const el = document.getElementById(campo);
                 if (el) el.value = "";
             });

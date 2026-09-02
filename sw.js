@@ -5,7 +5,7 @@
 // nova da rede. Chamadas ao Firebase/APIs passam direto pela rede, sem cache.
 // O próprio sw.js nunca é servido do cache, para não travar futuras atualizações.
 
-const VERSAO = 'v23';
+const VERSAO = 'v24';
 const CACHE_NOME = `funcionaldoari-${VERSAO}`;
 
 const ASSETS = [
@@ -29,6 +29,7 @@ const ASSETS = [
   './js/14-cobrancas-mensalidades.js',
   './js/15-atualizacao-avaliacoes.js',
   './js/16-leads.js',
+  './js/17-turmas.js',
   './pages/dashboard.html',
   './pages/agenda.html',
   './pages/novo_atendimento.html',

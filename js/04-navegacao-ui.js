@@ -74,6 +74,7 @@
         if (idAba === 'agenda') {
             if (typeof renderAgendamentosPublicos === 'function') renderAgendamentosPublicos();
             if (typeof renderAgenda === 'function') renderAgenda();
+            if (typeof renderTurmasLotadas === 'function') renderTurmasLotadas();
         }
         if (idAba === 'leads' && typeof renderLeadsEspera === 'function') {
             renderLeadsEspera();

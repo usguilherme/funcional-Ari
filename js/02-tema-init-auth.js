@@ -326,6 +326,13 @@
             leadsEspera = val ? Object.entries(val).map(([id, v]) => ({ id, ...v })) : [];
             if (typeof renderLeadsEspera === 'function') renderLeadsEspera();
         });
+
+        // NOVO: LOTAÇÃO DAS TURMAS (dias marcados como cheios pelo admin).
+        // Consumido pela página pública de agendamento para redirecionar à fila.
+        db.ref('turmas_lotadas').on('value', snap => {
+            turmasLotadas = snap.val() || {};
+            if (typeof renderTurmasLotadas === 'function') renderTurmasLotadas();
+        });
         
         db.ref('servicos').on('value', snap => {
             store.servicos = snap.val() ? Object.values(snap.val()) : [];

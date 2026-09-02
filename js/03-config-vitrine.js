@@ -5,16 +5,26 @@
         document.getElementById("cfg-nome-pix").value = configSistema.nomePix || "";
         document.getElementById("cfg-cidade-pix").value = configSistema.cidadePix || "";
         document.getElementById("cfg-meta-mensal").value = configSistema.metaMensal || "";
-        
+        const campoEvo = document.getElementById("cfg-evolucao-base");
+        if (campoEvo) campoEvo.value = configSistema.evolucaoBaseUrl || "";
+
         document.getElementById("modal-config").style.display = 'flex';
     }
 
     function salvarConfiguracoes() {
+        // URL base da evolução: normaliza (só http/https, sem espaços). Vazio =
+        // volta para o padrão no servidor (api/consulta-aluno.js).
+        let evolucaoBaseUrl = (document.getElementById("cfg-evolucao-base")?.value || "").trim();
+        if (evolucaoBaseUrl && !/^https?:\/\//i.test(evolucaoBaseUrl)) {
+            evolucaoBaseUrl = "https://" + evolucaoBaseUrl.replace(/^\/+/, "");
+        }
+
         const novaConfig = {
             chavePix: document.getElementById("cfg-chave-pix").value,
             nomePix: document.getElementById("cfg-nome-pix").value,
             cidadePix: document.getElementById("cfg-cidade-pix").value,
-            metaMensal: parseFloat(document.getElementById("cfg-meta-mensal").value) || 0
+            metaMensal: parseFloat(document.getElementById("cfg-meta-mensal").value) || 0,
+            evolucaoBaseUrl: evolucaoBaseUrl
         };
 
         db.ref('config').set(novaConfig)

@@ -281,11 +281,9 @@
         .list-item .tx strong { display: block; font-size: 14px; }
         .list-item .tx span { font-size: 12px; color: var(--text-muted); }
 
-        /* galeria */
-        .galeria { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .galeria figure { border-radius: 14px; overflow: hidden; border: 1px solid var(--ring); background: var(--bg-deep); position: relative; }
-        .galeria img { width: 100%; height: 150px; object-fit: cover; }
-        .galeria figcaption { padding: 8px 10px; font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; gap: 6px; }
+        /* painel de evolução (iframe dinâmico por código do cliente) */
+        .evo-frame-wrap { border-radius: 14px; overflow: hidden; border: 1px solid var(--ring); background: var(--bg-deep); }
+        .evo-frame { display: block; width: 100%; height: 460px; border: 0; background: #fff; }
 
         /* timeline */
         .timeline { position: relative; padding-left: 22px; }
@@ -1165,19 +1163,25 @@
                      '</div>';
             }
 
-            // galeria
-            h += '<div class="card"><h3><i data-lucide="images"></i> Fotos de evolução</h3>';
-            if (ALUNO.galeria && ALUNO.galeria.length) {
-                h += '<div class="galeria">';
-                ALUNO.galeria.slice().reverse().forEach(function (f) {
-                    h += '<figure onclick="window.open(\'' + attr(encodeURI(f.img)) + '\',\'_blank\')">' +
-                            '<img src="' + attr(encodeURI(f.img)) + '" alt="" loading="lazy">' +
-                            '<figcaption><span>' + esc(f.desc || 'Foto') + '</span><span>' + esc(f.data || '') + '</span></figcaption>' +
-                         '</figure>';
-                });
-                h += '</div>';
+            // ===== Painel de evolução (link dinâmico pelo Código do Cliente) =====
+            // Substitui o antigo módulo de "Fotos de evolução". O link é montado
+            // no servidor (api/consulta-aluno.js): URL base + código do cliente.
+            h += '<div class="card"><h3><i data-lucide="trending-up"></i> Meu acompanhamento de evolução</h3>';
+            if (ALUNO.evolucaoUrl) {
+                h += '<p class="muted" style="margin-bottom:12px">Seu histórico de evolução, atualizado pelo professor.</p>';
+                h += '<a class="btn btn-primary btn-block" style="margin-bottom:12px" target="_blank" rel="noopener" href="' + attr(ALUNO.evolucaoUrl) + '">' +
+                        '<i data-lucide="external-link"></i> Abrir minha evolução</a>';
+                h += '<div class="evo-frame-wrap">' +
+                        '<iframe class="evo-frame" src="' + attr(ALUNO.evolucaoUrl) + '" title="Minha evolução" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>' +
+                     '</div>';
+                h += '<p class="dim" style="margin-top:8px">Se o quadro acima não abrir aqui, use o botão para ver em uma nova aba.</p>';
             } else {
-                h += '<div class="empty"><i data-lucide="camera-off"></i><p>Nenhuma foto ainda. Peça ao professor para registrar seu "antes" na próxima aula — é assim que a evolução fica visível!</p></div>';
+                h += '<div class="empty"><i data-lucide="loader"></i>' +
+                        '<p>Sua evolução está sendo processada. Assim que o professor liberar seu acompanhamento, ele aparece aqui. 💪</p>';
+                if (zap) {
+                    h += '<a class="btn btn-outline btn-block" style="margin-top:12px" target="_blank" href="' + wa(zap, 'Oi! Queria acompanhar minha evolução pela Área do Aluno.') + '"><i data-lucide="message-circle"></i> Falar com o professor</a>';
+                }
+                h += '</div>';
             }
             h += '</div>';
 
@@ -1362,7 +1366,7 @@
                 { on: pontos >= 50, e: '⭐', t: 'Pontuador', d: '50+ pontos' },
                 { on: pontos >= 200, e: '🌟', t: 'Pontuador Pro', d: '200+ pontos' },
                 { on: pontos >= 500, e: '💫', t: 'Colecionador', d: '500+ pontos' },
-                { on: !!ALUNO.galeria && ALUNO.galeria.length >= 1, e: '📸', t: 'Antes e depois', d: 'Tem foto de evolução' },
+                { on: !!ALUNO.evolucaoUrl, e: '📈', t: 'Evolução ativa', d: 'Acompanhamento de evolução liberado' },
                 { on: streak >= 3, e: '🔥', t: 'Pegando fogo', d: '3 dias seguidos' },
                 { on: streak >= 7, e: '🚀', t: 'Imparável', d: '7 dias seguidos' },
                 { on: semana >= 3, e: '💪', t: 'Semana cheia', d: '3 treinos numa semana' },

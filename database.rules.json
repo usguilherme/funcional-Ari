@@ -14,6 +14,9 @@
       "$clienteId": {
         "statusMensalidade": {
           ".read": true
+        },
+        "codigoCliente": {
+          ".validate": "newData.val() == null || (newData.isString() && newData.val().length <= 40 && newData.val().matches(/^[A-Za-z0-9 ._-]*$/))"
         }
       }
     },
@@ -100,6 +103,15 @@
         "criadoEm": { ".validate": "newData.isNumber()" },
         "status": { ".validate": "newData.isString()" },
         "confirmadoEm": { ".validate": "newData.isNumber()" }
+      }
+    },
+
+    "turmas_lotadas": {
+      ".read": true,
+      ".write": "auth != null",
+      "atualizadoEm": { ".validate": "newData.isNumber()" },
+      "$dia": {
+        ".validate": "newData.isBoolean() || newData.isNumber() || newData.val() == null"
       }
     },
 

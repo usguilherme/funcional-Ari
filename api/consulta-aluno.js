@@ -97,11 +97,12 @@ export default async function handler(req, res) {
 
   try {
     const db = getAdminDb();
-    const [snapClientes, snapServicos, snapAtend, snapConfig] = await Promise.all([
+    const [snapClientes, snapServicos, snapAtend, snapConfig, snapSistema] = await Promise.all([
       db.ref('clientes').once('value'),
       db.ref('servicos').once('value'),
       db.ref('atendimentos').once('value'),
-      db.ref('landingConfig').once('value')
+      db.ref('landingConfig').once('value'),
+      db.ref('config').once('value')
     ]);
 
     const clientes = snapClientes.val() || {};
@@ -147,6 +148,17 @@ export default async function handler(req, res) {
       }));
 
     const cfg = snapConfig.val() || {};
+    const cfgSistema = snapSistema.val() || {};
+
+    // Link de evolução do aluno: URL base (configurável no painel) + código do
+    // cliente. Sem código cadastrado, a Área do Aluno mostra um aviso amigável.
+    const BASE_EVOLUCAO_PADRAO = 'https://funcionaldoari.com.br/';
+    let baseEvolucao = typeof cfgSistema.evolucaoBaseUrl === 'string' ? cfgSistema.evolucaoBaseUrl.trim() : '';
+    if (!/^https?:\/\//i.test(baseEvolucao)) baseEvolucao = BASE_EVOLUCAO_PADRAO;
+    const codigoCliente = typeof aluno.codigoCliente === 'string' ? aluno.codigoCliente.trim() : '';
+    const evolucaoUrl = codigoCliente
+      ? baseEvolucao.replace(/\/+$/, '') + '/' + encodeURIComponent(codigoCliente)
+      : '';
 
     return res.status(200).json({
       // --- identificação / perfil ---
@@ -174,6 +186,8 @@ export default async function handler(req, res) {
       pontos: Number(aluno.pontos) || 0,
       streak: Number(aluno.streak) || 0,
       linkDrive: typeof aluno.linkDrive === 'string' ? aluno.linkDrive.trim() : '',
+      codigoCliente,
+      evolucaoUrl,
       galeria,
       historico,
       atendimentos,

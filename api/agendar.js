@@ -92,6 +92,17 @@ export default async function handler(req, res) {
     const db = getAdminDb();
     const chaveHora = hora.replace(':', '-');
 
+    // Dia marcado como lotado pelo admin (nó `turmas_lotadas`, chave = dia da
+    // semana). Fonte da verdade — o front redireciona para a fila de espera.
+    const diaSemana = new Date(data + 'T00:00:00Z').getUTCDay();
+    const snapLotado = await db.ref(`turmas_lotadas/${diaSemana}`).once('value');
+    if (snapLotado.val() === true) {
+      return res.status(409).json({
+        erro: 'A turma desse dia está lotada. Entre na fila de espera.',
+        lotado: true
+      });
+    }
+
     if (profissionalId) {
       const snap = await db.ref(`disponibilidade/${data}/${profissionalId}/${chaveHora}`).once('value');
       if (snap.exists()) {

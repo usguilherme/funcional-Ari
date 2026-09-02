@@ -590,6 +590,12 @@
                 </div>
 
                 <div class="form-group mt-10" style="margin-bottom: 20px;">
+                    <label class="label-small" style="color: var(--primary);" for="novo-cli-codigo"><i data-lucide="qr-code"></i> Código do Cliente (evolução) — opcional</label>
+                    <input type="text" id="novo-cli-codigo" class="modern-input" placeholder="Ex: THA010" maxlength="40" autocapitalize="characters" autocomplete="off">
+                    <small class="label-small" style="color: var(--text-muted); text-transform: none; letter-spacing: 0; margin-top: 4px;">Vira o link de evolução do aluno na Área do Aluno.</small>
+                </div>
+
+                <div class="form-group mt-10" style="margin-bottom: 20px;">
                     <label class="label-small" for="novo-cli-foto">Foto do Aluno (opcional)</label>
                     <input type="file" id="novo-cli-foto" accept="image/*" class="modern-input">
                 </div>
@@ -616,6 +622,13 @@
 
                 <label class="label-small" for="cfg-cidade-pix">Cidade do Beneficiário</label>
                 <input type="text" id="cfg-cidade-pix" class="modern-input" placeholder="Ex: Campina Grande">
+
+                <div class="divider"></div>
+
+                <h4 style="color: var(--primary); margin-bottom: 10px;">Evolução do Aluno</h4>
+                <label class="label-small" for="cfg-evolucao-base">URL base do link de evolução</label>
+                <input type="url" id="cfg-evolucao-base" class="modern-input" placeholder="https://funcionaldoari.com.br/">
+                <small class="label-small" style="color: var(--text-muted); text-transform: none; letter-spacing: 0;">O link do aluno vira esta URL + o Código do Cliente. Padrão: https://funcionaldoari.com.br/</small>
 
                 <div class="divider"></div>
 
@@ -726,5 +739,6 @@
     <script src="js/14-cobrancas-mensalidades.js"></script>
     <script src="js/15-atualizacao-avaliacoes.js"></script>
     <script src="js/16-leads.js"></script>
+    <script src="js/17-turmas.js"></script>
 </body>
 </html>

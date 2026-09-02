@@ -199,6 +199,12 @@
         #pub-horarios-ocupados { color: var(--text-muted); background: rgba(255,255,255,0.03); border: 1px solid var(--ring); }
         #pub-aviso-conflito { color: #fca5a5; background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.25); }
         #pub-aviso-dia { color: #fcd34d; background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.28); }
+        #pub-aviso-lotado { color: #fca5a5; background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.3); }
+        #pub-aviso-lotado button {
+            margin-top: 10px; width: 100%; padding: 11px 16px; border-radius: 40px; cursor: pointer;
+            background: var(--ember); color: #fff; border: none; font-family: var(--font-body);
+            font-weight: 700; font-size: 13px;
+        }
 
         .hint-fixo { font-size: 11px; color: var(--text-dim); margin-left: 4px; display: inline-flex; align-items: center; gap: 5px; }
         .hint-fixo i { width: 12px; height: 12px; color: var(--gold); }
@@ -314,6 +320,10 @@
                 <div id="pub-aviso-dia" class="aviso-caixa">
                     📅 Escolha uma data que caia numa <strong>segunda, quarta ou sexta-feira</strong> — são os únicos dias com turma experimental.
                 </div>
+                <div id="pub-aviso-lotado" class="aviso-caixa">
+                    🚫 <strong>Turma lotada nesse dia.</strong> Mas calma — entre na fila de espera e a gente te chama assim que abrir uma vaga.
+                    <button type="button" onclick="preencherFilaComDadosAgendamento(); mostrarFilaEspera();"><i data-lucide="bell-plus"></i> Entrar na fila de espera</button>
+                </div>
                 <div id="pub-horarios-ocupados" class="aviso-caixa"></div>
                 <div id="pub-aviso-conflito" class="aviso-caixa">
                     ⚠️ Esse horário já está ocupado com esse instrutor. Escolha outro, por favor.
@@ -387,6 +397,37 @@
             // dia da semana exato (0=Dom, 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex, 6=Sáb)
             const dia = new Date(dataStr + "T00:00:00Z").getUTCDay();
             return DIAS_PERMITIDOS.includes(dia);
+        }
+
+        // ===== LOTAÇÃO DAS TURMAS (marcada pelo admin no painel) =====
+        // Nó público `turmas_lotadas`: { "1": bool, "3": bool, "5": bool }.
+        // Chave = dia da semana. Se o dia escolhido estiver lotado, o visitante
+        // é levado para a Fila de Espera em vez de agendar.
+        let turmasLotadasPub = {};
+        db.ref('turmas_lotadas').once('value').then(snap => {
+            turmasLotadasPub = snap.val() || {};
+            // Revalida caso o usuário já tenha escolhido uma data antes do carregamento.
+            if (document.getElementById("pub-data").value) atualizarAvisoLotacao();
+        }).catch(err => console.error("Erro ao carregar lotação das turmas:", err));
+
+        function turmaLotadaNoDia(dataStr) {
+            if (!dataStr || !/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) return false;
+            const dia = new Date(dataStr + "T00:00:00Z").getUTCDay();
+            return turmasLotadasPub[String(dia)] === true;
+        }
+
+        function atualizarAvisoLotacao() {
+            const data = document.getElementById("pub-data").value;
+            const aviso = document.getElementById("pub-aviso-lotado");
+            const lotado = data && ehDiaPermitido(data) && turmaLotadaNoDia(data);
+            aviso.style.display = lotado ? "block" : "none";
+            const btn = document.querySelector("#agendar-form-principal .btn-glow");
+            if (btn) {
+                btn.style.opacity = lotado ? "0.5" : "1";
+                btn.style.pointerEvents = lotado ? "none" : "auto";
+            }
+            if (lotado && window.lucide) lucide.createIcons();
+            return lotado;
         }
 
         // Não deixa escolher datas passadas
@@ -475,6 +516,7 @@
                 campo.value = "";
                 document.getElementById("pub-horarios-ocupados").style.display = "none";
                 document.getElementById("pub-aviso-conflito").style.display = "none";
+                document.getElementById("pub-aviso-lotado").style.display = "none";
                 horariosOcupadosCache = [];
                 if (comAlerta) alert(MSG_DIA_INVALIDO);
                 return false;
@@ -484,10 +526,13 @@
         }
 
         document.getElementById("pub-data").addEventListener("input", function () {
-            validarDataAgendamento(true);
+            if (validarDataAgendamento(true)) atualizarAvisoLotacao();
         });
         document.getElementById("pub-data").addEventListener("change", function () {
-            if (validarDataAgendamento(true)) carregarHorariosOcupados();
+            if (validarDataAgendamento(true)) {
+                atualizarAvisoLotacao();
+                carregarHorariosOcupados();
+            }
         });
         document.getElementById("pub-hora").addEventListener("change", verificarConflitoHorario);
 
@@ -512,6 +557,15 @@
                 document.getElementById("pub-aviso-dia").style.display = "block";
                 document.getElementById("pub-data").value = "";
                 alert(MSG_DIA_INVALIDO);
+                return;
+            }
+
+            // Dia marcado como lotado pelo admin: manda direto para a fila de espera.
+            if(turmaLotadaNoDia(data)) {
+                atualizarAvisoLotacao();
+                preencherFilaComDadosAgendamento();
+                alert("🚫 A turma desse dia já está lotada! Vamos te colocar na fila de espera — assim que abrir vaga, a gente te chama no WhatsApp.");
+                mostrarFilaEspera();
                 return;
             }
 
@@ -549,6 +603,15 @@
                 .then(async (resp) => {
                     const dados = await resp.json().catch(() => ({}));
                     if (!resp.ok) {
+                        // O servidor também barra dia lotado (fonte da verdade):
+                        // nesse caso, redireciona para a fila de espera.
+                        if (dados && dados.lotado) {
+                            preencherFilaComDadosAgendamento();
+                            alert(dados.erro || "Turma lotada nesse dia. Vamos te colocar na fila de espera.");
+                            mostrarFilaEspera();
+                            restaurarBtn();
+                            return;
+                        }
                         alert(dados.erro || "Erro ao realizar o agendamento. Tente novamente.");
                         restaurarBtn();
                         return;
@@ -575,6 +638,14 @@
         }
 
         // ===== FILA DE ESPERA (captura de lead) =====
+        // Aproveita o que a pessoa já digitou no formulário de agendamento.
+        function preencherFilaComDadosAgendamento() {
+            const nome = (document.getElementById("pub-nome").value || "").trim();
+            const tel = (document.getElementById("pub-tel").value || "").trim();
+            if (nome && !document.getElementById("fila-nome").value) document.getElementById("fila-nome").value = nome;
+            if (tel && !document.getElementById("fila-tel").value) document.getElementById("fila-tel").value = tel;
+        }
+
         function mostrarFilaEspera() {
             document.getElementById("agendar-form-principal").style.display = "none";
             document.getElementById("agendar-fila-espera").style.display = "block";
@@ -583,6 +654,7 @@
         function voltarAgendamento() {
             document.getElementById("agendar-fila-espera").style.display = "none";
             document.getElementById("agendar-form-principal").style.display = "block";
+            if (document.getElementById("pub-data").value) atualizarAvisoLotacao();
             if (window.lucide) lucide.createIcons();
         }
         function entrarNaFilaEspera() {
